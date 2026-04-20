@@ -1,5 +1,6 @@
 using bdt_evm_app.Data;
 using bdt_evm_app.Middleware;
+using bdt_evm_app.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +13,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-var app = builder.Build();
+builder.Services.AddScoped<ClockifyService>();
 
+var app = builder.Build();
 var publicRoutes = new[] { "/api/auth/login" };
 
 app.UseHttpsRedirection();

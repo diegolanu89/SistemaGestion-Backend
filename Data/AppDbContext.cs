@@ -12,4 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<PersonalAccessToken> PersonalAccessTokens { get; set; }
     public DbSet<ClockifyClient> ClockifyClients { get; set; }
     public DbSet<PotencialClient> PotencialClients { get; set; }
+    public DbSet<ClockifyUser> ClockifyUsers { get; set; }
+    public DbSet<ClockifyTimeEntry> ClockifyTimeEntries { get; set; }
+    public DbSet<ClockifyProject> ClockifyProjects { get; set; }
 }
