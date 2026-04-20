@@ -14,9 +14,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+var publicRoutes = new[] { "/api/auth/login" };
+
 app.UseHttpsRedirection();
 app.UseWhen(
-    context => context.Request.Path.StartsWithSegments("/api/app"),
+    context => !publicRoutes.Any(route =>
+        context.Request.Path.StartsWithSegments(route)),
     appBuilder => appBuilder.UseMiddleware<SanctumAuthMiddleware>()
 );
 app.MapControllers();
