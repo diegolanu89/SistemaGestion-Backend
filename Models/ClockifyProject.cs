@@ -40,4 +40,6 @@ public class ClockifyProject
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
     public ClockifyClient? Client { get; set; }
+    public ClockifyProjectFilter? Filter { get; set; }
+    public List<ChangeRequest> ChangeRequests { get; set; } = new();
 }

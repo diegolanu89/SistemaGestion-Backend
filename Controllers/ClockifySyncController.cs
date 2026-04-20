@@ -544,6 +544,199 @@ public class ClockifySyncController : ControllerBase
         }
     }
 
+    // GET api/clockify/projects/{id}/sync-status
+    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-status
+    // a /api/clockify/projects/{id}/sync-status para mantener consistencia con el resto
+    // de endpoints de Clockify. Requiere actualizar el frontend React.
+    [HttpGet("projects/{id}/sync-status")]
+    public async Task<IActionResult> GetSyncStatus(ulong id)
+    {
+        try
+        {
+            var project = await _db.ClockifyProjects.FindAsync(id);
+            if (project == null)
+                return NotFound(new { message = "Proyecto no encontrado" });
+
+            if (string.IsNullOrEmpty(project.ClockifyProjectId))
+                return Ok(new
+                {
+                    project_id = project.Id,
+                    clockify_project_id = (string?)null,
+                    time_entries_in_db = 0,
+                    time_entries_in_clockify = (int?)null,
+                    needs_sync = false,
+                    missing_count = 0,
+                    error = "El proyecto no tiene clockify_project_id configurado"
+                });
+
+            var timeEntriesInDb = await _db.ClockifyTimeEntries
+                .CountAsync(t => t.ProjectId == project.Id);
+
+            int? timeEntriesInClockify = null;
+            try
+            {
+                var firstPage = await _clockify.GetTimeEntriesByProject(
+                    project.ClockifyProjectId.Trim(),
+                    null, null, 1, 100
+                );
+                timeEntriesInClockify = firstPage.Count == 100 ? 100 : firstPage.Count;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "No se pudo obtener time entries desde Clockify para proyecto {Id}", id);
+            }
+
+            var needsSync = timeEntriesInClockify.HasValue && timeEntriesInClockify > timeEntriesInDb;
+            var missingCount = needsSync ? Math.Max(0, timeEntriesInClockify!.Value - timeEntriesInDb) : 0;
+
+            return Ok(new
+            {
+                project_id = project.Id,
+                clockify_project_id = project.ClockifyProjectId,
+                time_entries_in_db = timeEntriesInDb,
+                time_entries_in_clockify = timeEntriesInClockify,
+                needs_sync = needsSync,
+                missing_count = missingCount
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener estado de sincronización del proyecto {Id}", id);
+            return StatusCode(500, new { error = "Error al obtener estado de sincronización", message = e.Message });
+        }
+    }
+
+    // POST api/clockify/projects/{id}/sync-time-entries
+    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-time-entries
+    // a /api/clockify/projects/{id}/sync-time-entries para mantener consistencia con el resto
+    // de endpoints de Clockify. Requiere actualizar el frontend React.
+    [HttpPost("projects/{id}/sync-time-entries")]
+    public async Task<IActionResult> SyncProjectTimeEntries(
+        ulong id,
+        [FromQuery] string mode = "all",
+        [FromQuery] string? from = null)
+    {
+        if (!new[] { "all", "missing", "from_date" }.Contains(mode))
+            return BadRequest(new { error = "Modo inválido. Debe ser: all, missing, o from_date" });
+
+        if (mode == "from_date" && string.IsNullOrEmpty(from))
+            return BadRequest(new { error = "El parámetro 'from' es requerido cuando mode='from_date'" });
+
+        var project = await _db.ClockifyProjects.FindAsync(id);
+        if (project == null)
+            return NotFound(new { message = "Proyecto no encontrado" });
+
+        if (string.IsNullOrEmpty(project.ClockifyProjectId?.Trim()))
+            return BadRequest(new { error = "El proyecto no tiene clockify_project_id configurado" });
+
+        try
+        {
+            var totalInDbBefore = await _db.ClockifyTimeEntries
+                .CountAsync(t => t.ProjectId == project.Id);
+
+            string? startIso = null, endIso = null;
+
+            if (mode == "missing")
+            {
+                var oldest = await _db.ClockifyTimeEntries
+                    .Where(t => t.ProjectId == project.Id)
+                    .OrderBy(t => t.StartTime)
+                    .FirstOrDefaultAsync();
+
+                var twoYearsAgo = DateTime.UtcNow.AddYears(-2);
+                var startDate = oldest != null
+                    ? new[] { oldest.StartTime.AddMonths(-1), twoYearsAgo }.Min()
+                    : twoYearsAgo;
+
+                startIso = startDate.ToString("yyyy-MM-ddT00:00:00Z");
+                endIso = DateTime.UtcNow.ToString("yyyy-MM-ddT23:59:59Z");
+            }
+            else if (mode == "from_date" && !string.IsNullOrEmpty(from))
+            {
+                startIso = $"{from}T00:00:00Z";
+            }
+
+            var existingIds = mode == "missing"
+                ? await _db.ClockifyTimeEntries
+                    .Where(t => t.ProjectId == project.Id)
+                    .Select(t => t.ClockifyTimeEntryId)
+                    .ToListAsync()
+                : new List<string>();
+
+            var added = 0;
+            var skipped = 0;
+            var updated = 0;
+            var page = 1;
+            var allClockifyIds = new List<string>();
+            List<System.Text.Json.JsonElement> entries;
+
+            do
+            {
+                entries = await _clockify.GetTimeEntriesByProject(
+                    project.ClockifyProjectId.Trim(),
+                    startIso, endIso, page, 100
+                );
+
+                foreach (var e in entries)
+                {
+                    if (!e.TryGetProperty("id", out var eid)) continue;
+                    var clockifyId = eid.GetString() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(clockifyId))
+                        allClockifyIds.Add(clockifyId);
+
+                    if (mode == "missing" && existingIds.Contains(clockifyId))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    var existsBefore = await _db.ClockifyTimeEntries
+                        .AnyAsync(t => t.ClockifyTimeEntryId == clockifyId);
+
+                    if (await ProcessTimeEntry(e))
+                    {
+                        if (existsBefore) updated++;
+                        else added++;
+                    }
+                    else skipped++;
+                }
+
+                page++;
+            } while (entries.Count == 100);
+
+            var deleted = 0;
+            if (mode == "all" && allClockifyIds.Any())
+            {
+                deleted = await _db.ClockifyTimeEntries
+                    .Where(t => t.ProjectId == project.Id &&
+                                !allClockifyIds.Contains(t.ClockifyTimeEntryId))
+                    .ExecuteDeleteAsync();
+            }
+
+            await _db.SaveChangesAsync();
+            var totalInDbAfter = await _db.ClockifyTimeEntries
+                .CountAsync(t => t.ProjectId == project.Id);
+
+            return Ok(new
+            {
+                message = "Sincronización completada",
+                project_id = project.Id,
+                total_in_db_before = totalInDbBefore,
+                total_in_db_after = totalInDbAfter,
+                added,
+                updated,
+                skipped,
+                deleted,
+                params_used = new { mode, startIso, endIso, clockify_project_id = project.ClockifyProjectId }
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al sincronizar time entries del proyecto {Id}", id);
+            return StatusCode(500, new { error = "Error al sincronizar time entries", message = e.Message });
+        }
+    }
+
     private string ExtractCodeFromName(string name)
     {
         if (string.IsNullOrEmpty(name)) return string.Empty;

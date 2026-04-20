@@ -15,4 +15,25 @@ public class AppDbContext : DbContext
     public DbSet<ClockifyUser> ClockifyUsers { get; set; }
     public DbSet<ClockifyTimeEntry> ClockifyTimeEntries { get; set; }
     public DbSet<ClockifyProject> ClockifyProjects { get; set; }
+    public DbSet<ClockifyProjectFilter> ClockifyProjectFilters { get; set; }
+    public DbSet<ChangeRequest> ChangeRequests { get; set; }
+    public DbSet<AppUserVisibleProject> AppUserVisibleProjects { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ClockifyProject>()
+            .HasMany(p => p.ChangeRequests)
+            .WithOne()
+            .HasForeignKey(cr => cr.ProjectId);
+
+        modelBuilder.Entity<ClockifyProject>()
+            .HasOne(p => p.Filter)
+            .WithOne(f => f.Project)
+            .HasForeignKey<ClockifyProjectFilter>(f => f.ProjectId);
+
+        modelBuilder.Entity<ClockifyProject>()
+            .HasOne(p => p.Client)
+            .WithMany()
+            .HasForeignKey(p => p.ClientId);
+    }
 }
