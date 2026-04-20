@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
     public DbSet<ClockifyProjectFilter> ClockifyProjectFilters { get; set; }
     public DbSet<ChangeRequest> ChangeRequests { get; set; }
     public DbSet<AppUserVisibleProject> AppUserVisibleProjects { get; set; }
+    public DbSet<EtcSnapshot> EtcSnapshots { get; set; }
+    public DbSet<EtcRecord> EtcRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
