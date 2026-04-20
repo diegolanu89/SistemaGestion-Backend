@@ -27,4 +27,5 @@ public class User
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+    public Profile? Profile { get; set; }
 }
