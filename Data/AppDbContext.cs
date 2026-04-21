@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<AppUserVisibleProject> AppUserVisibleProjects { get; set; }
     public DbSet<EtcSnapshot> EtcSnapshots { get; set; }
     public DbSet<EtcRecord> EtcRecords { get; set; }
+    public DbSet<UserLeader> UserLeaders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,5 +38,17 @@ public class AppDbContext : DbContext
             .HasOne(p => p.Client)
             .WithMany()
             .HasForeignKey(p => p.ClientId);
+
+        modelBuilder.Entity<UserLeader>()
+            .HasOne(ul => ul.User)
+            .WithMany()
+            .HasForeignKey(ul => ul.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<UserLeader>()
+            .HasOne(ul => ul.Leader)
+            .WithMany()
+            .HasForeignKey(ul => ul.LeaderId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
