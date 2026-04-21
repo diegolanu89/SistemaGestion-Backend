@@ -18,7 +18,7 @@ builder.Services.AddScoped<ProjectBacService>();
 builder.Services.AddScoped<ProjectMetricsService>();
 
 var app = builder.Build();
-var publicRoutes = new[] { "/api/auth/login" };
+var publicRoutes = new[] { "/api/auth/login", "/api/health", "/api/log-action" };
 
 app.UseHttpsRedirection();
 app.UseWhen(
