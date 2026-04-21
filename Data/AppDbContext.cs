@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<EtcSnapshot> EtcSnapshots { get; set; }
     public DbSet<EtcRecord> EtcRecords { get; set; }
     public DbSet<UserLeader> UserLeaders { get; set; }
+    public DbSet<WorkingDaysCalendar> WorkingDaysCalendars { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
