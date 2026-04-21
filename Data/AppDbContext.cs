@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<UserVacationPeriod> UserVacationPeriods { get; set; }
     public DbSet<PotencialProject> PotencialProjects { get; set; }
     public DbSet<PotencialProjectAllocation> PotencialProjectAllocations { get; set; }
+    public DbSet<UserDashboardFilter> UserDashboardFilters { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
