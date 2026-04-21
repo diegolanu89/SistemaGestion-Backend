@@ -1,4 +1,4 @@
-﻿namespace bdt_evm_app.DTOs;
+namespace bdt_evm_app.DTOs;
 
 public class ProjectDto
 {
@@ -21,4 +21,11 @@ public class ProjectDto
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public object? Filter { get; set; }
+}
+
+public class UpdateBacDto
+{
+    public decimal? BacBaseHours { get; set; }
+    public decimal? BacBaseCost { get; set; }
+    public string? EtcCalculationMode { get; set; }
 }

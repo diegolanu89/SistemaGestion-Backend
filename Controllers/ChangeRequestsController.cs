@@ -57,6 +57,11 @@ public class ChangeRequestsController : ControllerBase
         if (!validStatuses.Contains(dto.Status))
             return UnprocessableEntity(new { message = "Estado inválido" });
 
+        var codeExists = await _db.ChangeRequests
+            .AnyAsync(cr => cr.ProjectId == projectId && cr.Code == dto.Code);
+        if (codeExists)
+            return UnprocessableEntity(new { message = $"Ya existe un control de cambio con el código '{dto.Code}' en este proyecto" });
+
         var cr = new ChangeRequest
         {
             ProjectId = projectId,

@@ -1,4 +1,4 @@
-﻿namespace bdt_evm_app.DTOs;
+namespace bdt_evm_app.DTOs;
 
 public class ProjectFilterDto
 {
@@ -7,4 +7,9 @@ public class ProjectFilterDto
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public ProjectDto? Project { get; set; }
+}
+
+public class CreateProjectFilterDto
+{
+    public List<ulong> ProjectIds { get; set; } = new();
 }

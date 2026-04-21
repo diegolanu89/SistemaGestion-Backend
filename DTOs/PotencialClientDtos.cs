@@ -1,4 +1,4 @@
-﻿namespace bdt_evm_app.DTOs;
+namespace bdt_evm_app.DTOs;
 
 public class PotencialClientDto
 {
@@ -6,4 +6,9 @@ public class PotencialClientDto
     public string Name { get; set; } = string.Empty;
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+}
+
+public class PotencialClientRequestDto
+{
+    public string Name { get; set; } = string.Empty;
 }
