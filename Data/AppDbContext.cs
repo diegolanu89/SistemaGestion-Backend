@@ -24,6 +24,8 @@ public class AppDbContext : DbContext
     public DbSet<WorkingDaysCalendar> WorkingDaysCalendars { get; set; }
     public DbSet<UserMonthlyCapacity> UserMonthlyCapacities { get; set; }
     public DbSet<UserVacationPeriod> UserVacationPeriods { get; set; }
+    public DbSet<PotencialProject> PotencialProjects { get; set; }
+    public DbSet<PotencialProjectAllocation> PotencialProjectAllocations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,5 +55,20 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(ul => ul.LeaderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PotencialProject>()
+            .HasOne(p => p.PotencialClient)
+            .WithMany()
+            .HasForeignKey(p => p.PotencialClientId);
+
+        modelBuilder.Entity<PotencialProject>()
+            .HasMany(p => p.Allocations)
+            .WithOne()
+            .HasForeignKey(a => a.PotencialProjectId);
+
+        modelBuilder.Entity<PotencialProjectAllocation>()
+            .HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
     }
 }
