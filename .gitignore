@@ -57,11 +57,10 @@ wwwroot/lib/
 appsettings.*.json
 !appsettings.Development.json
 .env
-.env.*
 secrets.json
 
 ## Docker
-.dockerignore
+# .dockerignore se commitea — define qué excluir de la imagen
 
 ## OS
 .DS_Store

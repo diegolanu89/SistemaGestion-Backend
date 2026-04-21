@@ -1,0 +1,30 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio
+**/.vs/
+**/*.user
+**/*.suo
+
+# Secrets y entorno — nunca van a la imagen
+.env
+.env.*
+secrets.json
+appsettings.Development.json
+
+# Git
+.git/
+.gitignore
+
+# Docker (no necesario dentro de la imagen)
+**/docker-compose*
+Dockerfile*
+
+# Logs
+Logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

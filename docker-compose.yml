@@ -1,0 +1,32 @@
+# ============================================================
+# Solo levanta el backend .NET
+# MySQL sigue corriendo en el host del proyecto original
+# ============================================================
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bdt_dotnet
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-7100}:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__Default: ${DB_CONNECTION_STRING}
+      Clockify__ApiKey: ${CLOCKIFY_API_KEY}
+      Clockify__WorkspaceId: ${CLOCKIFY_WORKSPACE_ID}
+      Clockify__UserId: ${CLOCKIFY_USER_ID}
+    # Permite que el contenedor alcance el MySQL del host
+    # En Windows y Mac con Docker Desktop funciona automáticamente
+    # En Linux nativo se necesita esta línea extra
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
