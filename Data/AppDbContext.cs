@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<EtcRecord> EtcRecords { get; set; }
     public DbSet<UserLeader> UserLeaders { get; set; }
     public DbSet<WorkingDaysCalendar> WorkingDaysCalendars { get; set; }
+    public DbSet<UserMonthlyCapacity> UserMonthlyCapacities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
