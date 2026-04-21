@@ -23,6 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<UserLeader> UserLeaders { get; set; }
     public DbSet<WorkingDaysCalendar> WorkingDaysCalendars { get; set; }
     public DbSet<UserMonthlyCapacity> UserMonthlyCapacities { get; set; }
+    public DbSet<UserVacationPeriod> UserVacationPeriods { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
