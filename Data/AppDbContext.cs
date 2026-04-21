@@ -71,5 +71,11 @@ public class AppDbContext : DbContext
             .HasOne(a => a.User)
             .WithMany()
             .HasForeignKey(a => a.UserId);
+
+        modelBuilder.Entity<AppUserVisibleProject>()
+            .HasOne(v => v.Project)
+            .WithMany()
+            .HasForeignKey(v => v.ProjectId)
+            .HasPrincipalKey(p => p.Id);
     }
 }
