@@ -21,3 +21,27 @@ public class LoginResponseDto
     public string Token { get; set; } = string.Empty;
     public AuthUserDto User { get; set; } = new();
 }
+
+public class AuthProfileDto
+{
+    public ulong Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class AuthUserWithProfileDto
+{
+    public ulong Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public bool Active { get; set; }
+    public AuthProfileDto Profile { get; set; } = new();
+    public IReadOnlyList<string> Permissions { get; set; } = Array.Empty<string>();
+}
+
+public class LoginWithProfileResponseDto
+{
+    public string Token { get; set; } = string.Empty;
+    public AuthUserWithProfileDto User { get; set; } = new();
+}
