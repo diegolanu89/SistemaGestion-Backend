@@ -27,6 +27,10 @@ public class AppDbContext : DbContext
     public DbSet<PotencialProject> PotencialProjects { get; set; }
     public DbSet<PotencialProjectAllocation> PotencialProjectAllocations { get; set; }
     public DbSet<UserDashboardFilter> UserDashboardFilters { get; set; }
+    public DbSet<ProjectIntakeRecord> ProjectIntakeRecords { get; set; }
+    public DbSet<ProjectIntakeTypeRef> ProjectIntakeTypeRefs { get; set; }
+    public DbSet<ProjectIntakeCategoryRef> ProjectIntakeCategoryRefs { get; set; }
+    public DbSet<ProjectIntakeStatusRef> ProjectIntakeStatusRefs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,5 +81,38 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(v => v.ProjectId)
             .HasPrincipalKey(p => p.Id);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.TypeRef)
+            .WithMany()
+            .HasForeignKey(r => r.ProjectType)
+            .HasPrincipalKey(t => t.Code)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.CategoryRef)
+            .WithMany()
+            .HasForeignKey(r => r.CategoryCode)
+            .HasPrincipalKey(c => c.Code)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.StatusRef)
+            .WithMany()
+            .HasForeignKey(r => r.ProjectStatusCode)
+            .HasPrincipalKey(s => s.Code)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.ClockifyProject)
+            .WithMany()
+            .HasForeignKey(r => r.ClockifyRecordId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.Client)
+            .WithMany()
+            .HasForeignKey(r => r.ClientId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
