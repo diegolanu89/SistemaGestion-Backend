@@ -230,6 +230,30 @@ public class ClockifyService
         }
     }
 
+    public async Task<System.Text.Json.JsonElement> CreateProjectAsync(string name, string? clientExternalId = null)
+    {
+        var body = new Dictionary<string, object> { ["name"] = name, ["isPublic"] = false };
+        if (!string.IsNullOrEmpty(clientExternalId))
+            body["clientId"] = clientExternalId;
+
+        var json = JsonSerializer.Serialize(body);
+
+        var response = await _client.PostAsync(
+            $"workspaces/{_workspaceId}/projects",
+            new StringContent(json, Encoding.UTF8, "application/json")
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Error al crear proyecto en Clockify: {Status} — {Error}", response.StatusCode, error);
+            throw new Exception($"Clockify API error {(int)response.StatusCode}: {error}");
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<JsonElement>(content);
+    }
+
     public string GetUserId() => _userId;
     public string GetWorkspaceId() => _workspaceId;
 }

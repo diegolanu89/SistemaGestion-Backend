@@ -21,6 +21,7 @@ obj/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
+docs/
 
 ## NuGet
 *.nupkg
