@@ -29,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ClockifyService>();
 builder.Services.AddScoped<ProjectBacService>();
 builder.Services.AddScoped<ProjectMetricsService>();
+builder.Services.AddScoped<ProjectIntakeService>();
 
 var app = builder.Build();
 var publicRoutes = new[] { "/api/auth/login", "/api/auth/login-with-profile", "/api/health", "/api/log-action" };

@@ -1,9 +1,29 @@
-# ============================================================
-# Solo levanta el backend .NET
-# MySQL sigue corriendo en el host del proyecto original
-# ============================================================
 
 services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: db_clockify_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: pm_clockify_evm
+      MYSQL_USER: bdt_user
+      MYSQL_PASSWORD: bdt_user
+    ports:
+      - "3306:3306"       
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "bdt_user", "-pbdt_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_network
+
   backend:
     build:
       context: .
@@ -20,14 +40,21 @@ services:
       Clockify__ApiKey: ${CLOCKIFY_API_KEY}
       Clockify__WorkspaceId: ${CLOCKIFY_WORKSPACE_ID}
       Clockify__UserId: ${CLOCKIFY_USER_ID}
-    # Permite que el contenedor alcance el MySQL del host
-    # En Windows y Mac con Docker Desktop funciona automáticamente
-    # En Linux nativo se necesita esta línea extra
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:
+    driver: bridge

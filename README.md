@@ -27,7 +27,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 ### Con Docker
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows o Mac)
-- MySQL 8.0 corriendo en el host *(Fase 1 — desarrollo en paralelo con Laravel)*
+- Nada más — MySQL corre como contenedor junto con el backend
 
 ---
 
@@ -57,7 +57,11 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 ---
 
-### Opción B — Con Docker
+### Opción B — Con Docker (recomendada)
+
+El compose levanta **dos contenedores** en una red interna compartida:
+- `db_clockify_mysql` — MySQL 8.0 con las tablas y datos mock ya cargados
+- `bdt_dotnet` — el backend .NET (espera a que MySQL esté healthy antes de iniciar)
 
 1. **Clonar el repositorio**
    ```bash
@@ -68,37 +72,34 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 2. **Configurar variables de entorno**
    ```bash
    cp .env.example .env
-   # Editá .env con tus valores reales
+   # Editá .env con tus valores reales (Clockify keys)
    ```
 
    El `.env` mínimo necesario:
    ```env
-   DB_CONNECTION_STRING=Server=host.docker.internal;Port=3306;Database=pm_clockify_evm;User=tu_user;Password=tu_password;
+   DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=pm_clockify_evm;User=bdt_user;Password=bdt_user;
    CLOCKIFY_API_KEY=tu_api_key
    CLOCKIFY_WORKSPACE_ID=tu_workspace_id
    CLOCKIFY_USER_ID=tu_user_id
    ```
 
-3. **Permitir conexiones desde Docker al MySQL del host**
+   > `Server=mysql` es el nombre del servicio MySQL dentro de la red Docker — no necesitás IP ni `host.docker.internal`.
 
-   Ejecutar en MySQL (una sola vez por colega):
-   ```sql
-   CREATE USER IF NOT EXISTS 'tu_user'@'%' IDENTIFIED BY 'tu_password';
-   GRANT ALL PRIVILEGES ON pm_clockify_evm.* TO 'bdt_user'@'%';
-   FLUSH PRIVILEGES;
-   ```
-   > Esto es necesario porque Docker se conecta al MySQL del host desde la IP `172.18.x.x`, no desde `localhost`.
-
-4. **Levantar el contenedor**
+3. **Levantar los contenedores**
    ```bash
    docker compose up --build -d
    ```
 
-5. **Verificar que todo funciona**
+   En el primer arranque, MySQL ejecuta automáticamente `mysql/init/01_schema.sql`
+   que crea todas las tablas y carga los datos mock de base.
+
+4. **Verificar que todo funciona**
    ```bash
    curl http://localhost:5000/api/health
    # Respuesta esperada: { "status": "ok", "database": "ok" }
    ```
+
+> **Nota:** el backend tarda unos segundos extra en iniciar porque espera a que MySQL pase su healthcheck antes de arrancar.
 
 ---
 
@@ -106,26 +107,50 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 | Variable | Descripción | Requerida |
 |---|---|---|
-| `DB_CONNECTION_STRING` | Connection string completa de MySQL | ✅ |
+| `DB_CONNECTION_STRING` | Connection string de MySQL (usar `Server=mysql` con Docker) | ✅ |
 | `CLOCKIFY_API_KEY` | API Key de Clockify | ✅ |
 | `CLOCKIFY_WORKSPACE_ID` | ID del workspace en Clockify | ✅ |
 | `CLOCKIFY_USER_ID` | ID del usuario en Clockify | ✅ |
 | `ASPNETCORE_ENVIRONMENT` | `Development` o `Production` | — |
-| `BACKEND_PORT` | Puerto expuesto (default: `5000`) | — |
+| `BACKEND_PORT` | Puerto expuesto en el host (default: `7100`) | — |
 
 ---
 
 ## Comandos Docker de referencia
 
+### Backend
+
 | Acción | Comando |
 |---|---|
 | Levantar (primera vez o con cambios de código) | `docker compose up --build -d` |
 | Levantar sin reconstruir | `docker compose up -d` |
-| Bajar el contenedor | `docker compose down` |
+| Bajar los contenedores | `docker compose down` |
 | Reiniciar (solo cambios de variables) | `docker compose down && docker compose up -d` |
-| Ver logs en tiempo real | `docker compose logs -f backend` |
-| Ver estado del contenedor | `docker compose ps` |
-| Entrar al contenedor | `docker compose exec backend sh` |
+| Ver logs del backend en tiempo real | `docker compose logs -f backend` |
+| Ver estado de los contenedores | `docker compose ps` |
+| Entrar al contenedor del backend | `docker compose exec backend sh` |
+
+### Base de datos
+
+| Acción | Comando |
+|---|---|
+| Ver logs de MySQL | `docker compose logs -f mysql` |
+| Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_clockify_evm` |
+| Resetear la DB (borra y re-crea con el schema) | `docker compose down -v && docker compose up -d` |
+
+> ⚠️ `docker compose down -v` elimina el volumen de datos. Usarlo solo cuando querés empezar desde cero con el schema limpio.
+
+---
+
+## Base de datos — schema e init
+
+El archivo `mysql/init/01_schema.sql` se ejecuta automáticamente la primera vez que se levanta el contenedor de MySQL (cuando el volumen `mysql_data` no existe).
+
+Incluye:
+- Creación de las 32 tablas del sistema
+- Datos mock de base (usuarios, clientes, configuraciones iniciales)
+
+Si el volumen ya existe (arranques posteriores), MySQL **no** vuelve a ejecutar el script — los datos persisten entre reinicios.
 
 ---
 
@@ -158,29 +183,6 @@ dotnet user-secrets set "Mi:NuevaVar" "valor_real"
 **5. Reiniciar el contenedor**
 ```bash
 docker compose down && docker compose up -d
-```
-
----
-
-## Estrategia de despliegue
-
-Este backend convive en paralelo con el sistema original Laravel durante el desarrollo.
-
-```
-FASE 1 — Desarrollo en paralelo (actual)
-├── Docker: solo backend .NET
-├── MySQL: host local compartido con Laravel (proyecto original)
-└── Frontend: apunta a Laravel
-
-FASE 2 — Testing
-├── Docker: backend .NET
-├── MySQL: host local
-└── Frontend: apunta al .NET
-
-FASE 3 — Switch (go live)
-├── docker-compose completo: .NET + MySQL
-├── Se apaga Laravel
-└── Frontend apunta al nuevo backend
 ```
 
 ---
