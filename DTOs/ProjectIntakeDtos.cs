@@ -104,4 +104,5 @@ public class UpdateProjectIntakeDto
     public string? CommercialStatus { get; set; }
     public string? LeaderName { get; set; }
     public string? Observations { get; set; }
+    public bool? RequiresClockifyCreation { get; set; }
 }
