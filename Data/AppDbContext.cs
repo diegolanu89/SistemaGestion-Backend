@@ -31,6 +31,10 @@ public class AppDbContext : DbContext
     public DbSet<ProjectIntakeTypeRef> ProjectIntakeTypeRefs { get; set; }
     public DbSet<ProjectIntakeCategoryRef> ProjectIntakeCategoryRefs { get; set; }
     public DbSet<ProjectIntakeStatusRef> ProjectIntakeStatusRefs { get; set; }
+    public DbSet<Module> Modules { get; set; }
+    public DbSet<PermissionAction> Actions { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<ProfilePermission> ProfilePermissions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -114,5 +118,33 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.ClientId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // RBAC normalizado — Module/PermissionAction/Permission/ProfilePermission
+        modelBuilder.Entity<Permission>()
+            .HasOne(p => p.Module)
+            .WithMany()
+            .HasForeignKey(p => p.ModuleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ProfilePermission>()
+            .HasKey(pp => new { pp.ProfileId, pp.PermissionId });
+
+        modelBuilder.Entity<ProfilePermission>()
+            .HasOne(pp => pp.Profile)
+            .WithMany()
+            .HasForeignKey(pp => pp.ProfileId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfilePermission>()
+            .HasOne(pp => pp.Permission)
+            .WithMany()
+            .HasForeignKey(pp => pp.PermissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfilePermission>()
+            .HasOne(pp => pp.Action)
+            .WithMany()
+            .HasForeignKey(pp => pp.ActionId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

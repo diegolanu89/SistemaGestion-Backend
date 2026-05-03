@@ -8,6 +8,7 @@ public class AuthUserDto
     public ulong? ProfileId { get; set; }
     public string? ProfileName { get; set; }
     public string? ProfileCode { get; set; }
+    public DateTime? CreatedAt { get; set; }
 }
 
 public class LoginRequestDto
@@ -28,6 +29,7 @@ public class AuthProfileDto
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public DateTime? CreatedAt { get; set; }
 }
 
 public class AuthUserWithProfileDto

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
-using bdt_evm_app.Services;
 
 namespace bdt_evm_app.Controllers;
 
@@ -82,9 +81,10 @@ public class AuthController : ControllerBase
     }
 
     // POST api/auth/login-with-profile
-    // Variante de login que además valida que el usuario tenga un perfil asignado
-    // y que su código de perfil esté reconocido por el catálogo (ProfileCatalog).
-    // Devuelve el usuario con datos completos del perfil + permisos derivados del código.
+    // Variante de login que valida que el usuario tenga un perfil asignado y que ese
+    // perfil tenga al menos un permiso en profile_permissions (RBAC normalizado, RF-03).
+    // Devuelve el usuario con datos del perfil + permisos como lista de "module:<code>"
+    // (mismo shape que devolvía ProfileCatalog.GetPermissions, sin breaking changes para el front).
     [HttpPost("login-with-profile")]
     public async Task<IActionResult> LoginWithProfile([FromBody] LoginRequestDto dto)
     {
@@ -104,7 +104,9 @@ public class AuthController : ControllerBase
         if (user.ProfileId == null || user.Profile == null)
             return UnprocessableEntity(new { message = "El usuario no tiene un perfil asignado" });
 
-        if (!ProfileCatalog.IsRecognized(user.Profile.Code))
+        var hasAnyPermission = await _db.ProfilePermissions
+            .AnyAsync(pp => pp.ProfileId == user.ProfileId);
+        if (!hasAnyPermission)
             return StatusCode(403, new { message = "El perfil del usuario no está autorizado para acceder al sistema" });
 
         var oldTokens = await _db.PersonalAccessTokens
@@ -135,6 +137,13 @@ public class AuthController : ControllerBase
 
         var plainTextToken = $"{accessToken.Id}|{rawToken}";
 
+        var moduleCodes = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == user.ProfileId)
+            .Select(pp => pp.Permission!.Module!.Code)
+            .Distinct()
+            .ToListAsync();
+        var permissions = moduleCodes.Select(c => "module:" + c).ToList();
+
         return Ok(new LoginWithProfileResponseDto
         {
             Token = plainTextToken,
@@ -151,7 +160,7 @@ public class AuthController : ControllerBase
                     Code = user.Profile.Code,
                     Description = user.Profile.Description
                 },
-                Permissions = ProfileCatalog.GetPermissions(user.Profile.Code)
+                Permissions = permissions
             }
         });
     }
@@ -219,7 +228,8 @@ public class AuthController : ControllerBase
             Email = user.Email,
             ProfileId = user.ProfileId,
             ProfileName = user.Profile?.Name,
-            ProfileCode = user.Profile?.Code
+            ProfileCode = user.Profile?.Code,
+            CreatedAt = user.CreatedAt
         });
     }
 }
