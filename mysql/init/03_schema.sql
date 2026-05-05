@@ -1,5 +1,5 @@
 -- =====================================================================
--- 005_create_change_audit_log.sql
+-- 03_schema.sql
 -- change_audit_log — cross-cutting audit log (RF-11).
 --
 -- Approved by client after internal review with Sergio. Approval was
@@ -21,6 +21,8 @@
 -- type of audited event (create/update/delete/login/logout), which is
 -- a different concept from access level.
 -- =====================================================================
+
+USE pm_clockify_evm;
 
 START TRANSACTION;
 

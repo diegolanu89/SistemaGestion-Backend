@@ -53,100 +53,112 @@ public class ProfilesController : ControllerBase
         });
     }
 
-    // POST api/app/profiles
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateProfileDto dto)
+    // GET api/app/profiles/{id}/permissions
+    [HttpGet("{id}/permissions")]
+    public async Task<IActionResult> GetPermissions(ulong id)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            return UnprocessableEntity(new { message = "El nombre es requerido" });
+        var profileExists = await _db.Profiles.AnyAsync(p => p.Id == id);
+        if (!profileExists)
+            return NotFound(new { message = "Perfil no encontrado" });
 
-        if (string.IsNullOrWhiteSpace(dto.Code))
-            return UnprocessableEntity(new { message = "El código es requerido" });
+        var items = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == id)
+            .Include(pp => pp.Permission).ThenInclude(p => p!.Module)
+            .Include(pp => pp.Action)
+            .OrderBy(pp => pp.Permission!.Code)
+            .Select(pp => new ProfilePermissionItemDto
+            {
+                PermissionId = pp.PermissionId,
+                PermissionCode = pp.Permission!.Code,
+                ModuleCode = pp.Permission!.Module!.Code,
+                Action = new ProfilePermissionActionDto
+                {
+                    Id = pp.Action!.Id,
+                    Code = pp.Action!.Code,
+                    Level = pp.Action!.Level
+                }
+            })
+            .ToListAsync();
 
-        var codeExists = await _db.Profiles.AnyAsync(p => p.Code == dto.Code);
-        if (codeExists)
-            return UnprocessableEntity(new { message = "El código ya está en uso" });
-
-        var profile = new Profile
+        return Ok(new ProfilePermissionsResponseDto
         {
-            Name = dto.Name.Trim(),
-            Code = dto.Code.Trim(),
-            Description = dto.Description?.Trim(),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        _db.Profiles.Add(profile);
-        await _db.SaveChangesAsync();
-
-        return StatusCode(201, new ProfileDto
-        {
-            Id = profile.Id,
-            Name = profile.Name,
-            Code = profile.Code,
-            Description = profile.Description
+            ProfileId = id,
+            Permissions = items
         });
     }
 
-    // PUT api/app/profiles/{id}
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(ulong id, [FromBody] UpdateProfileDto dto)
+    // PUT api/app/profiles/{id}/permissions
+    [HttpPut("{id}/permissions")]
+    public async Task<IActionResult> SyncPermissions(ulong id, [FromBody] SyncProfilePermissionsDto dto)
     {
-        var profile = await _db.Profiles.FindAsync(id);
+        if (dto?.Permissions == null)
+            return UnprocessableEntity(new { message = "El campo permissions es requerido (puede ser una lista vacía)" });
 
-        if (profile == null)
+        var profileExists = await _db.Profiles.AnyAsync(p => p.Id == id);
+        if (!profileExists)
             return NotFound(new { message = "Perfil no encontrado" });
 
-        if (dto.Name != null)
+        var duplicatePermissionIds = dto.Permissions
+            .GroupBy(x => x.PermissionId)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        if (duplicatePermissionIds.Count > 0)
+            return UnprocessableEntity(new
+            {
+                message = "Hay permission_id duplicados en la solicitud",
+                duplicates = duplicatePermissionIds
+            });
+
+        var requestedPermissionIds = dto.Permissions.Select(x => x.PermissionId).ToList();
+        var requestedActionIds = dto.Permissions.Select(x => x.ActionId).Distinct().ToList();
+
+        var validPermissionIds = await _db.Permissions
+            .Where(p => requestedPermissionIds.Contains(p.Id) && p.Active)
+            .Select(p => p.Id)
+            .ToListAsync();
+
+        var invalidPermissionIds = requestedPermissionIds.Except(validPermissionIds).ToList();
+        if (invalidPermissionIds.Count > 0)
+            return UnprocessableEntity(new
+            {
+                message = "Hay permission_id inválidos o inactivos",
+                invalid_permission_ids = invalidPermissionIds
+            });
+
+        var validActionIds = await _db.Actions
+            .Where(a => requestedActionIds.Contains(a.Id) && a.Active)
+            .Select(a => a.Id)
+            .ToListAsync();
+
+        var invalidActionIds = requestedActionIds.Except(validActionIds).ToList();
+        if (invalidActionIds.Count > 0)
+            return UnprocessableEntity(new
+            {
+                message = "Hay action_id inválidos o inactivos",
+                invalid_action_ids = invalidActionIds
+            });
+
+        var existing = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == id)
+            .ToListAsync();
+
+        _db.ProfilePermissions.RemoveRange(existing);
+
+        var now = DateTime.UtcNow;
+        var newRows = dto.Permissions.Select(x => new ProfilePermission
         {
-            if (string.IsNullOrWhiteSpace(dto.Name))
-                return UnprocessableEntity(new { message = "El nombre no puede estar vacío" });
-            profile.Name = dto.Name.Trim();
-        }
+            ProfileId = id,
+            PermissionId = x.PermissionId,
+            ActionId = x.ActionId,
+            CreatedAt = now,
+            UpdatedAt = now
+        }).ToList();
 
-        if (dto.Code != null)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Code))
-                return UnprocessableEntity(new { message = "El código no puede estar vacío" });
-
-            var codeExists = await _db.Profiles.AnyAsync(p => p.Code == dto.Code && p.Id != id);
-            if (codeExists)
-                return UnprocessableEntity(new { message = "El código ya está en uso" });
-
-            profile.Code = dto.Code.Trim();
-        }
-
-        if (dto.Description != null)
-            profile.Description = dto.Description.Trim();
-
-        profile.UpdatedAt = DateTime.UtcNow;
+        _db.ProfilePermissions.AddRange(newRows);
         await _db.SaveChangesAsync();
 
-        return Ok(new ProfileDto
-        {
-            Id = profile.Id,
-            Name = profile.Name,
-            Code = profile.Code,
-            Description = profile.Description
-        });
-    }
-
-    // DELETE api/app/profiles/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(ulong id)
-    {
-        var profile = await _db.Profiles.FindAsync(id);
-
-        if (profile == null)
-            return NotFound(new { message = "Perfil no encontrado" });
-
-        var hasUsers = await _db.Users.AnyAsync(u => u.ProfileId == id);
-        if (hasUsers)
-            return UnprocessableEntity(new { message = "No se puede eliminar el perfil porque tiene usuarios asignados" });
-
-        _db.Profiles.Remove(profile);
-        await _db.SaveChangesAsync();
-
-        return Ok(new { message = "Perfil eliminado" });
+        return await GetPermissions(id);
     }
 }
