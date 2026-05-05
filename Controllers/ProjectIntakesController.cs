@@ -314,6 +314,30 @@ public class ProjectIntakesController : ControllerBase
             if (dto.CommercialStatus != null) record.CommercialStatus = dto.CommercialStatus;
             if (dto.LeaderName != null) record.LeaderName = dto.LeaderName;
             if (dto.Observations != null) record.Observations = dto.Observations;
+            if (dto.RequiresClockifyCreation.HasValue) record.RequiresClockifyCreation = dto.RequiresClockifyCreation.Value;
+
+            string? clockifyMessage = null;
+
+            if (dto.RequiresClockifyCreation == true && record.ClockifyRecordId == null)
+            {
+                try
+                {
+                    var projectName = record.ProjectName ?? string.Empty;
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(projectName, record.ClientId);
+                    record.ClockifyRecordId = clockifyRecordId;
+                    clockifyMessage = message;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error al crear proyecto en Clockify durante update '{ProjectName}'", record.ProjectName);
+                    return UnprocessableEntity(new
+                    {
+                        success = false,
+                        message = "El proyecto fue validado pero falló la sincronización con Clockify",
+                        error = ex.Message
+                    });
+                }
+            }
 
             record.UpdatedBy = userId;
             record.UpdatedAt = DateTime.UtcNow;
@@ -328,7 +352,14 @@ public class ProjectIntakesController : ControllerBase
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
 
-            return Ok(new { success = true, message = "Proyecto actualizado exitosamente", data = MapToDto(record) });
+            return Ok(new
+            {
+                success = true,
+                message = clockifyMessage != null
+                    ? $"Proyecto actualizado exitosamente. Clockify: {clockifyMessage}"
+                    : "Proyecto actualizado exitosamente",
+                data = MapToDto(record)
+            });
         }
         catch (Exception e)
         {
