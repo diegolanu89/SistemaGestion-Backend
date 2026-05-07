@@ -32,7 +32,7 @@ builder.Services.AddScoped<ProjectMetricsService>();
 builder.Services.AddScoped<ProjectIntakeService>();
 
 var app = builder.Build();
-var publicRoutes = new[] { "/api/auth/login", "/api/health", "/api/log-action" };
+var publicRoutes = new[] { "/api/auth/login", "/api/auth/login-with-profile", "/api/health", "/api/log-action" };
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
