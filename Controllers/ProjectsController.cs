@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -24,6 +25,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects
     [HttpGet]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int per_page = 15,
@@ -102,6 +104,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects/evm
     [HttpGet("evm")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> EvmIndex()
     {
         return await GetAll(only_visible: "true");
@@ -109,6 +112,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects/{id}
     [HttpGet("{id}")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetById(ulong id)
     {
         var project = await _db.ClockifyProjects
@@ -128,6 +132,7 @@ public class ProjectsController : ControllerBase
 
     // PATCH api/projects/{id}/bac
     [HttpPatch("{id}/bac")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> UpdateBac(ulong id, [FromBody] UpdateBacDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(id);
@@ -157,6 +162,7 @@ public class ProjectsController : ControllerBase
 
     // POST api/projects/{id}/recalculate-hours
     [HttpPost("{id}/recalculate-hours")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> RecalculateHours(ulong id)
     {
         var project = await _db.ClockifyProjects.FindAsync(id);

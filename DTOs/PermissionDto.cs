@@ -10,3 +10,8 @@ public class PermissionDto
     public string? Description { get; set; }
     public bool Active { get; set; }
 }
+
+public class UpdatePermissionModuleDto
+{
+    public ulong ModuleId { get; set; }
+}

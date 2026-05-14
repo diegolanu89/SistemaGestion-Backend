@@ -54,16 +54,13 @@ VALUES
 ('ADMINISTRATION', 'Administración', 1, NOW(), NOW()),
 ('SETTINGS', 'Configuración', 1, NOW(), NOW());
 
-INSERT IGNORE INTO pm_clockify_evm.actions (code, level, active, created_at, updated_at)
-VALUES
-('READ', 1, 1, NOW(), NOW()),
-('WRITE', 2, 1, NOW(), NOW()),
-('ADMIN', 3, 1, NOW(), NOW());
+-- Las acciones (read_only, edit, create) ya las siembra 02_schema.sql con level 1/2/3.
+-- No re-insertamos acá para no chocar con el UNIQUE en `level`.
 
 DELETE pp
 FROM pm_clockify_evm.profile_permissions pp
 INNER JOIN pm_clockify_evm.profiles p ON p.id = pp.profile_id
-WHERE p.code = 'ADMIN';
+WHERE p.code IN ('admin', 'lider', 'soporte', 'ops_gerente', 'ops_lider', 'administracion');
 
 DELETE perm
 FROM pm_clockify_evm.permissions perm
@@ -95,25 +92,55 @@ VALUES
 ((SELECT id FROM pm_clockify_evm.modules WHERE code = 'ADMINISTRATION' LIMIT 1), 'Administración', 'ADMIN_ACCESS', 'Permite acceder a funcionalidades administrativas', 1, NOW(), NOW()),
 ((SELECT id FROM pm_clockify_evm.modules WHERE code = 'SETTINGS' LIMIT 1), 'Configuración', 'SETTINGS_ACCESS', 'Permite acceder a configuración del sistema', 1, NOW(), NOW());
 
+-- Matriz perfil → permisos (action_id=3 = 'create', acceso total al permiso)
+-- Mapeo módulo → permisos (según ERS y sidebar):
+--   Operación      = PROJECTS_ACCESS, PROJECTS_ASSIGN, ETC_ACCESS, ETC_EDIT, ESTIMATED_PROJECTS_ACCESS
+--   Análisis       = DASHBOARD_EVM_ACCESS, DASHBOARD_HOURS_ACCESS
+--   Reportería     = REPORTS_ACCESS
+--   Administración = PROJECTS_CREATE (Alta de proyectos), ADMIN_ACCESS
+--   Configuración  = SETTINGS_ACCESS
 INSERT INTO pm_clockify_evm.profile_permissions (profile_id, permission_id, action_id, created_at, updated_at)
 SELECT p.id, perm.id, a.id, NOW(), NOW()
 FROM pm_clockify_evm.profiles p
 CROSS JOIN pm_clockify_evm.permissions perm
 CROSS JOIN pm_clockify_evm.actions a
-WHERE p.code = 'ADMIN'
-AND a.code = 'ADMIN'
-AND perm.code IN (
-    'PROJECTS_ACCESS',
-    'PROJECTS_ASSIGN',
-    'PROJECTS_CREATE',
-    'ETC_ACCESS',
-    'ETC_EDIT',
-    'ESTIMATED_PROJECTS_ACCESS',
-    'DASHBOARD_EVM_ACCESS',
-    'DASHBOARD_HOURS_ACCESS',
-    'REPORTS_ACCESS',
-    'ADMIN_ACCESS',
-    'SETTINGS_ACCESS'
+WHERE a.code = 'create'
+AND (
+    -- 1. Administrador: acceso total
+    (p.code = 'admin' AND perm.code IN (
+        'PROJECTS_ACCESS','PROJECTS_ASSIGN','PROJECTS_CREATE',
+        'ETC_ACCESS','ETC_EDIT',
+        'ESTIMATED_PROJECTS_ACCESS','DASHBOARD_EVM_ACCESS','DASHBOARD_HOURS_ACCESS',
+        'REPORTS_ACCESS','ADMIN_ACCESS','SETTINGS_ACCESS'
+    ))
+    -- 2. Usuario Lider: solo dashboards
+    OR (p.code = 'lider' AND perm.code IN (
+        'DASHBOARD_EVM_ACCESS','DASHBOARD_HOURS_ACCESS'
+    ))
+    -- 3. Soporte: solo reportería
+    OR (p.code = 'soporte' AND perm.code IN (
+        'REPORTS_ACCESS'
+    ))
+    -- 4. Operaciones Gerente: Operación + Análisis + Reportería
+    OR (p.code = 'ops_gerente' AND perm.code IN (
+        'PROJECTS_ACCESS','PROJECTS_ASSIGN',
+        'ETC_ACCESS','ETC_EDIT',
+        'ESTIMATED_PROJECTS_ACCESS',
+        'DASHBOARD_EVM_ACCESS','DASHBOARD_HOURS_ACCESS',
+        'REPORTS_ACCESS'
+    ))
+    -- 5. Operaciones Líder: Operación + Análisis
+    OR (p.code = 'ops_lider' AND perm.code IN (
+        'PROJECTS_ACCESS','PROJECTS_ASSIGN',
+        'ETC_ACCESS','ETC_EDIT',
+        'ESTIMATED_PROJECTS_ACCESS',
+        'DASHBOARD_EVM_ACCESS','DASHBOARD_HOURS_ACCESS'
+    ))
+    -- 6. Administración: Administración + Configuración
+    --    (Alta de proyectos pertenece a módulo Administración según ERS — pide PROJECTS_CREATE)
+    OR (p.code = 'administracion' AND perm.code IN (
+        'ADMIN_ACCESS','PROJECTS_CREATE','SETTINGS_ACCESS'
+    ))
 );
 
 UPDATE pm_clockify_evm.users u
