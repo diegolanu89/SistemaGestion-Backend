@@ -50,12 +50,21 @@ public class SanctumAuthMiddleware
             return;
         }
 
+        // Resolver email del owner para que el AuditSaveChangesInterceptor
+        // pueda persistirlo en cada fila sin un segundo round-trip.
+        var userEmail = await db.Users
+            .Where(u => u.Id == token.TokenableId)
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync();
+
         // Actualizar last_used_at igual que Sanctum
         token.LastUsedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
-        // Guardar el userId en el contexto para usarlo en los controllers
+        // Guardar el userId/email en el contexto para usarlo en los
+        // controllers y en el AuditSaveChangesInterceptor.
         context.Items["UserId"] = token.TokenableId;
+        if (userEmail != null) context.Items["UserEmail"] = userEmail;
 
         await _next(context);
     }

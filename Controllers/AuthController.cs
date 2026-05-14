@@ -17,6 +17,26 @@ public class AuthController : ControllerBase
         _db = db;
     }
 
+    // RF-11: registra "ingreso/egreso al sistema". Estos eventos no son
+    // CRUD de entidad de negocio, así que el SaveChangesInterceptor no los
+    // captura — los inserta este controller explícitamente.
+    private async Task LogAuthEventAsync(string eventType, ulong userId, string email)
+    {
+        _db.ChangeAuditLogs.Add(new ChangeAuditLog
+        {
+            Ts = DateTime.UtcNow,
+            UserId = userId,
+            UserEmail = email,
+            Module = "administration",
+            Entity = nameof(User),
+            RecordId = userId.ToString(),
+            EventType = eventType,
+            RequestId = HttpContext.TraceIdentifier,
+            Ip = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+        await _db.SaveChangesAsync();
+    }
+
     // POST api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
@@ -64,6 +84,8 @@ public class AuthController : ControllerBase
 
         // El token que ve el cliente es: {id}|{rawToken} igual que Sanctum
         var plainTextToken = $"{accessToken.Id}|{rawToken}";
+
+        await LogAuthEventAsync(AuditEventType.Login, user.Id, user.Email);
 
         return Ok(new LoginResponseDto
         {
@@ -144,6 +166,8 @@ public class AuthController : ControllerBase
             .ToListAsync();
         var permissions = moduleCodes.Select(c => "module:" + c).ToList();
 
+        await LogAuthEventAsync(AuditEventType.Login, user.Id, user.Email);
+
         return Ok(new LoginWithProfileResponseDto
         {
             Token = plainTextToken,
@@ -181,8 +205,15 @@ public class AuthController : ControllerBase
         var token = await _db.PersonalAccessTokens.FindAsync(tokenId);
         if (token != null)
         {
+            var ownerId = token.TokenableId;
             _db.PersonalAccessTokens.Remove(token);
             await _db.SaveChangesAsync();
+
+            var ownerEmail = await _db.Users
+                .Where(u => u.Id == ownerId)
+                .Select(u => u.Email)
+                .FirstOrDefaultAsync();
+            await LogAuthEventAsync(AuditEventType.Logout, ownerId, ownerEmail ?? string.Empty);
         }
 
         return Ok(new { message = "Sesión cerrada" });

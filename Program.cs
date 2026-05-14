@@ -2,6 +2,7 @@ using bdt_evm_app.Data;
 using bdt_evm_app.Middleware;
 using bdt_evm_app.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("Default"))
-    )
+    ).AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>())
 );
 
 builder.Services.AddScoped<ClockifyService>();
