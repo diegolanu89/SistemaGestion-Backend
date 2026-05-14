@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -8,6 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/potencial-projects")]
+[RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
 public class PotencialProjectsController : ControllerBase
 {
     private readonly AppDbContext _db;

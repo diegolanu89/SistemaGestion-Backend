@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 
 namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/users")]
+[RequirePermission("ADMIN_ACCESS")]
 public class ClockifyUsersListController : ControllerBase
 {
     private readonly AppDbContext _db;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -20,6 +21,7 @@ public class EtcController : ControllerBase
 
     // GET api/projects/{projectId}/etc
     [HttpGet("api/projects/{projectId}/etc")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId, [FromQuery] string? snapshot)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -69,6 +71,7 @@ public class EtcController : ControllerBase
 
     // POST api/projects/{projectId}/etc
     [HttpPost("api/projects/{projectId}/etc")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] CreateEtcRecordDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -121,6 +124,7 @@ public class EtcController : ControllerBase
 
     // PUT api/etc/{id}
     [HttpPut("api/etc/{id}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Update(ulong id, [FromBody] UpdateEtcRecordDto dto)
     {
         var record = await _db.EtcRecords.FindAsync(id);
@@ -161,6 +165,7 @@ public class EtcController : ControllerBase
 
     // DELETE api/etc/{id}
     [HttpDelete("api/etc/{id}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Delete(ulong id)
     {
         var record = await _db.EtcRecords.FindAsync(id);
@@ -174,6 +179,7 @@ public class EtcController : ControllerBase
 
     // DELETE api/etc/project/{projectId}
     [HttpDelete("api/etc/project/{projectId}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> DeleteByProject(ulong projectId)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -202,6 +208,7 @@ public class EtcController : ControllerBase
 
     // GET api/etc/projects-summary
     [HttpGet("api/etc/projects-summary")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ProjectsWithEtc()
     {
         var latestSnapshotIds = await GetLatestSnapshotIdsPerProject();
@@ -232,6 +239,7 @@ public class EtcController : ControllerBase
 
     // POST api/projects/{projectId}/etc/finalize-baseline
     [HttpPost("api/projects/{projectId}/etc/finalize-baseline")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> FinalizeBaseline(ulong projectId)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -280,6 +288,7 @@ public class EtcController : ControllerBase
 
     // POST api/projects/{projectId}/etc/snapshot
     [HttpPost("api/projects/{projectId}/etc/snapshot")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> CreateSnapshot(ulong projectId, [FromBody] CreateSnapshotDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -338,6 +347,7 @@ public class EtcController : ControllerBase
 
     // POST api/etc/bulk
     [HttpPost("api/etc/bulk")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> StoreBulk([FromBody] BulkEtcDto dto)
     {
         if (dto.Entries == null || !dto.Entries.Any())
@@ -379,6 +389,7 @@ public class EtcController : ControllerBase
 
     // POST api/etc/validate-capacity
     [HttpPost("api/etc/validate-capacity")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ValidateCapacity([FromBody] ValidateEtcCapacityDto dto)
     {
         if (dto.Entries == null || !dto.Entries.Any())
@@ -390,6 +401,7 @@ public class EtcController : ControllerBase
 
     // GET api/etc/export-capacities
     [HttpGet("api/etc/export-capacities")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ExportCapacities()
     {
         var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");

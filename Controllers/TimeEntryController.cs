@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 
 namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/time-entries")]
+[RequirePermission("ETC_ACCESS")]
 public class TimeEntryController : ControllerBase
 {
     private readonly AppDbContext _db;

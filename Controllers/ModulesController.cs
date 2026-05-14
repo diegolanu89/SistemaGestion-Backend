@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 
@@ -7,6 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/modules")]
+[RequirePermission("ADMIN_ACCESS")]
 public class ModulesController : ControllerBase
 {
     private readonly AppDbContext _db;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -8,6 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/profiles")]
+[RequirePermission("ADMIN_ACCESS")]
 public class ProfilesController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -53,37 +55,22 @@ public class ProfilesController : ControllerBase
         });
     }
 
-    // GET api/app/profiles/{id}/permissions
+    // DEPRECATED:
+    // Este endpoint queda obsoleto por motivos de seguridad.
+    // El frontend ya NO debe consultar permisos por profileId enviado por cliente.
+    // Utilizar:
+    // GET /api/auth/permissions
+    // que resuelve los permisos desde el usuario autenticado (cookie HttpOnly + middleware).
+    [Obsolete(
+        "Deprecated for security reasons. Use GET /api/auth/permissions instead."
+    )]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [HttpGet("{id}/permissions")]
     public async Task<IActionResult> GetPermissions(ulong id)
     {
-        var profileExists = await _db.Profiles.AnyAsync(p => p.Id == id);
-        if (!profileExists)
-            return NotFound(new { message = "Perfil no encontrado" });
-
-        var items = await _db.ProfilePermissions
-            .Where(pp => pp.ProfileId == id)
-            .Include(pp => pp.Permission).ThenInclude(p => p!.Module)
-            .Include(pp => pp.Action)
-            .OrderBy(pp => pp.Permission!.Code)
-            .Select(pp => new ProfilePermissionItemDto
-            {
-                PermissionId = pp.PermissionId,
-                PermissionCode = pp.Permission!.Code,
-                ModuleCode = pp.Permission!.Module!.Code,
-                Action = new ProfilePermissionActionDto
-                {
-                    Id = pp.Action!.Id,
-                    Code = pp.Action!.Code,
-                    Level = pp.Action!.Level
-                }
-            })
-            .ToListAsync();
-
-        return Ok(new ProfilePermissionsResponseDto
+        return StatusCode(410, new
         {
-            ProfileId = id,
-            Permissions = items
+            message = "Endpoint deprecated. Use /api/auth/permissions"
         });
     }
 
