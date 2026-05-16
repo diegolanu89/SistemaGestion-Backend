@@ -22,7 +22,7 @@ USE pm_clockify_evm;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `app_user_visible_projects`
+-- Estructura de la tabla `app_user_visible_projects`
 --
 
 DROP TABLE IF EXISTS `app_user_visible_projects`;
@@ -41,7 +41,7 @@ CREATE TABLE `app_user_visible_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `app_user_visible_projects`
+-- Datos para la tabla `app_user_visible_projects`
 --
 
 LOCK TABLES `app_user_visible_projects` WRITE;
@@ -50,7 +50,7 @@ LOCK TABLES `app_user_visible_projects` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `calendar_months`
+-- Estructura de la tabla `calendar_months`
 --
 
 DROP TABLE IF EXISTS `calendar_months`;
@@ -69,7 +69,7 @@ CREATE TABLE `calendar_months` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `calendar_months`
+-- Datos para la tabla `calendar_months`
 --
 
 LOCK TABLES `calendar_months` WRITE;
@@ -79,7 +79,7 @@ INSERT INTO `calendar_months` VALUES (123,'2024-01','Enero 2024',0,NULL,NULL),(1
 UNLOCK TABLES;
 
 --
--- Table structure for table `change_requests`
+-- Estructura de la tabla `change_requests`
 --
 
 DROP TABLE IF EXISTS `change_requests`;
@@ -109,7 +109,7 @@ CREATE TABLE `change_requests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `change_requests`
+-- Datos para la tabla `change_requests`
 --
 
 LOCK TABLES `change_requests` WRITE;
@@ -119,7 +119,7 @@ INSERT INTO `change_requests` VALUES (2,1,'CC-002','Cambio de tecnolog├¡a','M
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_clients`
+-- Estructura de la tabla `clockify_clients`
 --
 
 DROP TABLE IF EXISTS `clockify_clients`;
@@ -138,7 +138,7 @@ CREATE TABLE `clockify_clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_clients`
+-- Datos para la tabla `clockify_clients`
 --
 
 LOCK TABLES `clockify_clients` WRITE;
@@ -148,7 +148,7 @@ INSERT INTO `clockify_clients` VALUES (1,'Cliente Global Corp',NULL,'activo',NUL
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_project_filters`
+-- Estructura de la tabla `clockify_project_filters`
 --
 
 DROP TABLE IF EXISTS `clockify_project_filters`;
@@ -166,7 +166,7 @@ CREATE TABLE `clockify_project_filters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_project_filters`
+-- Datos para la tabla `clockify_project_filters`
 --
 
 LOCK TABLES `clockify_project_filters` WRITE;
@@ -176,7 +176,7 @@ INSERT INTO `clockify_project_filters` VALUES (3,1,'2026-04-21 18:00:14','2026-0
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_projects`
+-- Estructura de la tabla `clockify_projects`
 --
 
 DROP TABLE IF EXISTS `clockify_projects`;
@@ -209,7 +209,7 @@ CREATE TABLE `clockify_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_projects`
+-- Datos para la tabla `clockify_projects`
 --
 
 LOCK TABLES `clockify_projects` WRITE;
@@ -219,7 +219,7 @@ INSERT INTO `clockify_projects` VALUES (1,'proj_001','Implementaci├│n ERP',N
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_time_entries`
+-- Estructura de la tabla `clockify_time_entries`
 --
 
 DROP TABLE IF EXISTS `clockify_time_entries`;
@@ -253,7 +253,7 @@ CREATE TABLE `clockify_time_entries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_time_entries`
+-- Datos para la tabla `clockify_time_entries`
 --
 
 LOCK TABLES `clockify_time_entries` WRITE;
@@ -263,7 +263,7 @@ INSERT INTO `clockify_time_entries` VALUES (1,'te_01',1,NULL,'Desarrollo backend
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_users`
+-- Estructura de la tabla `clockify_users`
 --
 
 DROP TABLE IF EXISTS `clockify_users`;
@@ -286,7 +286,7 @@ CREATE TABLE `clockify_users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_users`
+-- Datos para la tabla `clockify_users`
 --
 
 LOCK TABLES `clockify_users` WRITE;
@@ -296,7 +296,7 @@ INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin n
 UNLOCK TABLES;
 
 --
--- Table structure for table `etc_records`
+-- Estructura de la tabla `etc_records`
 --
 
 DROP TABLE IF EXISTS `etc_records`;
@@ -327,7 +327,7 @@ CREATE TABLE `etc_records` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `etc_records`
+-- Datos para la tabla `etc_records`
 --
 
 LOCK TABLES `etc_records` WRITE;
@@ -337,7 +337,7 @@ INSERT INTO `etc_records` VALUES (3,1,1,7,'haunau.lucia','2026-05','Mayo 2026',4
 UNLOCK TABLES;
 
 --
--- Table structure for table `etc_snapshots`
+-- Estructura de la tabla `etc_snapshots`
 --
 
 DROP TABLE IF EXISTS `etc_snapshots`;
@@ -357,7 +357,7 @@ CREATE TABLE `etc_snapshots` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `etc_snapshots`
+-- Datos para la tabla `etc_snapshots`
 --
 
 LOCK TABLES `etc_snapshots` WRITE;
@@ -367,7 +367,7 @@ INSERT INTO `etc_snapshots` VALUES (1,1,1,'Estimaci├│n Inicial Enero',NULL,N
 UNLOCK TABLES;
 
 --
--- Table structure for table `failed_jobs`
+-- Estructura de la tabla `failed_jobs`
 --
 
 DROP TABLE IF EXISTS `failed_jobs`;
@@ -387,7 +387,7 @@ CREATE TABLE `failed_jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `failed_jobs`
+-- Datos para la tabla `failed_jobs`
 --
 
 LOCK TABLES `failed_jobs` WRITE;
@@ -396,7 +396,7 @@ LOCK TABLES `failed_jobs` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `migrations`
+-- Estructura de la tabla `migrations`
 --
 
 DROP TABLE IF EXISTS `migrations`;
@@ -411,7 +411,7 @@ CREATE TABLE `migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `migrations`
+-- Datos para la tabla `migrations`
 --
 
 LOCK TABLES `migrations` WRITE;
@@ -421,7 +421,7 @@ INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,
 UNLOCK TABLES;
 
 --
--- Table structure for table `password_reset_tokens`
+-- Estructura de la tabla `password_reset_tokens`
 --
 
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -436,7 +436,7 @@ CREATE TABLE `password_reset_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `password_reset_tokens`
+-- Datos para la tabla `password_reset_tokens`
 --
 
 LOCK TABLES `password_reset_tokens` WRITE;
@@ -445,7 +445,7 @@ LOCK TABLES `password_reset_tokens` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `personal_access_tokens`
+-- Estructura de la tabla `personal_access_tokens`
 --
 
 DROP TABLE IF EXISTS `personal_access_tokens`;
@@ -469,7 +469,7 @@ CREATE TABLE `personal_access_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `personal_access_tokens`
+-- Datos para la tabla `personal_access_tokens`
 --
 
 LOCK TABLES `personal_access_tokens` WRITE;
@@ -479,7 +479,7 @@ INSERT INTO `personal_access_tokens` VALUES (6,'App\\Models\\User',1,'spa','b7a8
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_clients`
+-- Estructura de la tabla `potencial_clients`
 --
 
 DROP TABLE IF EXISTS `potencial_clients`;
@@ -495,7 +495,7 @@ CREATE TABLE `potencial_clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_clients`
+-- Datos para la tabla `potencial_clients`
 --
 
 LOCK TABLES `potencial_clients` WRITE;
@@ -505,7 +505,7 @@ INSERT INTO `potencial_clients` VALUES (1,'Prospecto Miner├¡a S.A.',NULL,NULL
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_project_allocations`
+-- Estructura de la tabla `potencial_project_allocations`
 --
 
 DROP TABLE IF EXISTS `potencial_project_allocations`;
@@ -531,7 +531,7 @@ CREATE TABLE `potencial_project_allocations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_project_allocations`
+-- Datos para la tabla `potencial_project_allocations`
 --
 
 LOCK TABLES `potencial_project_allocations` WRITE;
@@ -540,7 +540,7 @@ LOCK TABLES `potencial_project_allocations` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_projects`
+-- Estructura de la tabla `potencial_projects`
 --
 
 DROP TABLE IF EXISTS `potencial_projects`;
@@ -560,7 +560,7 @@ CREATE TABLE `potencial_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_projects`
+-- Datos para la tabla `potencial_projects`
 --
 
 LOCK TABLES `potencial_projects` WRITE;
@@ -570,7 +570,7 @@ INSERT INTO `potencial_projects` VALUES (4,'Proyecto Sin C├│digo',NULL,2,'20
 UNLOCK TABLES;
 
 --
--- Table structure for table `profiles`
+-- Estructura de la tabla `profiles`
 --
 
 DROP TABLE IF EXISTS `profiles`;
@@ -585,21 +585,26 @@ CREATE TABLE `profiles` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `profiles_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `profiles`
+-- Datos para la tabla `profiles`
 --
 
 LOCK TABLES `profiles` WRITE;
 /*!40000 ALTER TABLE `profiles` DISABLE KEYS */;
-INSERT INTO `profiles` VALUES (1,'Administrador','admin','Acceso total al sistema',NULL,NULL),(2,'Usuario Lider','lider','Acceso a Dashboards',NULL,NULL);
+INSERT INTO `profiles` VALUES
+(1,'Administrador','admin','Acceso total al sistema',NULL,NULL),
+(2,'Soporte','soporte','Acceso total sobre módulo Configuración',NULL,NULL),
+(3,'Operaciones Gerente','ops_gerente','Acceso total sobre Operación, Análisis y Reportería',NULL,NULL),
+(4,'Operaciones Líderes','ops_lider','Acceso total sobre Operación, Análisis y Reportería',NULL,NULL),
+(5,'Administración','administracion','Acceso total sobre Administración y Reportería',NULL,NULL);
 /*!40000 ALTER TABLE `profiles` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_category_refs`
+-- Estructura de la tabla `project_intake_category_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_category_refs`;
@@ -619,7 +624,7 @@ CREATE TABLE `project_intake_category_refs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_category_refs`
+-- Datos para la tabla `project_intake_category_refs`
 --
 
 LOCK TABLES `project_intake_category_refs` WRITE;
@@ -629,7 +634,7 @@ INSERT INTO `project_intake_category_refs` VALUES (9,'PRE','Pre-venta','Proyecto
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_records`
+-- Estructura de la tabla `project_intake_records`
 --
 
 DROP TABLE IF EXISTS `project_intake_records`;
@@ -676,7 +681,7 @@ CREATE TABLE `project_intake_records` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_records`
+-- Datos para la tabla `project_intake_records`
 --
 
 LOCK TABLES `project_intake_records` WRITE;
@@ -686,7 +691,7 @@ INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','202
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_status_refs`
+-- Estructura de la tabla `project_intake_status_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_status_refs`;
@@ -706,7 +711,7 @@ CREATE TABLE `project_intake_status_refs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_status_refs`
+-- Datos para la tabla `project_intake_status_refs`
 --
 
 LOCK TABLES `project_intake_status_refs` WRITE;
@@ -716,7 +721,7 @@ INSERT INTO `project_intake_status_refs` VALUES (7,'INGRESO','Ingreso','Proyecto
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_type_refs`
+-- Estructura de la tabla `project_intake_type_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_type_refs`;
@@ -742,7 +747,7 @@ CREATE TABLE `project_intake_type_refs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_type_refs`
+-- Datos para la tabla `project_intake_type_refs`
 --
 
 LOCK TABLES `project_intake_type_refs` WRITE;
@@ -752,7 +757,7 @@ INSERT INTO `project_intake_type_refs` VALUES (8,'30','Desarrollo','Proyectos de
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_tracking_updates`
+-- Estructura de la tabla `project_tracking_updates`
 --
 
 DROP TABLE IF EXISTS `project_tracking_updates`;
@@ -772,7 +777,7 @@ CREATE TABLE `project_tracking_updates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_tracking_updates`
+-- Datos para la tabla `project_tracking_updates`
 --
 
 LOCK TABLES `project_tracking_updates` WRITE;
@@ -781,7 +786,7 @@ LOCK TABLES `project_tracking_updates` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_trackings`
+-- Estructura de la tabla `project_trackings`
 --
 
 DROP TABLE IF EXISTS `project_trackings`;
@@ -803,7 +808,7 @@ CREATE TABLE `project_trackings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_trackings`
+-- Datos para la tabla `project_trackings`
 --
 
 LOCK TABLES `project_trackings` WRITE;
@@ -812,7 +817,7 @@ LOCK TABLES `project_trackings` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_dashboard_filters`
+-- Estructura de la tabla `user_dashboard_filters`
 --
 
 DROP TABLE IF EXISTS `user_dashboard_filters`;
@@ -834,7 +839,7 @@ CREATE TABLE `user_dashboard_filters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_dashboard_filters`
+-- Datos para la tabla `user_dashboard_filters`
 --
 
 LOCK TABLES `user_dashboard_filters` WRITE;
@@ -843,7 +848,7 @@ LOCK TABLES `user_dashboard_filters` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_hours_summary`
+-- Estructura de la tabla `user_hours_summary`
 --
 
 DROP TABLE IF EXISTS `user_hours_summary`;
@@ -874,7 +879,7 @@ CREATE TABLE `user_hours_summary` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_hours_summary`
+-- Datos para la tabla `user_hours_summary`
 --
 
 LOCK TABLES `user_hours_summary` WRITE;
@@ -883,7 +888,7 @@ LOCK TABLES `user_hours_summary` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_leaders`
+-- Estructura de la tabla `user_leaders`
 --
 
 DROP TABLE IF EXISTS `user_leaders`;
@@ -910,7 +915,7 @@ CREATE TABLE `user_leaders` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_leaders`
+-- Datos para la tabla `user_leaders`
 --
 
 LOCK TABLES `user_leaders` WRITE;
@@ -920,7 +925,7 @@ INSERT INTO `user_leaders` VALUES (3,5,6,'2026-01-01','2026-04-21','Asignaci├�
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_monthly_capacities`
+-- Estructura de la tabla `user_monthly_capacities`
 --
 
 DROP TABLE IF EXISTS `user_monthly_capacities`;
@@ -942,7 +947,7 @@ CREATE TABLE `user_monthly_capacities` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_monthly_capacities`
+-- Datos para la tabla `user_monthly_capacities`
 --
 
 LOCK TABLES `user_monthly_capacities` WRITE;
@@ -952,7 +957,7 @@ INSERT INTO `user_monthly_capacities` VALUES (1,5,'2026-01','Enero 2026',120.00,
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_monthly_status`
+-- Estructura de la tabla `user_monthly_status`
 --
 
 DROP TABLE IF EXISTS `user_monthly_status`;
@@ -982,7 +987,7 @@ CREATE TABLE `user_monthly_status` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_monthly_status`
+-- Datos para la tabla `user_monthly_status`
 --
 
 LOCK TABLES `user_monthly_status` WRITE;
@@ -991,7 +996,7 @@ LOCK TABLES `user_monthly_status` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_vacation_periods`
+-- Estructura de la tabla `user_vacation_periods`
 --
 
 DROP TABLE IF EXISTS `user_vacation_periods`;
@@ -1013,7 +1018,7 @@ CREATE TABLE `user_vacation_periods` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_vacation_periods`
+-- Datos para la tabla `user_vacation_periods`
 --
 
 LOCK TABLES `user_vacation_periods` WRITE;
@@ -1023,7 +1028,7 @@ INSERT INTO `user_vacation_periods` VALUES (1,5,'2024-05-01','2024-05-15',15,'Va
 UNLOCK TABLES;
 
 --
--- Table structure for table `users`
+-- Estructura de la tabla `users`
 --
 
 DROP TABLE IF EXISTS `users`;
@@ -1044,21 +1049,27 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_profile_id_foreign` (`profile_id`),
   CONSTRAINT `users_profile_id_foreign` FOREIGN KEY (`profile_id`) REFERENCES `profiles` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Datos para la tabla `users`
 --
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Admin Power User','admin@evm.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,'2026-04-12 22:15:35'),(2,'daniel','daniel@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,'2026-04-15 14:54:20','2026-04-15 14:55:52'),(5,'Pedro Pablo','pedro.pablo@test.com',NULL,'$2a$11$OC4SWs6i89qU0hfhwH0/U.LUlpn69RiziNtmca3n.rdIn1izhdVHi',2,1,NULL,'2026-04-20 04:01:59','2026-04-26 20:22:40');
+INSERT INTO `users` VALUES
+(1,'Admin','admin@evm.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(2,'Daniel','daniel@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(3,'Diego','diego@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(4,'Lucia','lucia@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(5,'Santiago','santi@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(6,'Christian','chris@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `working_days_calendar`
+-- Estructura de la tabla `working_days_calendar`
 --
 
 DROP TABLE IF EXISTS `working_days_calendar`;
@@ -1086,7 +1097,7 @@ CREATE TABLE `working_days_calendar` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `working_days_calendar`
+-- Datos para la tabla `working_days_calendar`
 --
 
 LOCK TABLES `working_days_calendar` WRITE;
@@ -1104,4 +1115,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-28  0:03:09
+-- Exportación completada el 2026-04-28 00:03:09
