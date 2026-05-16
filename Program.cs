@@ -24,20 +24,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SistemaGestion API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        In = ParameterLocation.Header,
-        Description = "Ingresá el token: Bearer {token}"
+        Name = "auth_token",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Cookie,
+        Description = "Autenticación por cookie. Llamá a POST /api/auth/login primero."
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "cookieAuth" }
             },
             []
         }
@@ -56,12 +55,13 @@ builder.Services.AddScoped<ProjectMetricsService>();
 builder.Services.AddScoped<ProjectIntakeService>();
 
 var app = builder.Build();
-var publicRoutes = new[] { "/api/auth/login", "/api/auth/login-with-profile", "/api/health", "/api/log-action", "/swagger" };
+var publicRoutes = new[] { "/api/auth/login", "/api/health", "/api/log-action", "/swagger" };
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseWhen(
     context => !publicRoutes.Any(route =>
