@@ -1,25 +1,25 @@
 -- =====================================================================
 -- 03_schema.sql
--- change_audit_log — cross-cutting audit log (RF-11).
+-- change_audit_log — registro de auditoría transversal (RF-11).
 --
--- Approved by client after internal review with Sergio. Approval was
--- conditional on no performance impact, hence:
---   * `user_id` has NO FK → audit log survives user deletes and avoids
---     lock contention with the users table.
---   * `module` is stored as string (no FK) to decouple RBAC schema
---     evolution from audit history.
---   * Indexes target the three expected access patterns:
---       (a) "history of this record"      → (entity, record_id, ts)
---       (b) "what did this user do"       → (user_id, ts)
---       (c) retention sweeps              → (ts)
---   * Population happens via interceptor in the backend (EF Core
---     SaveChangesInterceptor + explicit hook in AuthController for
---     login/logout). NO audit calls from controllers.
+-- Aprobado por el cliente luego de revisión interna con Sergio.
+-- La aprobación fue condicional a no generar impacto en performance:
+--   * `user_id` NO tiene FK → el log de auditoría sobrevive eliminaciones
+--     de usuarios y evita contención de locks con la tabla users.
+--   * `module` se guarda como string (sin FK) para desacoplar la
+--     evolución del esquema RBAC del historial de auditoría.
+--   * Los índices apuntan a los tres patrones de acceso esperados:
+--       (a) "historial de este registro"  → (entity, record_id, ts)
+--       (b) "qué hizo este usuario"       → (user_id, ts)
+--       (c) barridos de retención         → (ts)
+--   * La población ocurre vía interceptor en el backend
+--     (EF Core SaveChangesInterceptor + hook explícito en AuthController
+--     para login/logout). Sin llamadas de auditoría desde controllers.
 --
--- Naming note: the column is `event_type` (not `action`) to avoid
--- confusion with the RBAC `actions` table — this column carries the
--- type of audited event (create/update/delete/login/logout), which is
--- a different concept from access level.
+-- Nota de nomenclatura: la columna es `event_type` (no `action`) para
+-- evitar confusión con la tabla RBAC `actions` — esta columna representa
+-- el tipo de evento auditado (create/update/delete/login/logout), que es
+-- un concepto distinto al nivel de acceso.
 -- =====================================================================
 
 USE pm_clockify_evm;
