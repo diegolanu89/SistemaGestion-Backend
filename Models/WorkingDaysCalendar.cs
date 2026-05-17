@@ -9,6 +9,8 @@ public class WorkingDaysCalendar
     public ulong Id { get; set; }
     [Column("month_key")]
     public string MonthKey { get; set; } = string.Empty;
+    [Column("month_label")]
+    public string MonthLabel { get; set; } = string.Empty;
     [Column("year")]
     public int Year { get; set; }
     [Column("month")]
