@@ -279,7 +279,8 @@ public class ProjectIntakesController : ControllerBase
             {
                 try
                 {
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(dto.ProjectName, dto.ClientId);
+                    var clockifyName = $"{internalNumber} - {dto.ProjectName}";
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, dto.ClientId);
                     record.ClockifyRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
@@ -373,8 +374,8 @@ public class ProjectIntakesController : ControllerBase
             {
                 try
                 {
-                    var projectName = record.ProjectName ?? string.Empty;
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(projectName, record.ClientId);
+                    var clockifyName = $"{record.InternalProjectNumber} - {record.ProjectName ?? string.Empty}";
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, record.ClientId);
                     record.ClockifyRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
