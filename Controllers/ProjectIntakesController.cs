@@ -24,6 +24,29 @@ public class ProjectIntakesController : ControllerBase
         _logger = logger;
     }
 
+    // GET /api/project-intakes/next-number?type=30
+    [HttpGet("next-number")]
+    public async Task<IActionResult> GetNextNumber([FromQuery] string type)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return UnprocessableEntity(new { success = false, message = "El parámetro 'type' es obligatorio" });
+
+            var typeExists = await _db.ProjectIntakeTypeRefs.AnyAsync(t => t.Code == type && t.IsActive);
+            if (!typeExists)
+                return UnprocessableEntity(new { success = false, message = $"Tipo de proyecto '{type}' no válido o inactivo" });
+
+            var nextNumber = await _intakeService.GenerateInternalProjectNumberAsync(type);
+            return Ok(new { success = true, data = new { nextNumber } });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener próximo número de proyecto para tipo {Type}", type);
+            return StatusCode(500, new { success = false, message = "Error al calcular el próximo número", error = e.Message });
+        }
+    }
+
     // GET /api/project-intakes/options
     // Debe ir antes de {id} para que no sea tratado como un id
     [HttpGet("options")]
