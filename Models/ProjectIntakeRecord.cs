@@ -33,9 +33,8 @@ public class ProjectIntakeRecord
     public string? CommercialStatus { get; set; }
     [Column("client_id")]
     public ulong? ClientId { get; set; }
-
-    [Column("leader_name")]
-    public string? LeaderName { get; set; }
+    [Column("leader_clockify_user_id")]
+    public ulong? LeaderClockifyUserId { get; set; }
     [Column("observations")]
     public string? Observations { get; set; }
     [Column("requires_clockify_creation")]
@@ -58,4 +57,5 @@ public class ProjectIntakeRecord
     public ProjectIntakeStatusRef? StatusRef { get; set; }
     public ClockifyProject? ClockifyProject { get; set; }
     public ClockifyClient? Client { get; set; }
+    public ClockifyUser? LeaderClockifyUser { get; set; }
 }

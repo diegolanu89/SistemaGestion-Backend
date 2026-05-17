@@ -655,7 +655,7 @@ CREATE TABLE `project_intake_records` (
   `estimated_end_date` date DEFAULT NULL,
   `actual_end_date` date DEFAULT NULL,
   `commercial_status` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `leader_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `leader_clockify_user_id` bigint unsigned DEFAULT NULL,
   `observations` text COLLATE utf8mb4_unicode_ci,
   `requires_clockify_creation` tinyint(1) NOT NULL DEFAULT '0',
   `clockify_record_id` bigint unsigned DEFAULT NULL,
@@ -672,9 +672,11 @@ CREATE TABLE `project_intake_records` (
   KEY `idx_intake_is_active` (`is_active`),
   KEY `fk_intake_clockify_project` (`clockify_record_id`),
   KEY `idx_intake_client_id` (`client_id`),
+  KEY `idx_intake_leader` (`leader_clockify_user_id`),
   CONSTRAINT `fk_intake_category_code` FOREIGN KEY (`category_code`) REFERENCES `project_intake_category_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_client` FOREIGN KEY (`client_id`) REFERENCES `clockify_clients` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_intake_clockify_project` FOREIGN KEY (`clockify_record_id`) REFERENCES `clockify_projects` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_intake_leader` FOREIGN KEY (`leader_clockify_user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_intake_project_type` FOREIGN KEY (`project_type`) REFERENCES `project_intake_type_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_status_code` FOREIGN KEY (`project_status_code`) REFERENCES `project_intake_status_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -686,7 +688,7 @@ CREATE TABLE `project_intake_records` (
 
 LOCK TABLES `project_intake_records` WRITE;
 /*!40000 ALTER TABLE `project_intake_records` DISABLE KEYS */;
-INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,'Juan P├®rez','Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,'Mar├¡a Garc├¡a','En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(5,'10','10.001','SOP-2023-005','2023-01-10','TechCorp SA',NULL,'Soporte Mesa de Ayuda','SOP','CERRADO','2023-01-10','2023-12-31','2023-12-28',NULL,'Carlos L├│pez','Proyecto cerrado exitosamente',0,NULL,1,2,0,'2026-04-27 19:37:21','2026-04-27 19:40:53'),(6,'40','40.001','COM-2025-010','2025-01-20','Global Corp',NULL,'Expansi├│n Regional LATAM','STAFF','EN_CURSO','2025-01-20','2025-09-30',NULL,'Propuesta aceptada ÔÇö contrato firmado','Ana Rodr├¡guez','Inicio Q1 2025',0,NULL,1,1,1,'2026-04-27 19:37:28','2026-04-27 19:37:28'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(9,'10','10.002',NULL,'2025-04-27','Cliente Para Borrar SA',NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',0,NULL,2,2,0,'2026-04-27 19:45:30','2026-04-27 19:46:01'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45'),(11,'10','10.003',NULL,'2025-04-27',NULL,NULL,'Proyecto Para Borrar (modificado)','SOP','EN_CURSO','2025-04-27','2025-06-30','2025-05-01',NULL,'Carlos L├│pez','Modificado antes de dar de baja',0,NULL,2,2,0,'2026-04-27 20:19:45','2026-04-27 20:20:23'),(12,'10','10.004',NULL,'2025-04-27',NULL,NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',0,NULL,2,2,1,'2026-04-27 21:35:26','2026-04-27 21:35:26'),(13,'10','10.005',NULL,'2025-04-27',NULL,NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',1,9,2,2,1,'2026-04-27 21:36:01','2026-04-27 21:36:01'),(14,'10','10.006',NULL,'2025-04-27','Anthropic Testing Corp',6,'Proyecto Borrable 23','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',1,10,2,2,1,'2026-04-27 21:37:58','2026-04-27 21:37:58');
+INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,'Juan P├®rez','Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,'Mar├¡a Garc├¡a','En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45');
 /*!40000 ALTER TABLE `project_intake_records` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -743,7 +745,7 @@ CREATE TABLE `project_intake_type_refs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_intake_type_refs_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -752,7 +754,7 @@ CREATE TABLE `project_intake_type_refs` (
 
 LOCK TABLES `project_intake_type_refs` WRITE;
 /*!40000 ALTER TABLE `project_intake_type_refs` DISABLE KEYS */;
-INSERT INTO `project_intake_type_refs` VALUES (8,'30','Desarrollo','Proyectos de desarrollo de software','Nro. Proyecto Desarrollo','Nro. Proyecto Comercial','Fecha de Alta',1,0,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06'),(9,'10','Soporte','Proyectos de soporte y mantenimiento','Nro. Proyecto Soporte','Nro. Proyecto Comercial','Fecha de Alta',1,1,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06'),(10,'40','Comercial','Proyectos con seguimiento comercial activo','Nro. Proyecto Interno','Nro. Proyecto Comercial','Fecha de Alta',1,0,1,1,'2026-04-27 19:35:06','2026-04-27 19:35:06');
+INSERT INTO `project_intake_type_refs` VALUES (1,'30','Desarrollo','Proyectos de desarrollo de software','Nro. Proyecto Desarrollo','Nro. Proyecto Comercial','Fecha de Alta',1,0,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06');
 /*!40000 ALTER TABLE `project_intake_type_refs` ENABLE KEYS */;
 UNLOCK TABLES;
 
