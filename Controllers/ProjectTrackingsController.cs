@@ -54,6 +54,11 @@ public class ProjectTrackingsController : ControllerBase
     {
         try
         {
+            if (dto.StartDate == default)
+                return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
+            if (dto.PlannedEndDate == default)
+                return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
+
             var projectExists = await _db.ClockifyProjects.AnyAsync(p => p.Id == projectId);
             if (!projectExists)
                 return NotFound(new { success = false, message = "Proyecto no encontrado" });
@@ -99,6 +104,11 @@ public class ProjectTrackingsController : ControllerBase
             if (tracking == null)
                 return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado. Usá POST para crear." });
 
+            if (dto.StartDate == default)
+                return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
+            if (dto.PlannedEndDate == default)
+                return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
+
             tracking.StartDate = dto.StartDate;
             tracking.PlannedEndDate = dto.PlannedEndDate;
             tracking.ActualEndDate = dto.ActualEndDate;
@@ -123,6 +133,8 @@ public class ProjectTrackingsController : ControllerBase
     {
         try
         {
+            if (dto.ChangeEndDate == default)
+                return UnprocessableEntity(new { success = false, message = "change_end_date es obligatorio" });
             if (string.IsNullOrWhiteSpace(dto.Observations))
                 return UnprocessableEntity(new { success = false, message = "Las observaciones son obligatorias" });
 
