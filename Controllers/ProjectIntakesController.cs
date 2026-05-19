@@ -130,7 +130,10 @@ public class ProjectIntakesController : ControllerBase
         [FromQuery] int per_page = 15,
         [FromQuery] string? project_type = null,
         [FromQuery] string? project_status_code = null,
-        [FromQuery] string? is_active = null)
+        [FromQuery] string? is_active = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null,
+        [FromQuery] string? category = null)
     {
         try
         {
@@ -148,6 +151,18 @@ public class ProjectIntakesController : ControllerBase
 
             if (!string.IsNullOrEmpty(project_status_code))
                 query = query.Where(r => r.ProjectStatusCode == project_status_code);
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(r =>
+                    (r.ProjectName != null && r.ProjectName.Contains(search)) ||
+                    (r.ClientName != null && r.ClientName.Contains(search)) ||
+                    (r.Observations != null && r.Observations.Contains(search)));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(r => r.ProjectStatusCode == status);
+
+            if (!string.IsNullOrEmpty(category))
+                query = query.Where(r => r.CategoryCode == category);
 
             // Por defecto muestra solo activos; pasar is_active=false para ver dados de baja
             var showActive = is_active?.ToLower() != "false";

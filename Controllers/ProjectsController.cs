@@ -29,7 +29,11 @@ public class ProjectsController : ControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int per_page = 15,
-        [FromQuery] string only_visible = "true")
+        [FromQuery] string only_visible = "true",
+        [FromQuery] string? search = null,
+        [FromQuery] string? client = null,
+        [FromQuery] string? status = null,
+        [FromQuery] string? code = null)
     {
         try
         {
@@ -60,6 +64,18 @@ public class ProjectsController : ControllerBase
                     query = query.Where(p => p.Filter != null);
                 }
             }
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(p => p.Name.Contains(search));
+
+            if (!string.IsNullOrEmpty(client))
+                query = query.Where(p => p.Client != null && p.Client.Name.Contains(client));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(p => p.Status == status);
+
+            if (!string.IsNullOrEmpty(code))
+                query = query.Where(p => p.Code == code);
 
             query = query
                 .OrderBy(p => p.Status == "activo" ? 0 : 1)
