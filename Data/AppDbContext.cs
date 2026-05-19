@@ -119,6 +119,12 @@ public class AppDbContext : DbContext
             .HasForeignKey(r => r.ClientId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.LeaderClockifyUser)
+            .WithMany()
+            .HasForeignKey(r => r.LeaderClockifyUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // RBAC normalizado — Module/PermissionAction/Permission/ProfilePermission
         modelBuilder.Entity<Permission>()
             .HasOne(p => p.Module)
