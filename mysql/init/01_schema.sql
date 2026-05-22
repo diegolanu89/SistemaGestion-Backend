@@ -50,35 +50,6 @@ LOCK TABLES `app_user_visible_projects` WRITE;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `calendar_months`
---
-
-DROP TABLE IF EXISTS `calendar_months`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `calendar_months` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'YYYY-MM',
-  `month_label` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort_order` int unsigned NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `calendar_months_month_key_unique` (`month_key`)
-) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Datos para la tabla `calendar_months`
---
-
-LOCK TABLES `calendar_months` WRITE;
-/*!40000 ALTER TABLE `calendar_months` DISABLE KEYS */;
-INSERT INTO `calendar_months` VALUES (123,'2024-01','Enero 2024',0,NULL,NULL),(124,'2024-02','Febrero 2024',0,NULL,NULL);
-/*!40000 ALTER TABLE `calendar_months` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Estructura de la tabla `change_requests`
 --
 
@@ -114,7 +85,6 @@ CREATE TABLE `change_requests` (
 
 LOCK TABLES `change_requests` WRITE;
 /*!40000 ALTER TABLE `change_requests` DISABLE KEYS */;
-INSERT INTO `change_requests` VALUES (2,1,'CC-002','Cambio de tecnolog├¡a','Migraci├│n de base de datos','Mar├¡a Garc├¡a','2026-02-01','aprobado',100.00,5000.00,'Director TI','2025-05-15','2026-04-20 23:51:54','2026-04-21 18:52:44'),(3,1,'CC-003','Nuevo requerimiento via change-log',NULL,NULL,'2026-03-01','propuesto',10.00,1000.00,NULL,NULL,'2026-04-20 23:54:30','2026-04-20 23:54:30'),(4,1,'CC-001','Ampliaci├│n de alcance m├│dulo reportes','Se agregan 3 nuevos reportes al m├│dulo de an├ílisis','Juan Perez','2025-05-01','propuesto',80.00,4000.00,NULL,NULL,'2026-04-21 18:25:39','2026-04-21 18:25:39');
 /*!40000 ALTER TABLE `change_requests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +113,7 @@ CREATE TABLE `clockify_clients` (
 
 LOCK TABLES `clockify_clients` WRITE;
 /*!40000 ALTER TABLE `clockify_clients` DISABLE KEYS */;
-INSERT INTO `clockify_clients` VALUES (1,'Cliente Global Corp',NULL,'activo',NULL,NULL),(2,'Tech Startups Inc',NULL,'activo',NULL,NULL),(3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
+INSERT INTO `clockify_clients` VALUES (3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
 /*!40000 ALTER TABLE `clockify_clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -171,7 +141,7 @@ CREATE TABLE `clockify_project_filters` (
 
 LOCK TABLES `clockify_project_filters` WRITE;
 /*!40000 ALTER TABLE `clockify_project_filters` DISABLE KEYS */;
-INSERT INTO `clockify_project_filters` VALUES (3,1,'2026-04-21 18:00:14','2026-04-21 18:00:14'),(4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
+INSERT INTO `clockify_project_filters` VALUES (4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
 /*!40000 ALTER TABLE `clockify_project_filters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -214,7 +184,7 @@ CREATE TABLE `clockify_projects` (
 
 LOCK TABLES `clockify_projects` WRITE;
 /*!40000 ALTER TABLE `clockify_projects` DISABLE KEYS */;
-INSERT INTO `clockify_projects` VALUES (1,'proj_001','Implementaci├│n ERP',NULL,1,'activo',NULL,NULL,NULL,1200.00,60000.00,1390.00,70000.00,50.00,'automatic',NULL,'2026-04-21 21:10:50'),(2,'proj_002','App M├│vil v2',NULL,2,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,50.00,'manual',NULL,'2026-04-21 21:10:50'),(3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46'),(9,'69efd6c003616156f988a83c','Proyecto Borrable',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 21:36:02','2026-04-27 21:36:02'),(10,'69efd7357a2446b5d9fd1642','Proyecto Borrable 23',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 21:37:59','2026-04-27 21:37:59');
+INSERT INTO `clockify_projects` VALUES (3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46');
 /*!40000 ALTER TABLE `clockify_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -258,7 +228,7 @@ CREATE TABLE `clockify_time_entries` (
 
 LOCK TABLES `clockify_time_entries` WRITE;
 /*!40000 ALTER TABLE `clockify_time_entries` DISABLE KEYS */;
-INSERT INTO `clockify_time_entries` VALUES (1,'te_01',1,NULL,'Desarrollo backend','2024-01-10 09:00:00','2024-01-10 17:00:00',8.000,1,NULL,NULL,NULL,NULL),(2,'te_02',1,NULL,'Reuni├│n de avance','2024-01-10 10:00:00','2024-01-10 14:00:00',4.000,1,NULL,NULL,NULL,NULL),(3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
+INSERT INTO `clockify_time_entries` VALUES (3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
 /*!40000 ALTER TABLE `clockify_time_entries` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -291,7 +261,7 @@ CREATE TABLE `clockify_users` (
 
 LOCK TABLES `clockify_users` WRITE;
 /*!40000 ALTER TABLE `clockify_users` DISABLE KEYS */;
-INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(9,'','Juan P├®rez','juan.perez@empresa.com','developer',1,160.00,'2026-04-21 00:58:56','2026-04-21 00:58:56'),(11,'abc123xyz','Usuario Vinculado','vinculado@empresa.com',NULL,1,NULL,'2026-04-21 00:59:33','2026-04-21 00:59:33'),(13,'manual_d2c27a72f5f84ff593c4731ae5142543','Esteban Quito','juan.perez@empresa.com','MEMBER',1,160.00,'2026-04-21 17:23:57','2026-04-21 17:23:57'),(14,'manual_0f0246d75f6240328cd00cc189bd9265','Esteban Quito','juan.perez@empresa.com','MEMBER',1,160.00,'2026-04-21 17:24:08','2026-04-21 17:24:08'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
+INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
 /*!40000 ALTER TABLE `clockify_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -309,7 +279,7 @@ CREATE TABLE `etc_records` (
   `user_id` bigint unsigned DEFAULT NULL,
   `user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `hours` decimal(10,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -332,7 +302,6 @@ CREATE TABLE `etc_records` (
 
 LOCK TABLES `etc_records` WRITE;
 /*!40000 ALTER TABLE `etc_records` DISABLE KEYS */;
-INSERT INTO `etc_records` VALUES (3,1,1,7,'haunau.lucia','2026-05','Mayo 2026',40.00,'2026-04-21 11:50:23','2026-04-21 11:50:23'),(4,1,1,8,'santiagoguerci96','2026-06','Junio 2026',80.00,'2026-04-21 11:50:36','2026-04-21 11:50:36'),(5,1,2,6,'diegolanus89','2026-05','Mayo 2026',60.00,'2026-04-21 11:55:17','2026-04-21 11:55:17'),(6,1,2,7,'haunau.lucia','2026-06','Junio 2026',40.00,'2026-04-21 11:55:17','2026-04-21 11:55:17'),(7,1,2,6,'diegolanus89','2026-07','Julio 2026',50.00,'2026-04-21 11:55:38','2026-04-21 11:55:38'),(8,1,2,7,'haunau.lucia','2026-07','Julio 2026',30.00,'2026-04-21 11:55:38','2026-04-21 11:55:38'),(9,2,3,5,'daniel.alcazar','2025-05','Mayo 2025',80.00,'2026-04-21 16:02:36','2026-04-21 16:02:36'),(10,1,4,9,'Juan Perez','2025-05','Mayo 2025',80.00,'2026-04-21 16:06:44','2026-04-21 16:06:44'),(11,1,4,NULL,'Maria Lopez','2025-06','Junio 2025',120.00,'2026-04-21 16:06:44','2026-04-21 16:06:44'),(12,1,4,9,'Juan Perez','2025-05','Mayo 2025',80.00,'2026-04-21 16:08:08','2026-04-21 16:08:08'),(13,1,4,5,'daniel.alcazar','2025-06','Junio 2025',100.00,'2026-04-21 16:08:08','2026-04-21 16:08:08');
 /*!40000 ALTER TABLE `etc_records` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -362,7 +331,6 @@ CREATE TABLE `etc_snapshots` (
 
 LOCK TABLES `etc_snapshots` WRITE;
 /*!40000 ALTER TABLE `etc_snapshots` DISABLE KEYS */;
-INSERT INTO `etc_snapshots` VALUES (1,1,1,'Estimaci├│n Inicial Enero',NULL,NULL),(2,1,2,'Semana 2','2026-04-21 11:55:17','2026-04-21 11:55:17'),(3,2,1,'L├¡nea base','2026-04-21 16:02:36','2026-04-21 16:02:36'),(4,1,3,'Semana 3','2026-04-21 16:06:44','2026-04-21 16:06:44');
 /*!40000 ALTER TABLE `etc_snapshots` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -500,7 +468,7 @@ CREATE TABLE `potencial_clients` (
 
 LOCK TABLES `potencial_clients` WRITE;
 /*!40000 ALTER TABLE `potencial_clients` DISABLE KEYS */;
-INSERT INTO `potencial_clients` VALUES (1,'Prospecto Miner├¡a S.A.',NULL,NULL),(2,'Banco Galicia','2026-04-16 21:56:52','2026-04-16 21:56:52');
+INSERT INTO `potencial_clients` VALUES (2,'Banco Galicia','2026-04-16 21:56:52','2026-04-16 21:56:52');
 /*!40000 ALTER TABLE `potencial_clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -515,7 +483,7 @@ CREATE TABLE `potencial_project_allocations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `potencial_project_id` bigint unsigned NOT NULL,
   `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hours` decimal(10,2) NOT NULL DEFAULT '0.00',
@@ -565,7 +533,6 @@ CREATE TABLE `potencial_projects` (
 
 LOCK TABLES `potencial_projects` WRITE;
 /*!40000 ALTER TABLE `potencial_projects` DISABLE KEYS */;
-INSERT INTO `potencial_projects` VALUES (4,'Proyecto Sin C├│digo',NULL,2,'2026-04-21 11:28:26','2026-04-21 11:28:26'),(5,'Proyecto Nuevo','PROY-01',1,'2026-04-21 18:16:51','2026-04-21 18:16:51');
 /*!40000 ALTER TABLE `potencial_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -688,7 +655,7 @@ CREATE TABLE `project_intake_records` (
 
 LOCK TABLES `project_intake_records` WRITE;
 /*!40000 ALTER TABLE `project_intake_records` DISABLE KEYS */;
-INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,'Juan P├®rez','Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,'Mar├¡a Garc├¡a','En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45');
+INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,6,'Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,7,'En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,5,'Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,5,'Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45');
 /*!40000 ALTER TABLE `project_intake_records` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -862,7 +829,7 @@ CREATE TABLE `user_hours_summary` (
   `project_id` int unsigned DEFAULT NULL,
   `client_id` int unsigned DEFAULT NULL,
   `leader_id` bigint unsigned DEFAULT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `duration_hours` decimal(10,3) NOT NULL DEFAULT '0.000',
@@ -936,8 +903,8 @@ DROP TABLE IF EXISTS `user_monthly_capacities`;
 CREATE TABLE `user_monthly_capacities` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hours` decimal(8,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -968,7 +935,7 @@ DROP TABLE IF EXISTS `user_monthly_status`;
 CREATE TABLE `user_monthly_status` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `status` enum('activo','inactivo','vacaciones','licencia','baja') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
@@ -1079,7 +1046,8 @@ DROP TABLE IF EXISTS `working_days_calendar`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `working_days_calendar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `total_days` int NOT NULL,
@@ -1095,7 +1063,7 @@ CREATE TABLE `working_days_calendar` (
   UNIQUE KEY `working_days_calendar_month_key_unique` (`month_key`),
   KEY `idx_wdc_month_key` (`month_key`),
   KEY `idx_wdc_year_month` (`year`,`month`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1104,7 +1072,21 @@ CREATE TABLE `working_days_calendar` (
 
 LOCK TABLES `working_days_calendar` WRITE;
 /*!40000 ALTER TABLE `working_days_calendar` DISABLE KEYS */;
-INSERT INTO `working_days_calendar` VALUES (2,'2024-02',2024,2,29,21,168.00,0,NULL,NULL,NULL,NULL),(3,'2026-04',2026,4,30,22,176.00,0,NULL,'Abril 2026','2026-04-21 00:32:22','2026-04-21 00:32:22'),(4,'2026-05',2026,5,31,20,160.00,2,'[\"2026-05-01\", \"2026-05-25\"]','Mayo 2026 con feriados','2026-04-21 00:32:45','2026-04-21 00:32:45');
+-- Columnas: id, month_key, month_label, year, month, total_days, working_days, hours_month, holiday_days, holidays_list, notes, created_at, updated_at
+-- Feriados nacionales Argentina 2026 (inamovibles + móviles calculados)
+INSERT INTO `working_days_calendar` VALUES
+(1, '2026-01','Enero 2026',     2026,1, 31,21,168.00,1, '[\"2026-01-01\"]',                       NULL,NULL,NULL),
+(2, '2026-02','Febrero 2026',   2026,2, 28,18,144.00,2, '[\"2026-02-16\",\"2026-02-17\"]',         'Carnaval',NULL,NULL),
+(3, '2026-03','Marzo 2026',     2026,3, 31,21,168.00,1, '[\"2026-03-24\"]',                       NULL,NULL,NULL),
+(4, '2026-04','Abril 2026',     2026,4, 30,20,160.00,2, '[\"2026-04-02\",\"2026-04-03\"]',         'Semana Santa',NULL,NULL),
+(5, '2026-05','Mayo 2026',      2026,5, 31,19,152.00,2, '[\"2026-05-01\",\"2026-05-25\"]',         NULL,NULL,NULL),
+(6, '2026-06','Junio 2026',     2026,6, 30,21,168.00,1, '[\"2026-06-17\"]',                       'Jun 20 cae sábado',NULL,NULL),
+(7, '2026-07','Julio 2026',     2026,7, 31,22,176.00,1, '[\"2026-07-09\"]',                       NULL,NULL,NULL),
+(8, '2026-08','Agosto 2026',    2026,8, 31,20,160.00,1, '[\"2026-08-17\"]',                       NULL,NULL,NULL),
+(9, '2026-09','Septiembre 2026',2026,9, 30,22,176.00,0, NULL,                                     NULL,NULL,NULL),
+(10,'2026-10','Octubre 2026',   2026,10,31,21,168.00,1, '[\"2026-10-12\"]',                       NULL,NULL,NULL),
+(11,'2026-11','Noviembre 2026', 2026,11,30,20,160.00,1, '[\"2026-11-20\"]',                       NULL,NULL,NULL),
+(12,'2026-12','Diciembre 2026', 2026,12,31,21,168.00,2, '[\"2026-12-08\",\"2026-12-25\"]',         NULL,NULL,NULL);
 /*!40000 ALTER TABLE `working_days_calendar` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
