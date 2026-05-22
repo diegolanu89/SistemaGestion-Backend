@@ -69,6 +69,82 @@ public class EtcController : ControllerBase
         });
     }
 
+    // GET api/projects/{projectId}/etc/summary
+    // Devuelve totales por recurso (fila) y por mes (columna) para la grilla ETC
+    [HttpGet("api/projects/{projectId}/etc/summary")]
+    [RequirePermission("ETC_ACCESS")]
+    public async Task<IActionResult> GetSummary(ulong projectId, [FromQuery] string? snapshot)
+    {
+        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        if (project == null)
+            return NotFound(new { message = "Proyecto no encontrado" });
+
+        var wantBaseline = snapshot == "baseline";
+        EtcSnapshot? etcSnapshot;
+
+        if (wantBaseline)
+            etcSnapshot = await _db.EtcSnapshots
+                .Where(s => s.ProjectId == projectId)
+                .OrderBy(s => s.Version)
+                .FirstOrDefaultAsync();
+        else
+            etcSnapshot = await _db.EtcSnapshots
+                .Where(s => s.ProjectId == projectId)
+                .OrderByDescending(s => s.Version)
+                .FirstOrDefaultAsync();
+
+        List<EtcRecord> records;
+        if (etcSnapshot != null)
+            records = await _db.EtcRecords
+                .Where(r => r.SnapshotId == etcSnapshot.Id)
+                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
+                .ToListAsync();
+        else
+            records = await _db.EtcRecords
+                .Where(r => r.ProjectId == projectId && r.SnapshotId == null)
+                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
+                .ToListAsync();
+
+        // Meses únicos ordenados cronológicamente
+        var months = records.Select(r => r.MonthKey).Distinct().OrderBy(m => m).ToList();
+
+        // Agrupar por recurso → filas
+        var resourceRows = records
+            .GroupBy(r => r.UserName ?? "Sin nombre")
+            .Select(g => new EtcResourceRowDto
+            {
+                UserId = g.First().UserId,
+                UserName = g.Key,
+                HoursByMonth = months.ToDictionary(m => m, m => g.Where(r => r.MonthKey == m).Sum(r => r.Hours)),
+                Total = g.Sum(r => r.Hours)
+            })
+            .OrderBy(r => r.UserName)
+            .ToList();
+
+        // Totales por mes → columnas
+        var totalsByMonth = months.ToDictionary(
+            m => m,
+            m => records.Where(r => r.MonthKey == m).Sum(r => r.Hours)
+        );
+
+        var summary = new EtcSummaryDto
+        {
+            Snapshot = etcSnapshot != null ? new
+            {
+                id = etcSnapshot.Id,
+                version = etcSnapshot.Version,
+                label = etcSnapshot.Label,
+                created_at = etcSnapshot.CreatedAt?.ToString("o")
+            } : null,
+            Months = months,
+            Resources = resourceRows,
+            TotalsByMonth = totalsByMonth,
+            GrandTotal = records.Sum(r => r.Hours)
+        };
+
+        return Ok(new { success = true, data = summary });
+    }
+
     // POST api/projects/{projectId}/etc
     [HttpPost("api/projects/{projectId}/etc")]
     [RequirePermission("ETC_EDIT")]
