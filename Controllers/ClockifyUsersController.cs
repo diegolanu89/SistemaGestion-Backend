@@ -168,4 +168,33 @@ public class ClockifyUsersController : ControllerBase
             return StatusCode(500, new { success = false, message = "Error al eliminar el usuario" });
         }
     }
+
+    // GET api/clockify-users/options
+    // Devuelve lista plana sin paginar, pensada para poblar dropdowns/selects.
+    // Por defecto trae solo activos; pasar ?active=false para incluir también inactivos.
+    [HttpGet("options")]
+    public async Task<IActionResult> GetOptions([FromQuery] bool active = true)
+    {
+        try
+        {
+            var query = _db.ClockifyUsers.AsQueryable();
+            if (active)
+                query = query.Where(u => u.Active);
+            var users = await query
+                .OrderBy(u => u.Name)
+                .Select(u => new ClockifyUserDto
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email
+                })
+                .ToListAsync();
+            return Ok(new { success = true, data = new { users } });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener opciones de clockify_users");
+            return StatusCode(500, new { success = false, message = "Error al obtener las opciones", error = e.Message });
+        }
+    }
 }
