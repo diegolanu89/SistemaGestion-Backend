@@ -37,6 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<PermissionAction> Actions { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<ProfilePermission> ProfilePermissions { get; set; }
+    public DbSet<ChangeAuditLog> ChangeAuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
