@@ -72,7 +72,9 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
                 case EntityState.Added:
                     eventType = AuditEventType.Create;
                     oldJson = null;
-                    newJson = SerializeProperties(entry, modifiedOnly: false, useOriginal: false);
+                    // PKs generadas por la DB todavía no están aquí (EF usa
+                    // un sentinel temporal). Se serializa en SavedChangesAsync.
+                    newJson = null;
                     break;
 
                 case EntityState.Modified:
@@ -131,6 +133,10 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
         var rows = new List<ChangeAuditLog>(pending.Count);
         foreach (var p in pending)
         {
+            var newJson = p.EventType == AuditEventType.Create
+                ? SerializeProperties(p.Entry, modifiedOnly: false, useOriginal: false)
+                : p.NewJson;
+
             rows.Add(new ChangeAuditLog
             {
                 Ts = now,
@@ -141,7 +147,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
                 RecordId = ResolveRecordId(p.Entry),
                 EventType = p.EventType,
                 OldValue = p.OldJson,
-                NewValue = p.NewJson,
+                NewValue = newJson,
                 RequestId = requestId,
                 Ip = ip
             });
