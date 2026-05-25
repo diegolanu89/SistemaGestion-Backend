@@ -3,6 +3,7 @@ using bdt_evm_app.Middleware;
 using bdt_evm_app.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,28 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SistemaGestion API", Version = "v1" });
+    c.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+    {
+        Name = "auth_token",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Cookie,
+        Description = "Autenticación por cookie. Llamá a POST /api/auth/login primero."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "cookieAuth" }
+            },
+            []
+        }
+    });
+});
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),
@@ -35,9 +58,13 @@ builder.Services.AddScoped<ProjectMetricsService>();
 builder.Services.AddScoped<ProjectIntakeService>();
 
 var app = builder.Build();
-var publicRoutes = new[] { "/api/auth/login", "/api/auth/login-with-profile", "/api/health", "/api/log-action" };
+var publicRoutes = new[] { "/api/auth/login", "/api/health", "/api/log-action", "/swagger" };
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseWhen(
     context => !publicRoutes.Any(route =>

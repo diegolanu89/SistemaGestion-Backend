@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -8,6 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/users")]
+[RequirePermission("ADMIN_ACCESS")]
 public class UsersController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -68,12 +70,28 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return UnprocessableEntity(new { message = "El nombre es requerido" });
+
+        if (string.IsNullOrWhiteSpace(dto.Email) || !IsValidEmail(dto.Email))
+            return UnprocessableEntity(new { message = "El correo no es válido" });
+
+        if (string.IsNullOrWhiteSpace(dto.Password))
+            return UnprocessableEntity(new { message = "La contraseña es requerida" });
+
+        if (dto.Password.Length < 8)
+            return UnprocessableEntity(new { message = "La contraseña debe tener al menos 8 caracteres" });
+
         if (dto.Password != dto.PasswordConfirmation)
             return UnprocessableEntity(new { message = "Las contraseñas no coinciden" });
 
+        var profileExists = await _db.Profiles.AnyAsync(p => p.Id == dto.ProfileId);
+        if (!profileExists)
+            return UnprocessableEntity(new { message = "El perfil especificado no existe" });
+
         var emailExists = await _db.Users.AnyAsync(u => u.Email == dto.Email);
         if (emailExists)
-            return UnprocessableEntity(new { message = "El email ya está en uso" });
+            return UnprocessableEntity(new { message = "El correo ya está en uso" });
 
         var user = new User
         {
@@ -114,8 +132,17 @@ public class UsersController : ControllerBase
         if (user == null)
             return NotFound(new { message = "No encontrado" });
 
+        if (dto.Name != null && string.IsNullOrWhiteSpace(dto.Name))
+            return UnprocessableEntity(new { message = "El nombre no puede estar vacío" });
+
+        if (dto.Email != null && !IsValidEmail(dto.Email))
+            return UnprocessableEntity(new { message = "El correo no es válido" });
+
         if (dto.Password != null)
         {
+            if (dto.Password.Length < 8)
+                return UnprocessableEntity(new { message = "La contraseña debe tener al menos 8 caracteres" });
+
             if (dto.Password != dto.PasswordConfirmation)
                 return UnprocessableEntity(new { message = "Las contraseñas no coinciden" });
 
@@ -127,7 +154,7 @@ public class UsersController : ControllerBase
         {
             var emailExists = await _db.Users.AnyAsync(u => u.Email == dto.Email && u.Id != id);
             if (emailExists)
-                return UnprocessableEntity(new { message = "El email ya está en uso" });
+                return UnprocessableEntity(new { message = "El correo ya está en uso" });
             user.Email = dto.Email;
         }
         if (dto.ProfileId != null) user.ProfileId = dto.ProfileId;
@@ -158,9 +185,16 @@ public class UsersController : ControllerBase
         if (user == null)
             return NotFound(new { message = "No encontrado" });
 
-        _db.Users.Remove(user);
+        user.Active = false;
+        user.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
-        return Ok(new { message = "Usuario eliminado" });
+        return Ok(new { message = "Usuario desactivado" });
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        try { _ = new System.Net.Mail.MailAddress(email); return true; }
+        catch { return false; }
     }
 }

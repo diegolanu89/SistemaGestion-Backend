@@ -22,7 +22,7 @@ USE pm_clockify_evm;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `app_user_visible_projects`
+-- Estructura de la tabla `app_user_visible_projects`
 --
 
 DROP TABLE IF EXISTS `app_user_visible_projects`;
@@ -41,7 +41,7 @@ CREATE TABLE `app_user_visible_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `app_user_visible_projects`
+-- Datos para la tabla `app_user_visible_projects`
 --
 
 LOCK TABLES `app_user_visible_projects` WRITE;
@@ -50,36 +50,7 @@ LOCK TABLES `app_user_visible_projects` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `calendar_months`
---
-
-DROP TABLE IF EXISTS `calendar_months`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `calendar_months` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'YYYY-MM',
-  `month_label` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort_order` int unsigned NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `calendar_months_month_key_unique` (`month_key`)
-) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `calendar_months`
---
-
-LOCK TABLES `calendar_months` WRITE;
-/*!40000 ALTER TABLE `calendar_months` DISABLE KEYS */;
-INSERT INTO `calendar_months` VALUES (123,'2024-01','Enero 2024',0,NULL,NULL),(124,'2024-02','Febrero 2024',0,NULL,NULL);
-/*!40000 ALTER TABLE `calendar_months` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `change_requests`
+-- Estructura de la tabla `change_requests`
 --
 
 DROP TABLE IF EXISTS `change_requests`;
@@ -109,17 +80,16 @@ CREATE TABLE `change_requests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `change_requests`
+-- Datos para la tabla `change_requests`
 --
 
 LOCK TABLES `change_requests` WRITE;
 /*!40000 ALTER TABLE `change_requests` DISABLE KEYS */;
-INSERT INTO `change_requests` VALUES (2,1,'CC-002','Cambio de tecnolog├¡a','Migraci├│n de base de datos','Mar├¡a Garc├¡a','2026-02-01','aprobado',100.00,5000.00,'Director TI','2025-05-15','2026-04-20 23:51:54','2026-04-21 18:52:44'),(3,1,'CC-003','Nuevo requerimiento via change-log',NULL,NULL,'2026-03-01','propuesto',10.00,1000.00,NULL,NULL,'2026-04-20 23:54:30','2026-04-20 23:54:30'),(4,1,'CC-001','Ampliaci├│n de alcance m├│dulo reportes','Se agregan 3 nuevos reportes al m├│dulo de an├ílisis','Juan Perez','2025-05-01','propuesto',80.00,4000.00,NULL,NULL,'2026-04-21 18:25:39','2026-04-21 18:25:39');
 /*!40000 ALTER TABLE `change_requests` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_clients`
+-- Estructura de la tabla `clockify_clients`
 --
 
 DROP TABLE IF EXISTS `clockify_clients`;
@@ -138,17 +108,17 @@ CREATE TABLE `clockify_clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_clients`
+-- Datos para la tabla `clockify_clients`
 --
 
 LOCK TABLES `clockify_clients` WRITE;
 /*!40000 ALTER TABLE `clockify_clients` DISABLE KEYS */;
-INSERT INTO `clockify_clients` VALUES (1,'Cliente Global Corp',NULL,'activo',NULL,NULL),(2,'Tech Startups Inc',NULL,'activo',NULL,NULL),(3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
+INSERT INTO `clockify_clients` VALUES (3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
 /*!40000 ALTER TABLE `clockify_clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_project_filters`
+-- Estructura de la tabla `clockify_project_filters`
 --
 
 DROP TABLE IF EXISTS `clockify_project_filters`;
@@ -166,17 +136,17 @@ CREATE TABLE `clockify_project_filters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_project_filters`
+-- Datos para la tabla `clockify_project_filters`
 --
 
 LOCK TABLES `clockify_project_filters` WRITE;
 /*!40000 ALTER TABLE `clockify_project_filters` DISABLE KEYS */;
-INSERT INTO `clockify_project_filters` VALUES (3,1,'2026-04-21 18:00:14','2026-04-21 18:00:14'),(4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
+INSERT INTO `clockify_project_filters` VALUES (4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
 /*!40000 ALTER TABLE `clockify_project_filters` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_projects`
+-- Estructura de la tabla `clockify_projects`
 --
 
 DROP TABLE IF EXISTS `clockify_projects`;
@@ -209,17 +179,17 @@ CREATE TABLE `clockify_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_projects`
+-- Datos para la tabla `clockify_projects`
 --
 
 LOCK TABLES `clockify_projects` WRITE;
 /*!40000 ALTER TABLE `clockify_projects` DISABLE KEYS */;
-INSERT INTO `clockify_projects` VALUES (1,'proj_001','Implementaci├│n ERP',NULL,1,'activo',NULL,NULL,NULL,1200.00,60000.00,1390.00,70000.00,50.00,'automatic',NULL,'2026-04-21 21:10:50'),(2,'proj_002','App M├│vil v2',NULL,2,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,50.00,'manual',NULL,'2026-04-21 21:10:50'),(3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46'),(9,'69efd6c003616156f988a83c','Proyecto Borrable',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 21:36:02','2026-04-27 21:36:02'),(10,'69efd7357a2446b5d9fd1642','Proyecto Borrable 23',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 21:37:59','2026-04-27 21:37:59');
+INSERT INTO `clockify_projects` VALUES (3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46');
 /*!40000 ALTER TABLE `clockify_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_time_entries`
+-- Estructura de la tabla `clockify_time_entries`
 --
 
 DROP TABLE IF EXISTS `clockify_time_entries`;
@@ -253,17 +223,17 @@ CREATE TABLE `clockify_time_entries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_time_entries`
+-- Datos para la tabla `clockify_time_entries`
 --
 
 LOCK TABLES `clockify_time_entries` WRITE;
 /*!40000 ALTER TABLE `clockify_time_entries` DISABLE KEYS */;
-INSERT INTO `clockify_time_entries` VALUES (1,'te_01',1,NULL,'Desarrollo backend','2024-01-10 09:00:00','2024-01-10 17:00:00',8.000,1,NULL,NULL,NULL,NULL),(2,'te_02',1,NULL,'Reuni├│n de avance','2024-01-10 10:00:00','2024-01-10 14:00:00',4.000,1,NULL,NULL,NULL,NULL),(3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
+INSERT INTO `clockify_time_entries` VALUES (3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
 /*!40000 ALTER TABLE `clockify_time_entries` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `clockify_users`
+-- Estructura de la tabla `clockify_users`
 --
 
 DROP TABLE IF EXISTS `clockify_users`;
@@ -286,17 +256,17 @@ CREATE TABLE `clockify_users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `clockify_users`
+-- Datos para la tabla `clockify_users`
 --
 
 LOCK TABLES `clockify_users` WRITE;
 /*!40000 ALTER TABLE `clockify_users` DISABLE KEYS */;
-INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(9,'','Juan P├®rez','juan.perez@empresa.com','developer',1,160.00,'2026-04-21 00:58:56','2026-04-21 00:58:56'),(11,'abc123xyz','Usuario Vinculado','vinculado@empresa.com',NULL,1,NULL,'2026-04-21 00:59:33','2026-04-21 00:59:33'),(13,'manual_d2c27a72f5f84ff593c4731ae5142543','Esteban Quito','juan.perez@empresa.com','MEMBER',1,160.00,'2026-04-21 17:23:57','2026-04-21 17:23:57'),(14,'manual_0f0246d75f6240328cd00cc189bd9265','Esteban Quito','juan.perez@empresa.com','MEMBER',1,160.00,'2026-04-21 17:24:08','2026-04-21 17:24:08'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
+INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
 /*!40000 ALTER TABLE `clockify_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `etc_records`
+-- Estructura de la tabla `etc_records`
 --
 
 DROP TABLE IF EXISTS `etc_records`;
@@ -309,7 +279,7 @@ CREATE TABLE `etc_records` (
   `user_id` bigint unsigned DEFAULT NULL,
   `user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `hours` decimal(10,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -327,17 +297,16 @@ CREATE TABLE `etc_records` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `etc_records`
+-- Datos para la tabla `etc_records`
 --
 
 LOCK TABLES `etc_records` WRITE;
 /*!40000 ALTER TABLE `etc_records` DISABLE KEYS */;
-INSERT INTO `etc_records` VALUES (3,1,1,7,'haunau.lucia','2026-05','Mayo 2026',40.00,'2026-04-21 11:50:23','2026-04-21 11:50:23'),(4,1,1,8,'santiagoguerci96','2026-06','Junio 2026',80.00,'2026-04-21 11:50:36','2026-04-21 11:50:36'),(5,1,2,6,'diegolanus89','2026-05','Mayo 2026',60.00,'2026-04-21 11:55:17','2026-04-21 11:55:17'),(6,1,2,7,'haunau.lucia','2026-06','Junio 2026',40.00,'2026-04-21 11:55:17','2026-04-21 11:55:17'),(7,1,2,6,'diegolanus89','2026-07','Julio 2026',50.00,'2026-04-21 11:55:38','2026-04-21 11:55:38'),(8,1,2,7,'haunau.lucia','2026-07','Julio 2026',30.00,'2026-04-21 11:55:38','2026-04-21 11:55:38'),(9,2,3,5,'daniel.alcazar','2025-05','Mayo 2025',80.00,'2026-04-21 16:02:36','2026-04-21 16:02:36'),(10,1,4,9,'Juan Perez','2025-05','Mayo 2025',80.00,'2026-04-21 16:06:44','2026-04-21 16:06:44'),(11,1,4,NULL,'Maria Lopez','2025-06','Junio 2025',120.00,'2026-04-21 16:06:44','2026-04-21 16:06:44'),(12,1,4,9,'Juan Perez','2025-05','Mayo 2025',80.00,'2026-04-21 16:08:08','2026-04-21 16:08:08'),(13,1,4,5,'daniel.alcazar','2025-06','Junio 2025',100.00,'2026-04-21 16:08:08','2026-04-21 16:08:08');
 /*!40000 ALTER TABLE `etc_records` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `etc_snapshots`
+-- Estructura de la tabla `etc_snapshots`
 --
 
 DROP TABLE IF EXISTS `etc_snapshots`;
@@ -357,17 +326,16 @@ CREATE TABLE `etc_snapshots` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `etc_snapshots`
+-- Datos para la tabla `etc_snapshots`
 --
 
 LOCK TABLES `etc_snapshots` WRITE;
 /*!40000 ALTER TABLE `etc_snapshots` DISABLE KEYS */;
-INSERT INTO `etc_snapshots` VALUES (1,1,1,'Estimaci├│n Inicial Enero',NULL,NULL),(2,1,2,'Semana 2','2026-04-21 11:55:17','2026-04-21 11:55:17'),(3,2,1,'L├¡nea base','2026-04-21 16:02:36','2026-04-21 16:02:36'),(4,1,3,'Semana 3','2026-04-21 16:06:44','2026-04-21 16:06:44');
 /*!40000 ALTER TABLE `etc_snapshots` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `failed_jobs`
+-- Estructura de la tabla `failed_jobs`
 --
 
 DROP TABLE IF EXISTS `failed_jobs`;
@@ -387,7 +355,7 @@ CREATE TABLE `failed_jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `failed_jobs`
+-- Datos para la tabla `failed_jobs`
 --
 
 LOCK TABLES `failed_jobs` WRITE;
@@ -396,7 +364,7 @@ LOCK TABLES `failed_jobs` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `migrations`
+-- Estructura de la tabla `migrations`
 --
 
 DROP TABLE IF EXISTS `migrations`;
@@ -411,7 +379,7 @@ CREATE TABLE `migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `migrations`
+-- Datos para la tabla `migrations`
 --
 
 LOCK TABLES `migrations` WRITE;
@@ -421,7 +389,7 @@ INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,
 UNLOCK TABLES;
 
 --
--- Table structure for table `password_reset_tokens`
+-- Estructura de la tabla `password_reset_tokens`
 --
 
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -436,7 +404,7 @@ CREATE TABLE `password_reset_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `password_reset_tokens`
+-- Datos para la tabla `password_reset_tokens`
 --
 
 LOCK TABLES `password_reset_tokens` WRITE;
@@ -445,7 +413,7 @@ LOCK TABLES `password_reset_tokens` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `personal_access_tokens`
+-- Estructura de la tabla `personal_access_tokens`
 --
 
 DROP TABLE IF EXISTS `personal_access_tokens`;
@@ -469,7 +437,7 @@ CREATE TABLE `personal_access_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `personal_access_tokens`
+-- Datos para la tabla `personal_access_tokens`
 --
 
 LOCK TABLES `personal_access_tokens` WRITE;
@@ -479,7 +447,7 @@ INSERT INTO `personal_access_tokens` VALUES (6,'App\\Models\\User',1,'spa','b7a8
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_clients`
+-- Estructura de la tabla `potencial_clients`
 --
 
 DROP TABLE IF EXISTS `potencial_clients`;
@@ -495,17 +463,17 @@ CREATE TABLE `potencial_clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_clients`
+-- Datos para la tabla `potencial_clients`
 --
 
 LOCK TABLES `potencial_clients` WRITE;
 /*!40000 ALTER TABLE `potencial_clients` DISABLE KEYS */;
-INSERT INTO `potencial_clients` VALUES (1,'Prospecto Miner├¡a S.A.',NULL,NULL),(2,'Banco Galicia','2026-04-16 21:56:52','2026-04-16 21:56:52');
+INSERT INTO `potencial_clients` VALUES (2,'Banco Galicia','2026-04-16 21:56:52','2026-04-16 21:56:52');
 /*!40000 ALTER TABLE `potencial_clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_project_allocations`
+-- Estructura de la tabla `potencial_project_allocations`
 --
 
 DROP TABLE IF EXISTS `potencial_project_allocations`;
@@ -515,7 +483,7 @@ CREATE TABLE `potencial_project_allocations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `potencial_project_id` bigint unsigned NOT NULL,
   `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hours` decimal(10,2) NOT NULL DEFAULT '0.00',
@@ -531,7 +499,7 @@ CREATE TABLE `potencial_project_allocations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_project_allocations`
+-- Datos para la tabla `potencial_project_allocations`
 --
 
 LOCK TABLES `potencial_project_allocations` WRITE;
@@ -540,7 +508,7 @@ LOCK TABLES `potencial_project_allocations` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `potencial_projects`
+-- Estructura de la tabla `potencial_projects`
 --
 
 DROP TABLE IF EXISTS `potencial_projects`;
@@ -560,17 +528,16 @@ CREATE TABLE `potencial_projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `potencial_projects`
+-- Datos para la tabla `potencial_projects`
 --
 
 LOCK TABLES `potencial_projects` WRITE;
 /*!40000 ALTER TABLE `potencial_projects` DISABLE KEYS */;
-INSERT INTO `potencial_projects` VALUES (4,'Proyecto Sin C├│digo',NULL,2,'2026-04-21 11:28:26','2026-04-21 11:28:26'),(5,'Proyecto Nuevo','PROY-01',1,'2026-04-21 18:16:51','2026-04-21 18:16:51');
 /*!40000 ALTER TABLE `potencial_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `profiles`
+-- Estructura de la tabla `profiles`
 --
 
 DROP TABLE IF EXISTS `profiles`;
@@ -585,21 +552,26 @@ CREATE TABLE `profiles` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `profiles_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `profiles`
+-- Datos para la tabla `profiles`
 --
 
 LOCK TABLES `profiles` WRITE;
 /*!40000 ALTER TABLE `profiles` DISABLE KEYS */;
-INSERT INTO `profiles` VALUES (1,'Administrador','admin','Acceso total al sistema',NULL,NULL),(2,'Usuario Lider','lider','Acceso a Dashboards',NULL,NULL);
+INSERT INTO `profiles` VALUES
+(1,'Administrador','admin','Acceso total al sistema',NULL,NULL),
+(2,'Soporte','soporte','Acceso total sobre módulo Configuración',NULL,NULL),
+(3,'Operaciones Gerente','ops_gerente','Acceso total sobre Operación, Análisis y Reportería',NULL,NULL),
+(4,'Operaciones Líderes','ops_lider','Acceso total sobre Operación, Análisis y Reportería',NULL,NULL),
+(5,'Administración','administracion','Acceso total sobre Administración y Reportería',NULL,NULL);
 /*!40000 ALTER TABLE `profiles` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_category_refs`
+-- Estructura de la tabla `project_intake_category_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_category_refs`;
@@ -619,7 +591,7 @@ CREATE TABLE `project_intake_category_refs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_category_refs`
+-- Datos para la tabla `project_intake_category_refs`
 --
 
 LOCK TABLES `project_intake_category_refs` WRITE;
@@ -629,7 +601,7 @@ INSERT INTO `project_intake_category_refs` VALUES (9,'PRE','Pre-venta','Proyecto
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_records`
+-- Estructura de la tabla `project_intake_records`
 --
 
 DROP TABLE IF EXISTS `project_intake_records`;
@@ -650,7 +622,7 @@ CREATE TABLE `project_intake_records` (
   `estimated_end_date` date DEFAULT NULL,
   `actual_end_date` date DEFAULT NULL,
   `commercial_status` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `leader_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `leader_clockify_user_id` bigint unsigned DEFAULT NULL,
   `observations` text COLLATE utf8mb4_unicode_ci,
   `requires_clockify_creation` tinyint(1) NOT NULL DEFAULT '0',
   `clockify_record_id` bigint unsigned DEFAULT NULL,
@@ -667,26 +639,28 @@ CREATE TABLE `project_intake_records` (
   KEY `idx_intake_is_active` (`is_active`),
   KEY `fk_intake_clockify_project` (`clockify_record_id`),
   KEY `idx_intake_client_id` (`client_id`),
+  KEY `idx_intake_leader` (`leader_clockify_user_id`),
   CONSTRAINT `fk_intake_category_code` FOREIGN KEY (`category_code`) REFERENCES `project_intake_category_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_client` FOREIGN KEY (`client_id`) REFERENCES `clockify_clients` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_intake_clockify_project` FOREIGN KEY (`clockify_record_id`) REFERENCES `clockify_projects` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_intake_leader` FOREIGN KEY (`leader_clockify_user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_intake_project_type` FOREIGN KEY (`project_type`) REFERENCES `project_intake_type_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_status_code` FOREIGN KEY (`project_status_code`) REFERENCES `project_intake_status_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_records`
+-- Datos para la tabla `project_intake_records`
 --
 
 LOCK TABLES `project_intake_records` WRITE;
 /*!40000 ALTER TABLE `project_intake_records` DISABLE KEYS */;
-INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,'Juan P├®rez','Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,'Mar├¡a Garc├¡a','En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(5,'10','10.001','SOP-2023-005','2023-01-10','TechCorp SA',NULL,'Soporte Mesa de Ayuda','SOP','CERRADO','2023-01-10','2023-12-31','2023-12-28',NULL,'Carlos L├│pez','Proyecto cerrado exitosamente',0,NULL,1,2,0,'2026-04-27 19:37:21','2026-04-27 19:40:53'),(6,'40','40.001','COM-2025-010','2025-01-20','Global Corp',NULL,'Expansi├│n Regional LATAM','STAFF','EN_CURSO','2025-01-20','2025-09-30',NULL,'Propuesta aceptada ÔÇö contrato firmado','Ana Rodr├¡guez','Inicio Q1 2025',0,NULL,1,1,1,'2026-04-27 19:37:28','2026-04-27 19:37:28'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(9,'10','10.002',NULL,'2025-04-27','Cliente Para Borrar SA',NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',0,NULL,2,2,0,'2026-04-27 19:45:30','2026-04-27 19:46:01'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,'Juan P├®rez','Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45'),(11,'10','10.003',NULL,'2025-04-27',NULL,NULL,'Proyecto Para Borrar (modificado)','SOP','EN_CURSO','2025-04-27','2025-06-30','2025-05-01',NULL,'Carlos L├│pez','Modificado antes de dar de baja',0,NULL,2,2,0,'2026-04-27 20:19:45','2026-04-27 20:20:23'),(12,'10','10.004',NULL,'2025-04-27',NULL,NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',0,NULL,2,2,1,'2026-04-27 21:35:26','2026-04-27 21:35:26'),(13,'10','10.005',NULL,'2025-04-27',NULL,NULL,'Proyecto Borrable','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',1,9,2,2,1,'2026-04-27 21:36:01','2026-04-27 21:36:01'),(14,'10','10.006',NULL,'2025-04-27','Anthropic Testing Corp',6,'Proyecto Borrable 23','SOP','INGRESO','2025-04-27','2025-06-30','2025-05-01',NULL,NULL,'Este proyecto se va a dar de baja',1,10,2,2,1,'2026-04-27 21:37:58','2026-04-27 21:37:58');
+INSERT INTO `project_intake_records` VALUES (3,'30','30.001','COM-2024-001','2024-03-01','Cliente Ejemplo S.A.',NULL,'Sistema de Gesti├│n Interna','DES','EN_CURSO','2024-03-01','2024-12-31',NULL,NULL,6,'Proyecto piloto de prueba',0,NULL,1,2,0,'2026-04-27 19:35:26','2026-04-27 19:40:48'),(4,'30','30.002','COM-2024-002','2024-06-15','Otra Empresa SRL',NULL,'Portal de Clientes v2','PRE','INGRESO','2024-06-15','2025-03-31',NULL,NULL,7,'En evaluaci├│n t├®cnica',0,NULL,1,1,1,'2026-04-27 19:37:12','2026-04-27 19:37:12'),(7,'30','30.003',NULL,'2024-09-01','Proyecto Cancelado SA',NULL,'Proyecto Cancelado','PRE','PERDIDO','2024-09-01','2024-12-01',NULL,NULL,NULL,'Cancelado por el cliente antes de iniciar',0,NULL,1,1,0,'2026-04-27 19:37:32','2026-04-27 19:37:32'),(8,'30','30.004','COM-2025-099','2025-04-27','Anthropic Testing Corp',NULL,'Plataforma IA Interna','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,5,'Proyecto de prueba con alta en Clockify',1,7,2,2,1,'2026-04-27 19:43:11','2026-04-27 19:43:11'),(10,'30','30.005','COM-2025-099','2025-04-27','BDT Global',3,'Plataforma IA Interna Audit','DES','INGRESO','2025-04-27','2025-12-31',NULL,NULL,5,'Proyecto con alta en Clockify',1,8,2,2,1,'2026-04-27 20:18:45','2026-04-27 20:18:45');
 /*!40000 ALTER TABLE `project_intake_records` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_status_refs`
+-- Estructura de la tabla `project_intake_status_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_status_refs`;
@@ -706,7 +680,7 @@ CREATE TABLE `project_intake_status_refs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_status_refs`
+-- Datos para la tabla `project_intake_status_refs`
 --
 
 LOCK TABLES `project_intake_status_refs` WRITE;
@@ -716,7 +690,7 @@ INSERT INTO `project_intake_status_refs` VALUES (7,'INGRESO','Ingreso','Proyecto
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_intake_type_refs`
+-- Estructura de la tabla `project_intake_type_refs`
 --
 
 DROP TABLE IF EXISTS `project_intake_type_refs`;
@@ -738,21 +712,21 @@ CREATE TABLE `project_intake_type_refs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_intake_type_refs_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_intake_type_refs`
+-- Datos para la tabla `project_intake_type_refs`
 --
 
 LOCK TABLES `project_intake_type_refs` WRITE;
 /*!40000 ALTER TABLE `project_intake_type_refs` DISABLE KEYS */;
-INSERT INTO `project_intake_type_refs` VALUES (8,'30','Desarrollo','Proyectos de desarrollo de software','Nro. Proyecto Desarrollo','Nro. Proyecto Comercial','Fecha de Alta',1,0,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06'),(9,'10','Soporte','Proyectos de soporte y mantenimiento','Nro. Proyecto Soporte','Nro. Proyecto Comercial','Fecha de Alta',1,1,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06'),(10,'40','Comercial','Proyectos con seguimiento comercial activo','Nro. Proyecto Interno','Nro. Proyecto Comercial','Fecha de Alta',1,0,1,1,'2026-04-27 19:35:06','2026-04-27 19:35:06');
+INSERT INTO `project_intake_type_refs` VALUES (1,'30','Desarrollo','Proyectos de desarrollo de software','Nro. Proyecto Desarrollo','Nro. Proyecto Comercial','Fecha de Alta',1,0,0,1,'2026-04-27 19:35:06','2026-04-27 19:35:06');
 /*!40000 ALTER TABLE `project_intake_type_refs` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_tracking_updates`
+-- Estructura de la tabla `project_tracking_updates`
 --
 
 DROP TABLE IF EXISTS `project_tracking_updates`;
@@ -772,7 +746,7 @@ CREATE TABLE `project_tracking_updates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_tracking_updates`
+-- Datos para la tabla `project_tracking_updates`
 --
 
 LOCK TABLES `project_tracking_updates` WRITE;
@@ -781,7 +755,7 @@ LOCK TABLES `project_tracking_updates` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `project_trackings`
+-- Estructura de la tabla `project_trackings`
 --
 
 DROP TABLE IF EXISTS `project_trackings`;
@@ -803,7 +777,7 @@ CREATE TABLE `project_trackings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project_trackings`
+-- Datos para la tabla `project_trackings`
 --
 
 LOCK TABLES `project_trackings` WRITE;
@@ -812,7 +786,7 @@ LOCK TABLES `project_trackings` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_dashboard_filters`
+-- Estructura de la tabla `user_dashboard_filters`
 --
 
 DROP TABLE IF EXISTS `user_dashboard_filters`;
@@ -834,7 +808,7 @@ CREATE TABLE `user_dashboard_filters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_dashboard_filters`
+-- Datos para la tabla `user_dashboard_filters`
 --
 
 LOCK TABLES `user_dashboard_filters` WRITE;
@@ -843,7 +817,7 @@ LOCK TABLES `user_dashboard_filters` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_hours_summary`
+-- Estructura de la tabla `user_hours_summary`
 --
 
 DROP TABLE IF EXISTS `user_hours_summary`;
@@ -855,7 +829,7 @@ CREATE TABLE `user_hours_summary` (
   `project_id` int unsigned DEFAULT NULL,
   `client_id` int unsigned DEFAULT NULL,
   `leader_id` bigint unsigned DEFAULT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `duration_hours` decimal(10,3) NOT NULL DEFAULT '0.000',
@@ -874,7 +848,7 @@ CREATE TABLE `user_hours_summary` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_hours_summary`
+-- Datos para la tabla `user_hours_summary`
 --
 
 LOCK TABLES `user_hours_summary` WRITE;
@@ -883,7 +857,7 @@ LOCK TABLES `user_hours_summary` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_leaders`
+-- Estructura de la tabla `user_leaders`
 --
 
 DROP TABLE IF EXISTS `user_leaders`;
@@ -910,7 +884,7 @@ CREATE TABLE `user_leaders` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_leaders`
+-- Datos para la tabla `user_leaders`
 --
 
 LOCK TABLES `user_leaders` WRITE;
@@ -920,7 +894,7 @@ INSERT INTO `user_leaders` VALUES (3,5,6,'2026-01-01','2026-04-21','Asignaci├�
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_monthly_capacities`
+-- Estructura de la tabla `user_monthly_capacities`
 --
 
 DROP TABLE IF EXISTS `user_monthly_capacities`;
@@ -929,8 +903,8 @@ DROP TABLE IF EXISTS `user_monthly_capacities`;
 CREATE TABLE `user_monthly_capacities` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `month_label` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hours` decimal(8,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -942,7 +916,7 @@ CREATE TABLE `user_monthly_capacities` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_monthly_capacities`
+-- Datos para la tabla `user_monthly_capacities`
 --
 
 LOCK TABLES `user_monthly_capacities` WRITE;
@@ -952,7 +926,7 @@ INSERT INTO `user_monthly_capacities` VALUES (1,5,'2026-01','Enero 2026',120.00,
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_monthly_status`
+-- Estructura de la tabla `user_monthly_status`
 --
 
 DROP TABLE IF EXISTS `user_monthly_status`;
@@ -961,7 +935,7 @@ DROP TABLE IF EXISTS `user_monthly_status`;
 CREATE TABLE `user_monthly_status` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `status` enum('activo','inactivo','vacaciones','licencia','baja') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
@@ -982,7 +956,7 @@ CREATE TABLE `user_monthly_status` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_monthly_status`
+-- Datos para la tabla `user_monthly_status`
 --
 
 LOCK TABLES `user_monthly_status` WRITE;
@@ -991,7 +965,7 @@ LOCK TABLES `user_monthly_status` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_vacation_periods`
+-- Estructura de la tabla `user_vacation_periods`
 --
 
 DROP TABLE IF EXISTS `user_vacation_periods`;
@@ -1013,7 +987,7 @@ CREATE TABLE `user_vacation_periods` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_vacation_periods`
+-- Datos para la tabla `user_vacation_periods`
 --
 
 LOCK TABLES `user_vacation_periods` WRITE;
@@ -1023,7 +997,7 @@ INSERT INTO `user_vacation_periods` VALUES (1,5,'2024-05-01','2024-05-15',15,'Va
 UNLOCK TABLES;
 
 --
--- Table structure for table `users`
+-- Estructura de la tabla `users`
 --
 
 DROP TABLE IF EXISTS `users`;
@@ -1044,21 +1018,27 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_profile_id_foreign` (`profile_id`),
   CONSTRAINT `users_profile_id_foreign` FOREIGN KEY (`profile_id`) REFERENCES `profiles` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Datos para la tabla `users`
 --
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Admin Power User','admin@evm.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,'2026-04-12 22:15:35'),(2,'daniel','daniel@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,'2026-04-15 14:54:20','2026-04-15 14:55:52'),(5,'Pedro Pablo','pedro.pablo@test.com',NULL,'$2a$11$OC4SWs6i89qU0hfhwH0/U.LUlpn69RiziNtmca3n.rdIn1izhdVHi',2,1,NULL,'2026-04-20 04:01:59','2026-04-26 20:22:40');
+INSERT INTO `users` VALUES
+(1,'Admin','admin@evm.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(2,'Daniel','daniel@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(3,'Diego','diego@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(4,'Lucia','lucia@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(5,'Santiago','santi@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL),
+(6,'Christian','chris@test.com',NULL,'$2y$12$rPlsryMWohVrw475KUzlDOhColDT7qLIPq5QDS6hIUhe7Bp/jCioy',1,1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `working_days_calendar`
+-- Estructura de la tabla `working_days_calendar`
 --
 
 DROP TABLE IF EXISTS `working_days_calendar`;
@@ -1066,7 +1046,8 @@ DROP TABLE IF EXISTS `working_days_calendar`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `working_days_calendar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `month_key` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_key` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `month_label` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `year` int NOT NULL,
   `month` int NOT NULL,
   `total_days` int NOT NULL,
@@ -1082,16 +1063,30 @@ CREATE TABLE `working_days_calendar` (
   UNIQUE KEY `working_days_calendar_month_key_unique` (`month_key`),
   KEY `idx_wdc_month_key` (`month_key`),
   KEY `idx_wdc_year_month` (`year`,`month`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `working_days_calendar`
+-- Datos para la tabla `working_days_calendar`
 --
 
 LOCK TABLES `working_days_calendar` WRITE;
 /*!40000 ALTER TABLE `working_days_calendar` DISABLE KEYS */;
-INSERT INTO `working_days_calendar` VALUES (2,'2024-02',2024,2,29,21,168.00,0,NULL,NULL,NULL,NULL),(3,'2026-04',2026,4,30,22,176.00,0,NULL,'Abril 2026','2026-04-21 00:32:22','2026-04-21 00:32:22'),(4,'2026-05',2026,5,31,20,160.00,2,'[\"2026-05-01\", \"2026-05-25\"]','Mayo 2026 con feriados','2026-04-21 00:32:45','2026-04-21 00:32:45');
+-- Columnas: id, month_key, month_label, year, month, total_days, working_days, hours_month, holiday_days, holidays_list, notes, created_at, updated_at
+-- Feriados nacionales Argentina 2026 (inamovibles + móviles calculados)
+INSERT INTO `working_days_calendar` VALUES
+(1, '2026-01','Enero 2026',     2026,1, 31,21,168.00,1, '[\"2026-01-01\"]',                       NULL,NULL,NULL),
+(2, '2026-02','Febrero 2026',   2026,2, 28,18,144.00,2, '[\"2026-02-16\",\"2026-02-17\"]',         'Carnaval',NULL,NULL),
+(3, '2026-03','Marzo 2026',     2026,3, 31,21,168.00,1, '[\"2026-03-24\"]',                       NULL,NULL,NULL),
+(4, '2026-04','Abril 2026',     2026,4, 30,20,160.00,2, '[\"2026-04-02\",\"2026-04-03\"]',         'Semana Santa',NULL,NULL),
+(5, '2026-05','Mayo 2026',      2026,5, 31,19,152.00,2, '[\"2026-05-01\",\"2026-05-25\"]',         NULL,NULL,NULL),
+(6, '2026-06','Junio 2026',     2026,6, 30,21,168.00,1, '[\"2026-06-17\"]',                       'Jun 20 cae sábado',NULL,NULL),
+(7, '2026-07','Julio 2026',     2026,7, 31,22,176.00,1, '[\"2026-07-09\"]',                       NULL,NULL,NULL),
+(8, '2026-08','Agosto 2026',    2026,8, 31,20,160.00,1, '[\"2026-08-17\"]',                       NULL,NULL,NULL),
+(9, '2026-09','Septiembre 2026',2026,9, 30,22,176.00,0, NULL,                                     NULL,NULL,NULL),
+(10,'2026-10','Octubre 2026',   2026,10,31,21,168.00,1, '[\"2026-10-12\"]',                       NULL,NULL,NULL),
+(11,'2026-11','Noviembre 2026', 2026,11,30,20,160.00,1, '[\"2026-11-20\"]',                       NULL,NULL,NULL),
+(12,'2026-12','Diciembre 2026', 2026,12,31,21,168.00,2, '[\"2026-12-08\",\"2026-12-25\"]',         NULL,NULL,NULL);
 /*!40000 ALTER TABLE `working_days_calendar` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1104,4 +1099,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-28  0:03:09
+-- Exportación completada el 2026-04-28 00:03:09

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -24,40 +25,61 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects
     [HttpGet]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int per_page = 15,
-        [FromQuery] string only_visible = "true")
+        [FromQuery] string only_visible = "true",
+        [FromQuery] string? search = null,
+        [FromQuery] string? client = null,
+        [FromQuery] string? status = null,
+        [FromQuery] string? code = null)
     {
         try
         {
-            var onlyVisible = only_visible.ToLower() != "false" && only_visible != "0";
-            var userId = HttpContext.Items["UserId"] as ulong?;
+            // TODO: Confirmar con el cliente si para algún rol específico o usuario
+            // se restringe la visibilidad de proyectos a nivel de registro
+            // (usando app_user_visible_projects). Por ahora la restricción se maneja
+            // únicamente por roles (RBAC), por lo que el filtro por visibilidad queda deshabilitado.
+            // var onlyVisible = only_visible.ToLower() != "false" && only_visible != "0";
+            // var userId = HttpContext.Items["UserId"] as ulong?;
 
             var query = _db.ClockifyProjects
                 .Include(p => p.Client)
                 .Include(p => p.Filter)
                 .AsQueryable();
 
-            if (onlyVisible)
-            {
-                if (userId.HasValue)
-                {
-                    var projectIds = await _db.AppUserVisibleProjects
-                        .Where(v => v.UserId == userId.Value)
-                        .Select(v => v.ProjectId)
-                        .ToListAsync();
+            // if (onlyVisible)
+            // {
+            //     if (userId.HasValue)
+            //     {
+            //         var projectIds = await _db.AppUserVisibleProjects
+            //             .Where(v => v.UserId == userId.Value)
+            //             .Select(v => v.ProjectId)
+            //             .ToListAsync();
+            //
+            //         if (projectIds.Any())
+            //             query = query.Where(p => projectIds.Contains(p.Id));
+            //         else
+            //             query = query.Where(p => p.Filter != null);
+            //     }
+            //     else
+            //     {
+            //         query = query.Where(p => p.Filter != null);
+            //     }
+            // }
 
-                    if (projectIds.Any())
-                        query = query.Where(p => projectIds.Contains(p.Id));
-                    else
-                        query = query.Where(p => p.Filter != null);
-                }
-                else
-                {
-                    query = query.Where(p => p.Filter != null);
-                }
-            }
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(p => p.Name.Contains(search));
+
+            if (!string.IsNullOrEmpty(client))
+                query = query.Where(p => p.Client != null && p.Client.Name.Contains(client));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(p => p.Status == status);
+
+            if (!string.IsNullOrEmpty(code))
+                query = query.Where(p => p.Code == code);
 
             query = query
                 .OrderBy(p => p.Status == "activo" ? 0 : 1)
@@ -102,6 +124,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects/evm
     [HttpGet("evm")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> EvmIndex()
     {
         return await GetAll(only_visible: "true");
@@ -109,6 +132,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects/{id}
     [HttpGet("{id}")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetById(ulong id)
     {
         var project = await _db.ClockifyProjects
@@ -128,6 +152,7 @@ public class ProjectsController : ControllerBase
 
     // PATCH api/projects/{id}/bac
     [HttpPatch("{id}/bac")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> UpdateBac(ulong id, [FromBody] UpdateBacDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(id);
@@ -157,6 +182,7 @@ public class ProjectsController : ControllerBase
 
     // POST api/projects/{id}/recalculate-hours
     [HttpPost("{id}/recalculate-hours")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> RecalculateHours(ulong id)
     {
         var project = await _db.ClockifyProjects.FindAsync(id);

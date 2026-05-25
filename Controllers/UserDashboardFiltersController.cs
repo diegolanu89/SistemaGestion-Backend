@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -9,6 +10,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/dashboard-filters")]
+[RequirePermission("DASHBOARD_EVM_ACCESS")]
 public class UserDashboardFiltersController : ControllerBase
 {
     private readonly AppDbContext _db;

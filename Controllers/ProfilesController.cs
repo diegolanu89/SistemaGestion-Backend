@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -8,6 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/profiles")]
+[RequirePermission("ADMIN_ACCESS")]
 public class ProfilesController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -144,6 +146,30 @@ public class ProfilesController : ControllerBase
         _db.ProfilePermissions.AddRange(newRows);
         await _db.SaveChangesAsync();
 
-        return await GetPermissions(id);
+        var items = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == id)
+            .Include(pp => pp.Permission)
+                .ThenInclude(p => p!.Module)
+            .Include(pp => pp.Action)
+            .OrderBy(pp => pp.Permission!.Code)
+            .Select(pp => new ProfilePermissionItemDto
+            {
+                PermissionId = pp.PermissionId,
+                PermissionCode = pp.Permission!.Code,
+                ModuleCode = pp.Permission!.Module!.Code,
+                Action = new ProfilePermissionActionDto
+                {
+                    Id = pp.Action!.Id,
+                    Code = pp.Action!.Code,
+                    Level = pp.Action!.Level
+                }
+            })
+            .ToListAsync();
+
+        return Ok(new ProfilePermissionsResponseDto
+        {
+            ProfileId = id,
+            Permissions = items
+        });
     }
 }

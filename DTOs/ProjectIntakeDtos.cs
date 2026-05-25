@@ -53,6 +53,7 @@ public class ProjectIntakeRecordDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
+    public ulong? LeaderClockifyUserId { get; set; }
     public string? LeaderName { get; set; }
     public string? Observations { get; set; }
     public bool RequiresClockifyCreation { get; set; }
@@ -85,7 +86,7 @@ public class CreateProjectIntakeDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
-    public string? LeaderName { get; set; }
+    public ulong? LeaderClockifyUserId { get; set; }
     public string? Observations { get; set; }
     public bool RequiresClockifyCreation { get; set; } = false;
 }
@@ -102,7 +103,7 @@ public class UpdateProjectIntakeDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
-    public string? LeaderName { get; set; }
+    public ulong? LeaderClockifyUserId { get; set; }
     public string? Observations { get; set; }
     public bool? RequiresClockifyCreation { get; set; }
 }

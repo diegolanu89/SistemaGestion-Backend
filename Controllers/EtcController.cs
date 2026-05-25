@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -20,6 +21,7 @@ public class EtcController : ControllerBase
 
     // GET api/projects/{projectId}/etc
     [HttpGet("api/projects/{projectId}/etc")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId, [FromQuery] string? snapshot)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -67,8 +69,85 @@ public class EtcController : ControllerBase
         });
     }
 
+    // GET api/projects/{projectId}/etc/summary
+    // Devuelve totales por recurso (fila) y por mes (columna) para la grilla ETC
+    [HttpGet("api/projects/{projectId}/etc/summary")]
+    [RequirePermission("ETC_ACCESS")]
+    public async Task<IActionResult> GetSummary(ulong projectId, [FromQuery] string? snapshot)
+    {
+        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        if (project == null)
+            return NotFound(new { message = "Proyecto no encontrado" });
+
+        var wantBaseline = snapshot == "baseline";
+        EtcSnapshot? etcSnapshot;
+
+        if (wantBaseline)
+            etcSnapshot = await _db.EtcSnapshots
+                .Where(s => s.ProjectId == projectId)
+                .OrderBy(s => s.Version)
+                .FirstOrDefaultAsync();
+        else
+            etcSnapshot = await _db.EtcSnapshots
+                .Where(s => s.ProjectId == projectId)
+                .OrderByDescending(s => s.Version)
+                .FirstOrDefaultAsync();
+
+        List<EtcRecord> records;
+        if (etcSnapshot != null)
+            records = await _db.EtcRecords
+                .Where(r => r.SnapshotId == etcSnapshot.Id)
+                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
+                .ToListAsync();
+        else
+            records = await _db.EtcRecords
+                .Where(r => r.ProjectId == projectId && r.SnapshotId == null)
+                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
+                .ToListAsync();
+
+        // Meses únicos ordenados cronológicamente
+        var months = records.Select(r => r.MonthKey).Distinct().OrderBy(m => m).ToList();
+
+        // Agrupar por recurso → filas
+        var resourceRows = records
+            .GroupBy(r => r.UserName ?? "Sin nombre")
+            .Select(g => new EtcResourceRowDto
+            {
+                UserId = g.First().UserId,
+                UserName = g.Key,
+                HoursByMonth = months.ToDictionary(m => m, m => g.Where(r => r.MonthKey == m).Sum(r => r.Hours)),
+                Total = g.Sum(r => r.Hours)
+            })
+            .OrderBy(r => r.UserName)
+            .ToList();
+
+        // Totales por mes → columnas
+        var totalsByMonth = months.ToDictionary(
+            m => m,
+            m => records.Where(r => r.MonthKey == m).Sum(r => r.Hours)
+        );
+
+        var summary = new EtcSummaryDto
+        {
+            Snapshot = etcSnapshot != null ? new
+            {
+                id = etcSnapshot.Id,
+                version = etcSnapshot.Version,
+                label = etcSnapshot.Label,
+                created_at = etcSnapshot.CreatedAt?.ToString("o")
+            } : null,
+            Months = months,
+            Resources = resourceRows,
+            TotalsByMonth = totalsByMonth,
+            GrandTotal = records.Sum(r => r.Hours)
+        };
+
+        return Ok(new { success = true, data = summary });
+    }
+
     // POST api/projects/{projectId}/etc
     [HttpPost("api/projects/{projectId}/etc")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] CreateEtcRecordDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -121,6 +200,7 @@ public class EtcController : ControllerBase
 
     // PUT api/etc/{id}
     [HttpPut("api/etc/{id}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Update(ulong id, [FromBody] UpdateEtcRecordDto dto)
     {
         var record = await _db.EtcRecords.FindAsync(id);
@@ -161,6 +241,7 @@ public class EtcController : ControllerBase
 
     // DELETE api/etc/{id}
     [HttpDelete("api/etc/{id}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Delete(ulong id)
     {
         var record = await _db.EtcRecords.FindAsync(id);
@@ -174,6 +255,7 @@ public class EtcController : ControllerBase
 
     // DELETE api/etc/project/{projectId}
     [HttpDelete("api/etc/project/{projectId}")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> DeleteByProject(ulong projectId)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -202,6 +284,7 @@ public class EtcController : ControllerBase
 
     // GET api/etc/projects-summary
     [HttpGet("api/etc/projects-summary")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ProjectsWithEtc()
     {
         var latestSnapshotIds = await GetLatestSnapshotIdsPerProject();
@@ -232,6 +315,7 @@ public class EtcController : ControllerBase
 
     // POST api/projects/{projectId}/etc/finalize-baseline
     [HttpPost("api/projects/{projectId}/etc/finalize-baseline")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> FinalizeBaseline(ulong projectId)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -280,6 +364,7 @@ public class EtcController : ControllerBase
 
     // POST api/projects/{projectId}/etc/snapshot
     [HttpPost("api/projects/{projectId}/etc/snapshot")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> CreateSnapshot(ulong projectId, [FromBody] CreateSnapshotDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -338,6 +423,7 @@ public class EtcController : ControllerBase
 
     // POST api/etc/bulk
     [HttpPost("api/etc/bulk")]
+    [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> StoreBulk([FromBody] BulkEtcDto dto)
     {
         if (dto.Entries == null || !dto.Entries.Any())
@@ -379,6 +465,7 @@ public class EtcController : ControllerBase
 
     // POST api/etc/validate-capacity
     [HttpPost("api/etc/validate-capacity")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ValidateCapacity([FromBody] ValidateEtcCapacityDto dto)
     {
         if (dto.Entries == null || !dto.Entries.Any())
@@ -390,6 +477,7 @@ public class EtcController : ControllerBase
 
     // GET api/etc/export-capacities
     [HttpGet("api/etc/export-capacities")]
+    [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> ExportCapacities()
     {
         var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");

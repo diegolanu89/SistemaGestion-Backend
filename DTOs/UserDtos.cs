@@ -17,7 +17,7 @@ public class CreateUserDto
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string PasswordConfirmation { get; set; } = string.Empty;
-    public ulong? ProfileId { get; set; }
+    public ulong ProfileId { get; set; }
     public bool Active { get; set; } = true;
 }
 

@@ -14,6 +14,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 | ORM | Entity Framework Core 9.0 |
 | Auth | Tokens tipo Sanctum + BCrypt |
 | Integración | Clockify API |
+| Documentación API | Swagger UI (Swashbuckle 6.9) |
 | Contenedores | Docker + Docker Compose |
 
 ---
@@ -184,6 +185,30 @@ dotnet user-secrets set "Mi:NuevaVar" "valor_real"
 ```bash
 docker compose down && docker compose up -d
 ```
+
+---
+
+## Documentación de la API (Swagger)
+
+Con la app corriendo, la documentación interactiva está disponible en:
+
+```
+http://localhost:5000/swagger
+```
+
+Desde ahí podés explorar todos los endpoints, ver los esquemas de request/response y ejecutar llamadas directamente desde el browser.
+
+### Autenticación en Swagger
+
+Los endpoints protegidos requieren un token Bearer. Para autenticarte:
+
+1. Llamar a `POST /api/auth/login` o `POST /api/auth/login-with-profile` desde Swagger (no requieren token)
+2. Copiar el valor del campo `token` de la respuesta
+3. Hacer clic en el botón **Authorize** (arriba a la derecha)
+4. Ingresar el token con el formato: `Bearer <token>`
+5. Confirmar con **Authorize** — a partir de ese momento todas las llamadas incluyen el header automáticamente
+
+> La ruta `/swagger` no requiere autenticación — está excluida del middleware de auth.
 
 ---
 

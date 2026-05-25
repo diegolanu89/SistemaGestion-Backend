@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.Services;
 
@@ -7,6 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/projects")]
+[RequirePermission("DASHBOARD_EVM_ACCESS")]
 public class MetricsController : ControllerBase
 {
     private readonly AppDbContext _db;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.Models;
 using bdt_evm_app.Services;
@@ -9,6 +10,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/clockify")]
+[RequirePermission("ADMIN_ACCESS")]
 public class ClockifySyncController : ControllerBase
 {
     private readonly AppDbContext _db;

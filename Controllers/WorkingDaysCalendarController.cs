@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -8,6 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/working-days-calendar")]
+[RequirePermission("SETTINGS_ACCESS")]
 public class WorkingDaysCalendarController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -17,6 +19,53 @@ public class WorkingDaysCalendarController : ControllerBase
     {
         _db = db;
         _logger = logger;
+    }
+
+    // GET api/working-days-calendar/options
+    // Lista simplificada para dropdowns: filtra por ventana de tiempo
+    // from_month: desde qué mes (default: mes actual). to_month: hasta qué mes (default: +12 meses).
+    // include_past: incluye meses anteriores a from_month que ya tienen datos en el sistema (default: false).
+    [HttpGet("options")]
+    public async Task<IActionResult> GetOptions(
+        [FromQuery] string? from_month = null,
+        [FromQuery] string? to_month = null,
+        [FromQuery] bool include_past = false)
+    {
+        try
+        {
+            var today = DateTime.Today;
+            var defaultFrom = new DateTime(today.Year, today.Month, 1);
+            var defaultTo = defaultFrom.AddMonths(12);
+
+            var fromKey = from_month ?? defaultFrom.ToString("yyyy-MM");
+            var toKey = to_month ?? defaultTo.ToString("yyyy-MM");
+
+            var query = _db.WorkingDaysCalendars.AsQueryable();
+
+            if (include_past)
+                // Muestra la ventana solicitada MÁS cualquier mes anterior que ya exista en la tabla
+                query = query.Where(c => string.Compare(c.MonthKey, toKey) <= 0);
+            else
+                query = query.Where(c => string.Compare(c.MonthKey, fromKey) >= 0 && string.Compare(c.MonthKey, toKey) <= 0);
+
+            var options = await query
+                .OrderBy(c => c.Year).ThenBy(c => c.Month)
+                .Select(c => new MonthOptionDto
+                {
+                    MonthKey = c.MonthKey,
+                    MonthLabel = c.MonthLabel,
+                    WorkingDays = c.WorkingDays,
+                    HoursMonth = c.HoursMonth
+                })
+                .ToListAsync();
+
+            return Ok(new { success = true, data = options });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener opciones de meses");
+            return StatusCode(500, new { success = false, message = "Error al obtener opciones de meses", error = e.Message });
+        }
     }
 
     // GET api/working-days-calendar
@@ -138,6 +187,7 @@ public class WorkingDaysCalendarController : ControllerBase
             var calendar = new WorkingDaysCalendar
             {
                 MonthKey = dto.MonthKey,
+                MonthLabel = dto.MonthLabel,
                 Year = dto.Year,
                 Month = dto.Month,
                 TotalDays = dto.TotalDays,
@@ -195,6 +245,7 @@ public class WorkingDaysCalendarController : ControllerBase
                 calendar.MonthKey = dto.MonthKey;
             }
 
+            if (dto.MonthLabel != null) calendar.MonthLabel = dto.MonthLabel;
             if (dto.Year.HasValue) calendar.Year = dto.Year.Value;
             if (dto.Month.HasValue) calendar.Month = dto.Month.Value;
             if (dto.TotalDays.HasValue) calendar.TotalDays = dto.TotalDays.Value;
@@ -250,6 +301,7 @@ public class WorkingDaysCalendarController : ControllerBase
     {
         Id = c.Id,
         MonthKey = c.MonthKey,
+        MonthLabel = c.MonthLabel,
         Year = c.Year,
         Month = c.Month,
         TotalDays = c.TotalDays,

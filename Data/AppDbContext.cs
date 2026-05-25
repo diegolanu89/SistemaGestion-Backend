@@ -31,6 +31,8 @@ public class AppDbContext : DbContext
     public DbSet<ProjectIntakeTypeRef> ProjectIntakeTypeRefs { get; set; }
     public DbSet<ProjectIntakeCategoryRef> ProjectIntakeCategoryRefs { get; set; }
     public DbSet<ProjectIntakeStatusRef> ProjectIntakeStatusRefs { get; set; }
+    public DbSet<ProjectTracking> ProjectTrackings { get; set; }
+    public DbSet<ProjectTrackingUpdate> ProjectTrackingUpdates { get; set; }
     public DbSet<Module> Modules { get; set; }
     public DbSet<PermissionAction> Actions { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -119,6 +121,24 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.ClientId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.LeaderClockifyUser)
+            .WithMany()
+            .HasForeignKey(r => r.LeaderClockifyUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<ProjectTracking>()
+            .HasOne(t => t.Project)
+            .WithMany()
+            .HasForeignKey(t => t.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProjectTrackingUpdate>()
+            .HasOne(u => u.ProjectTracking)
+            .WithMany(t => t.Updates)
+            .HasForeignKey(u => u.ProjectTrackingId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // RBAC normalizado — Module/PermissionAction/Permission/ProfilePermission
         modelBuilder.Entity<Permission>()

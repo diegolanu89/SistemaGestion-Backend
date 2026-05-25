@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
@@ -9,6 +10,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/project-intakes")]
+[RequirePermission("PROJECTS_CREATE")]
 public class ProjectIntakesController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -20,6 +22,29 @@ public class ProjectIntakesController : ControllerBase
         _db = db;
         _intakeService = intakeService;
         _logger = logger;
+    }
+
+    // GET /api/project-intakes/next-number?type=30
+    [HttpGet("next-number")]
+    public async Task<IActionResult> GetNextNumber([FromQuery] string type)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return UnprocessableEntity(new { success = false, message = "El parámetro 'type' es obligatorio" });
+
+            var typeExists = await _db.ProjectIntakeTypeRefs.AnyAsync(t => t.Code == type && t.IsActive);
+            if (!typeExists)
+                return UnprocessableEntity(new { success = false, message = $"Tipo de proyecto '{type}' no válido o inactivo" });
+
+            var nextNumber = await _intakeService.GenerateInternalProjectNumberAsync(type);
+            return Ok(new { success = true, data = new { nextNumber } });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener próximo número de proyecto para tipo {Type}", type);
+            return StatusCode(500, new { success = false, message = "Error al calcular el próximo número", error = e.Message });
+        }
     }
 
     // GET /api/project-intakes/options
@@ -80,7 +105,16 @@ public class ProjectIntakesController : ControllerBase
                 .Select(c => new { c.Id, c.Name, c.ExternalId })
                 .ToListAsync();
 
-            return Ok(new { success = true, data = new { types, categories, statuses, clients } });
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var leaders = await _db.UserLeaders
+                .Where(ul => ul.EndDate == null || ul.EndDate >= today)
+                .Include(ul => ul.Leader)
+                .Select(ul => new { ul.Leader!.Id, ul.Leader!.Name, ul.Leader!.Email })
+                .Distinct()
+                .OrderBy(u => u.Name)
+                .ToListAsync();
+
+            return Ok(new { success = true, data = new { types, categories, statuses, clients, leaders } });
         }
         catch (Exception e)
         {
@@ -96,7 +130,10 @@ public class ProjectIntakesController : ControllerBase
         [FromQuery] int per_page = 15,
         [FromQuery] string? project_type = null,
         [FromQuery] string? project_status_code = null,
-        [FromQuery] string? is_active = null)
+        [FromQuery] string? is_active = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null,
+        [FromQuery] string? category = null)
     {
         try
         {
@@ -106,6 +143,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.StatusRef)
                 .Include(r => r.ClockifyProject)
                 .Include(r => r.Client)
+                .Include(r => r.LeaderClockifyUser)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(project_type))
@@ -113,6 +151,18 @@ public class ProjectIntakesController : ControllerBase
 
             if (!string.IsNullOrEmpty(project_status_code))
                 query = query.Where(r => r.ProjectStatusCode == project_status_code);
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(r =>
+                    (r.ProjectName != null && r.ProjectName.Contains(search)) ||
+                    (r.ClientName != null && r.ClientName.Contains(search)) ||
+                    (r.Observations != null && r.Observations.Contains(search)));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(r => r.ProjectStatusCode == status);
+
+            if (!string.IsNullOrEmpty(category))
+                query = query.Where(r => r.CategoryCode == category);
 
             // Por defecto muestra solo activos; pasar is_active=false para ver dados de baja
             var showActive = is_active?.ToLower() != "false";
@@ -157,6 +207,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.StatusRef)
                 .Include(r => r.ClockifyProject)
                 .Include(r => r.Client)
+                .Include(r => r.LeaderClockifyUser)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (record == null)
@@ -205,6 +256,13 @@ public class ProjectIntakesController : ControllerBase
                 resolvedClientName = client.Name;
             }
 
+            if (dto.LeaderClockifyUserId.HasValue)
+            {
+                var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                if (!leaderExists)
+                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
+            }
+
             var record = new ProjectIntakeRecord
             {
                 ProjectType = dto.ProjectType,
@@ -220,7 +278,7 @@ public class ProjectIntakesController : ControllerBase
                 EstimatedEndDate = dto.EstimatedEndDate,
                 ActualEndDate = dto.ActualEndDate,
                 CommercialStatus = dto.CommercialStatus,
-                LeaderName = dto.LeaderName,
+                LeaderClockifyUserId = dto.LeaderClockifyUserId,
                 Observations = dto.Observations,
                 RequiresClockifyCreation = dto.RequiresClockifyCreation,
                 IsActive = true,
@@ -236,7 +294,8 @@ public class ProjectIntakesController : ControllerBase
             {
                 try
                 {
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(dto.ProjectName, dto.ClientId);
+                    var clockifyName = $"{internalNumber} - {dto.ProjectName}";
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, dto.ClientId);
                     record.ClockifyRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
@@ -262,6 +321,8 @@ public class ProjectIntakesController : ControllerBase
                 await _db.Entry(record).Reference(r => r.ClockifyProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
+            if (record.LeaderClockifyUserId.HasValue)
+                await _db.Entry(record).Reference(r => r.LeaderClockifyUser).LoadAsync();
 
             return StatusCode(201, new
             {
@@ -312,7 +373,13 @@ public class ProjectIntakesController : ControllerBase
             if (dto.EstimatedEndDate.HasValue) record.EstimatedEndDate = dto.EstimatedEndDate;
             if (dto.ActualEndDate.HasValue) record.ActualEndDate = dto.ActualEndDate;
             if (dto.CommercialStatus != null) record.CommercialStatus = dto.CommercialStatus;
-            if (dto.LeaderName != null) record.LeaderName = dto.LeaderName;
+            if (dto.LeaderClockifyUserId.HasValue)
+            {
+                var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                if (!leaderExists)
+                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
+                record.LeaderClockifyUserId = dto.LeaderClockifyUserId;
+            }
             if (dto.Observations != null) record.Observations = dto.Observations;
             if (dto.RequiresClockifyCreation.HasValue) record.RequiresClockifyCreation = dto.RequiresClockifyCreation.Value;
 
@@ -322,8 +389,8 @@ public class ProjectIntakesController : ControllerBase
             {
                 try
                 {
-                    var projectName = record.ProjectName ?? string.Empty;
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(projectName, record.ClientId);
+                    var clockifyName = $"{record.InternalProjectNumber} - {record.ProjectName ?? string.Empty}";
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, record.ClientId);
                     record.ClockifyRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
@@ -351,6 +418,8 @@ public class ProjectIntakesController : ControllerBase
                 await _db.Entry(record).Reference(r => r.ClockifyProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
+            if (record.LeaderClockifyUserId.HasValue)
+                await _db.Entry(record).Reference(r => r.LeaderClockifyUser).LoadAsync();
 
             return Ok(new
             {
@@ -414,7 +483,8 @@ public class ProjectIntakesController : ControllerBase
         EstimatedEndDate = r.EstimatedEndDate,
         ActualEndDate = r.ActualEndDate,
         CommercialStatus = r.CommercialStatus,
-        LeaderName = r.LeaderName,
+        LeaderClockifyUserId = r.LeaderClockifyUserId,
+        LeaderName = r.LeaderClockifyUser?.Name,
         Observations = r.Observations,
         RequiresClockifyCreation = r.RequiresClockifyCreation,
         ClockifyRecordId = r.ClockifyRecordId,
