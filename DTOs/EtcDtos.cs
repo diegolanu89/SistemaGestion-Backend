@@ -54,3 +54,20 @@ public class ValidateEtcCapacityDto
     public ulong ProjectId { get; set; }
     public List<EtcEntryDto> Entries { get; set; } = new();
 }
+
+public class EtcResourceRowDto
+{
+    public ulong? UserId { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public Dictionary<string, decimal> HoursByMonth { get; set; } = new();
+    public decimal Total { get; set; }
+}
+
+public class EtcSummaryDto
+{
+    public object? Snapshot { get; set; }
+    public List<string> Months { get; set; } = new();
+    public List<EtcResourceRowDto> Resources { get; set; } = new();
+    public Dictionary<string, decimal> TotalsByMonth { get; set; } = new();
+    public decimal GrandTotal { get; set; }
+}
