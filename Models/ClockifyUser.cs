@@ -9,7 +9,7 @@ public class ClockifyUser
     [Column("id")]
     public ulong Id { get; set; }
     [Column("clockify_user_id")]
-    public string ClockifyUserId { get; set; } = string.Empty;
+    public string? ClockifyUserId { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("email")]

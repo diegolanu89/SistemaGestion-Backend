@@ -78,17 +78,9 @@ public class ClockifyUsersController : ControllerBase
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return UnprocessableEntity(new { success = false, message = "El nombre es requerido" });
 
-            if (!string.IsNullOrEmpty(dto.ClockifyUserId))
-            {
-                var exists = await _db.ClockifyUsers
-                    .AnyAsync(u => u.ClockifyUserId == dto.ClockifyUserId);
-                if (exists)
-                    return UnprocessableEntity(new { success = false, message = "El clockify_user_id ya existe" });
-            }
-
             var user = new ClockifyUser
             {
-                ClockifyUserId = dto.ClockifyUserId ?? $"manual_{Guid.NewGuid():N}",
+                ClockifyUserId = null,
                 Name = dto.Name,
                 Email = dto.Email,
                 Active = dto.Active,

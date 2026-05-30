@@ -9,7 +9,6 @@ public class ClockifyUserDto
 
 public class CreateClockifyUserDto
 {
-    public string? ClockifyUserId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Email { get; set; }
     public bool Active { get; set; } = true;
