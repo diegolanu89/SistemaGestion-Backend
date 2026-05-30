@@ -23,10 +23,16 @@ public class UserVacationPeriodsController : ControllerBase
 
     // GET api/user-vacation-periods
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? search)
     {
-        var periods = await _db.UserVacationPeriods
+        var query = _db.UserVacationPeriods
             .Include(p => p.User)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(p => p.User != null && p.User.Name.Contains(search));
+
+        var periods = await query
             .OrderByDescending(p => p.DateFrom)
             .ToListAsync();
 

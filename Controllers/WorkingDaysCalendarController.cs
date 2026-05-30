@@ -179,6 +179,19 @@ public class WorkingDaysCalendarController : ControllerBase
             if (dto.TotalDays < 1 || dto.TotalDays > 31)
                 return UnprocessableEntity(new { success = false, message = "total_days debe estar entre 1 y 31" });
 
+            var realDaysInMonth = DateTime.DaysInMonth(dto.Year, dto.Month);
+            if (dto.TotalDays != realDaysInMonth)
+                return UnprocessableEntity(new { success = false, message = $"total_days debe ser {realDaysInMonth} para {dto.Year}-{dto.Month:D2}" });
+
+            if (dto.WorkingDays < 0 || dto.WorkingDays > dto.TotalDays)
+                return UnprocessableEntity(new { success = false, message = $"working_days debe estar entre 0 y total_days ({dto.TotalDays})" });
+
+            if (dto.HolidayDays < 0 || dto.HolidayDays > dto.TotalDays)
+                return UnprocessableEntity(new { success = false, message = $"holiday_days debe estar entre 0 y total_days ({dto.TotalDays})" });
+
+            if (dto.WorkingDays + dto.HolidayDays > dto.TotalDays)
+                return UnprocessableEntity(new { success = false, message = $"La suma de working_days ({dto.WorkingDays}) y holiday_days ({dto.HolidayDays}) no puede superar total_days ({dto.TotalDays})" });
+
             var exists = await _db.WorkingDaysCalendars
                 .AnyAsync(c => c.MonthKey == dto.MonthKey);
             if (exists)
@@ -235,6 +248,26 @@ public class WorkingDaysCalendarController : ControllerBase
 
             if (dto.TotalDays.HasValue && (dto.TotalDays < 1 || dto.TotalDays > 31))
                 return UnprocessableEntity(new { success = false, message = "total_days debe estar entre 1 y 31" });
+
+            // Validaciones cruzadas: resolver valores efectivos (dto ?? valor actual)
+            var effectiveYear = dto.Year ?? calendar.Year;
+            var effectiveMonth = dto.Month ?? calendar.Month;
+            var effectiveTotalDays = dto.TotalDays ?? calendar.TotalDays;
+            var effectiveWorkingDays = dto.WorkingDays ?? calendar.WorkingDays;
+            var effectiveHolidayDays = dto.HolidayDays ?? calendar.HolidayDays;
+
+            var realDaysInMonth = DateTime.DaysInMonth(effectiveYear, effectiveMonth);
+            if (effectiveTotalDays != realDaysInMonth)
+                return UnprocessableEntity(new { success = false, message = $"total_days debe ser {realDaysInMonth} para {effectiveYear}-{effectiveMonth:D2}" });
+
+            if (effectiveWorkingDays < 0 || effectiveWorkingDays > effectiveTotalDays)
+                return UnprocessableEntity(new { success = false, message = $"working_days debe estar entre 0 y total_days ({effectiveTotalDays})" });
+
+            if (effectiveHolidayDays < 0 || effectiveHolidayDays > effectiveTotalDays)
+                return UnprocessableEntity(new { success = false, message = $"holiday_days debe estar entre 0 y total_days ({effectiveTotalDays})" });
+
+            if (effectiveWorkingDays + effectiveHolidayDays > effectiveTotalDays)
+                return UnprocessableEntity(new { success = false, message = $"La suma de working_days ({effectiveWorkingDays}) y holiday_days ({effectiveHolidayDays}) no puede superar total_days ({effectiveTotalDays})" });
 
             if (!string.IsNullOrEmpty(dto.MonthKey) && dto.MonthKey != calendar.MonthKey)
             {

@@ -21,10 +21,11 @@ public class UsersController : ControllerBase
 
     // GET api/app/users
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? search)
     {
         var users = await _db.Users
             .Include(u => u.Profile)
+            .Where(u => string.IsNullOrEmpty(search) || u.Name.Contains(search) || u.Email.Contains(search))
             .OrderBy(u => u.Name)
             .Select(u => new UserDto
             {

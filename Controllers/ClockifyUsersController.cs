@@ -78,17 +78,9 @@ public class ClockifyUsersController : ControllerBase
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return UnprocessableEntity(new { success = false, message = "El nombre es requerido" });
 
-            if (!string.IsNullOrEmpty(dto.ClockifyUserId))
-            {
-                var exists = await _db.ClockifyUsers
-                    .AnyAsync(u => u.ClockifyUserId == dto.ClockifyUserId);
-                if (exists)
-                    return UnprocessableEntity(new { success = false, message = "El clockify_user_id ya existe" });
-            }
-
             var user = new ClockifyUser
             {
-                ClockifyUserId = dto.ClockifyUserId ?? $"manual_{Guid.NewGuid():N}",
+                ClockifyUserId = null,
                 Name = dto.Name,
                 Email = dto.Email,
                 Active = dto.Active,
@@ -166,6 +158,35 @@ public class ClockifyUsersController : ControllerBase
         {
             _logger.LogError(e, "Error al eliminar clockify_user {Id}", id);
             return StatusCode(500, new { success = false, message = "Error al eliminar el usuario" });
+        }
+    }
+
+    // GET api/clockify-users/options
+    // Devuelve lista plana sin paginar, pensada para poblar dropdowns/selects.
+    // Por defecto trae solo activos; pasar ?active=false para incluir también inactivos.
+    [HttpGet("options")]
+    public async Task<IActionResult> GetOptions([FromQuery] bool active = true)
+    {
+        try
+        {
+            var query = _db.ClockifyUsers.AsQueryable();
+            if (active)
+                query = query.Where(u => u.Active);
+            var users = await query
+                .OrderBy(u => u.Name)
+                .Select(u => new ClockifyUserDto
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email
+                })
+                .ToListAsync();
+            return Ok(new { success = true, data = new { users } });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener opciones de clockify_users");
+            return StatusCode(500, new { success = false, message = "Error al obtener las opciones", error = e.Message });
         }
     }
 }
