@@ -7,9 +7,11 @@ using bdt_evm_app.Models;
 
 namespace bdt_evm_app.Controllers;
 
+// RF-10: PROJECTS_CREATE se exige por método (POST/PUT/DELETE). El GET
+// usa PROJECTS_ACCESS porque el Dashboard EVM lo lee para mostrar "Control
+// de cambios" y abrir el modal de seguimiento.
 [ApiController]
 [Route("api/project-trackings")]
-[RequirePermission("PROJECTS_CREATE")]
 public class ProjectTrackingsController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -23,6 +25,7 @@ public class ProjectTrackingsController : ControllerBase
 
     // GET /api/project-trackings/{projectId}
     [HttpGet("{projectId}")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId)
     {
         try
@@ -50,6 +53,7 @@ public class ProjectTrackingsController : ControllerBase
     // POST /api/project-trackings/{projectId}
     // Crea el tracking de fechas base (solo si no existe)
     [HttpPost("{projectId}")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
     {
         try
@@ -93,6 +97,7 @@ public class ProjectTrackingsController : ControllerBase
     // PUT /api/project-trackings/{projectId}
     // Actualiza las fechas base (Bloque 1)
     [HttpPut("{projectId}")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> Update(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
     {
         try
@@ -129,6 +134,7 @@ public class ProjectTrackingsController : ControllerBase
     // POST /api/project-trackings/{projectId}/updates
     // Agrega un registro al historial de desvíos (Bloque 2)
     [HttpPost("{projectId}/updates")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> AddUpdate(ulong projectId, [FromBody] CreateTrackingUpdateDto dto)
     {
         try
@@ -168,6 +174,7 @@ public class ProjectTrackingsController : ControllerBase
     // PUT /api/project-trackings/{projectId}/updates/{updateId}
     // Edita un registro del historial
     [HttpPut("{projectId}/updates/{updateId}")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> EditUpdate(ulong projectId, ulong updateId, [FromBody] UpdateTrackingUpdateDto dto)
     {
         try
@@ -202,6 +209,7 @@ public class ProjectTrackingsController : ControllerBase
     // DELETE /api/project-trackings/{projectId}/updates/{updateId}
     // Elimina un registro del historial (eliminación física — el historial es auditoría)
     [HttpDelete("{projectId}/updates/{updateId}")]
+    [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> DeleteUpdate(ulong projectId, ulong updateId)
     {
         try

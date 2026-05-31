@@ -8,8 +8,9 @@ using bdt_evm_app.Services;
 
 namespace bdt_evm_app.Controllers;
 
+// RF-10: ADMIN_ACCESS se exige por método (mutaciones). El GET de la lista
+// usa PROJECTS_ACCESS porque el Dashboard EVM lo lee para "Control de cambios".
 [ApiController]
-[RequirePermission("ADMIN_ACCESS")]
 public class ChangeRequestsController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -25,6 +26,7 @@ public class ChangeRequestsController : ControllerBase
 
     // GET api/projects/{id}/change-requests
     [HttpGet("api/projects/{projectId}/change-requests")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -43,6 +45,7 @@ public class ChangeRequestsController : ControllerBase
 
     // POST api/projects/{id}/change-requests
     [HttpPost("api/projects/{projectId}/change-requests")]
+    [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] CreateChangeRequestDto dto)
     {
         var project = await _db.ClockifyProjects.FindAsync(projectId);
@@ -96,6 +99,7 @@ public class ChangeRequestsController : ControllerBase
 
     // PATCH api/change-requests/{id}
     [HttpPatch("api/change-requests/{id}")]
+    [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> Update(ulong id, [FromBody] UpdateChangeRequestDto dto)
     {
         var cr = await _db.ChangeRequests.FindAsync(id);
@@ -131,16 +135,19 @@ public class ChangeRequestsController : ControllerBase
 
     // GET api/projects/{id}/change-log
     [HttpGet("api/projects/{projectId}/change-log")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetChangeLog(ulong projectId)
         => await GetByProject(projectId);
 
     // POST api/projects/{id}/change-log
     [HttpPost("api/projects/{projectId}/change-log")]
+    [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> CreateChangeLog(ulong projectId, [FromBody] CreateChangeRequestDto dto)
         => await Create(projectId, dto);
 
     // PUT api/projects/{id}/change-log/{changeId}
     [HttpPut("api/projects/{projectId}/change-log/{changeId}")]
+    [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> UpdateChangeLog(ulong projectId, ulong changeId, [FromBody] UpdateChangeRequestDto dto)
     {
         var cr = await _db.ChangeRequests.FindAsync(changeId);
@@ -155,6 +162,7 @@ public class ChangeRequestsController : ControllerBase
 
     // DELETE api/projects/{id}/change-log/{changeId}
     [HttpDelete("api/projects/{projectId}/change-log/{changeId}")]
+    [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> DeleteChangeLog(ulong projectId, ulong changeId)
     {
         var cr = await _db.ChangeRequests.FindAsync(changeId);
