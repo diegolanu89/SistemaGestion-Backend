@@ -55,22 +55,39 @@ public class ProfilesController : ControllerBase
         });
     }
 
-    // DEPRECATED:
-    // Este endpoint queda obsoleto por motivos de seguridad.
-    // El frontend ya NO debe consultar permisos por profileId enviado por cliente.
-    // Utilizar:
-    // GET /api/auth/permissions
-    // que resuelve los permisos desde el usuario autenticado (cookie HttpOnly + middleware).
-    [Obsolete(
-        "Deprecated for security reasons. Use GET /api/auth/permissions instead."
-    )]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    // GET api/app/profiles/{id}/permissions
     [HttpGet("{id}/permissions")]
     public async Task<IActionResult> GetPermissions(ulong id)
     {
-        return StatusCode(410, new
+        var profileExists = await _db.Profiles.AnyAsync(p => p.Id == id);
+
+        if (!profileExists)
+            return NotFound(new { message = "Perfil no encontrado" });
+
+        var items = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == id)
+            .Include(pp => pp.Permission)
+                .ThenInclude(p => p!.Module)
+            .Include(pp => pp.Action)
+            .OrderBy(pp => pp.Permission!.Code)
+            .Select(pp => new ProfilePermissionItemDto
+            {
+                PermissionId = pp.PermissionId,
+                PermissionCode = pp.Permission!.Code,
+                ModuleCode = pp.Permission!.Module!.Code,
+                Action = new ProfilePermissionActionDto
+                {
+                    Id = pp.Action!.Id,
+                    Code = pp.Action!.Code,
+                    Level = pp.Action!.Level
+                }
+            })
+            .ToListAsync();
+
+        return Ok(new ProfilePermissionsResponseDto
         {
-            message = "Endpoint deprecated. Use /api/auth/permissions"
+            ProfileId = id,
+            Permissions = items
         });
     }
 
@@ -170,6 +187,119 @@ public class ProfilesController : ControllerBase
         {
             ProfileId = id,
             Permissions = items
+        });
+    }
+
+    // POST api/app/profiles
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateProfileDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return UnprocessableEntity(new { message = "El nombre es requerido" });
+
+        if (string.IsNullOrWhiteSpace(dto.Code))
+            return UnprocessableEntity(new { message = "El código es requerido" });
+
+        var codeExists = await _db.Profiles.AnyAsync(p => p.Code == dto.Code);
+
+        if (codeExists)
+            return UnprocessableEntity(new { message = "Ya existe un perfil con ese código" });
+
+        var profile = new Profile
+        {
+            Name = dto.Name,
+            Code = dto.Code.ToUpper(),
+            Description = dto.Description,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _db.Profiles.Add(profile);
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new ProfileDto
+        {
+            Id = profile.Id,
+            Name = profile.Name,
+            Code = profile.Code,
+            Description = profile.Description
+        });
+    }
+
+    // PUT api/app/profiles/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+        ulong id,
+        [FromBody] UpdateProfileDto dto)
+    {
+        var profile = await _db.Profiles.FirstOrDefaultAsync(p => p.Id == id);
+
+        if (profile == null)
+            return NotFound(new { message = "Perfil no encontrado" });
+
+        if (profile.Code == "ADMIN")
+            return UnprocessableEntity(new
+            {
+                message = "El perfil ADMIN está protegido"
+            });
+
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+            profile.Name = dto.Name;
+
+        if (dto.Description != null)
+            profile.Description = dto.Description;
+
+        profile.UpdatedAt = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new ProfileDto
+        {
+            Id = profile.Id,
+            Name = profile.Name,
+            Code = profile.Code,
+            Description = profile.Description
+        });
+    }
+
+    // DELETE api/app/profiles/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(ulong id)
+    {
+        var profile = await _db.Profiles.FirstOrDefaultAsync(p => p.Id == id);
+
+        if (profile == null)
+            return NotFound(new { message = "Perfil no encontrado" });
+
+        if (profile.Code == "ADMIN")
+            return UnprocessableEntity(new
+            {
+                message = "El perfil ADMIN está protegido"
+            });
+
+        var usersUsingProfile = await _db.Users
+            .AnyAsync(u => u.ProfileId == id);
+
+        if (usersUsingProfile)
+            return UnprocessableEntity(new
+            {
+                message = "Existen usuarios asociados al perfil"
+            });
+
+        var permissions = await _db.ProfilePermissions
+            .Where(x => x.ProfileId == id)
+            .ToListAsync();
+
+        _db.ProfilePermissions.RemoveRange(permissions);
+
+        _db.Profiles.Remove(profile);
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Perfil eliminado"
         });
     }
 }

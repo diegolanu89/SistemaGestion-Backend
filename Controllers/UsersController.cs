@@ -198,4 +198,34 @@ public class UsersController : ControllerBase
         try { _ = new System.Net.Mail.MailAddress(email); return true; }
         catch { return false; }
     }
+
+
+    // GET api/app/users/{id}/permissions
+    [HttpGet("{id}/permissions")]
+    public async Task<IActionResult> GetPermissions(ulong id)
+    {
+        var user = await _db.Users
+            .Include(u => u.Profile)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+            return NotFound();
+
+        var permissions = await _db.ProfilePermissions
+            .Where(pp => pp.ProfileId == user.ProfileId)
+            .Include(pp => pp.Permission)
+            .Include(pp => pp.Action)
+            .Select(pp => new
+            {
+                PermissionId = pp.PermissionId,
+                PermissionCode = pp.Permission!.Code,
+                PermissionName = pp.Permission.Name,
+                ActionId = pp.ActionId,
+                ActionCode = pp.Action!.Code,
+                Level = pp.Action.Level
+            })
+            .ToListAsync();
+
+        return Ok(permissions);
+    }
 }
