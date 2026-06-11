@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
@@ -90,6 +91,10 @@ public class ChangeRequestsController : ControllerBase
         if (dto.Status == "aprobado")
             await _bacService.RecalculateTotal(project);
 
+        // Auditoría de horas (RF-11): solo si el alta agrega horas.
+        if (cr.BacHoursIncrement > 0)
+            await LogHoursAdjustmentAsync(project, cr, previousHours: 0m, action: "alta");
+
         return StatusCode(201, new
         {
             message = "Control de cambio creado",
@@ -114,6 +119,8 @@ public class ChangeRequestsController : ControllerBase
         if (dto.Status != null && !validStatuses.Contains(dto.Status))
             return UnprocessableEntity(new { message = "Estado inválido" });
 
+        var previousHours = cr.BacHoursIncrement;
+
         if (dto.Title != null) cr.Title = dto.Title;
         if (dto.Description != null) cr.Description = dto.Description;
         if (dto.Status != null) cr.Status = dto.Status;
@@ -125,6 +132,10 @@ public class ChangeRequestsController : ControllerBase
 
         await _db.SaveChangesAsync();
         await _bacService.RecalculateTotal(project);
+
+        // Auditoría de horas (RF-11): solo si la edición cambió las horas.
+        if (dto.BacHoursIncrement.HasValue && cr.BacHoursIncrement != previousHours)
+            await LogHoursAdjustmentAsync(project, cr, previousHours, action: "modificacion");
 
         return Ok(new
         {
@@ -181,6 +192,66 @@ public class ChangeRequestsController : ControllerBase
             await _bacService.RecalculateTotal(project);
 
         return Ok(new { message = "Control de cambio eliminado" });
+    }
+
+    private static readonly JsonSerializerOptions _auditJson = new()
+    {
+        WriteIndented = false,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    // Escribe una entrada de auditoría explícita para los ajustes de horas
+    // hechos desde "Control de cambios". El interceptor genérico ya audita el
+    // diff crudo del ChangeRequest; esta entrada agrega lo que pidió negocio:
+    // la SUMATORIA de horas del proyecto, la pantalla de origen y un comentario
+    // legible. Todo viaja en new_value (sin cambios de schema).
+    private async Task LogHoursAdjustmentAsync(ClockifyProject project, ChangeRequest cr, decimal previousHours, string action)
+    {
+        // Sumatoria real al momento del log: suma de incrementos de TODOS los
+        // controles de cambio del proyecto (independiente de su estado, igual
+        // criterio que ProjectBacService.RecalculateTotal).
+        var sumatoriaHoras = await _db.ChangeRequests
+            .Where(c => c.ProjectId == project.Id && c.BacHoursIncrement > 0)
+            .SumAsync(c => c.BacHoursIncrement);
+
+        var (userId, userEmail) = ResolveAuditUser();
+
+        var payload = new
+        {
+            pantalla = "control_de_cambios",
+            comentario = "ajustes de hora desde control de cambios",
+            accion = action,
+            changeRequestId = cr.Id,
+            changeRequestCode = cr.Code,
+            horasAnteriores = previousHours,
+            horasDeEsteCambio = cr.BacHoursIncrement,
+            sumatoriaHorasControlesDeCambio = sumatoriaHoras,
+            bacTotalHoras = project.BacTotalHours
+        };
+
+        _db.ChangeAuditLogs.Add(new ChangeAuditLog
+        {
+            Ts = DateTime.UtcNow,
+            UserId = userId,
+            UserEmail = userEmail,
+            Module = "operations",
+            Entity = "ChangeRequestHoursAdjustment",
+            RecordId = cr.Id.ToString(),
+            EventType = AuditEventType.Update,
+            NewValue = JsonSerializer.Serialize(payload, _auditJson),
+            RequestId = HttpContext.TraceIdentifier,
+            Ip = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+        await _db.SaveChangesAsync();
+    }
+
+    // Resuelve el usuario del request desde HttpContext.Items (lo setea el
+    // SanctumAuthMiddleware), igual que el AuditSaveChangesInterceptor.
+    private (ulong?, string?) ResolveAuditUser()
+    {
+        ulong? userId = HttpContext.Items.TryGetValue("UserId", out var raw) && raw is ulong u ? u : null;
+        var email = HttpContext.Items.TryGetValue("UserEmail", out var er) ? er as string : null;
+        return (userId, email);
     }
 
     private static ChangeRequestDto MapToDto(ChangeRequest cr) => new()
