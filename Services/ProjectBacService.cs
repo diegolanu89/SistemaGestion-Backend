@@ -29,11 +29,23 @@ public class ProjectBacService
         var hoursInc = increments?.HoursInc ?? 0;
         var costInc = increments?.CostInc ?? 0;
 
-        project.BacTotalHours = project.BacBaseHours + hoursInc;
-        project.BacTotalCost = project.BacBaseCost + costInc;
-        project.UpdatedAt = DateTime.UtcNow;
+        var newTotalHours = project.BacBaseHours + hoursInc;
+        var newTotalCost = project.BacBaseCost + costInc;
 
-        await _db.SaveChangesAsync();
+        // Solo persistir si el total realmente cambió. RecalculateTotal se
+        // invoca también desde lecturas (GetAll, GetById); sin este guard,
+        // el bump incondicional de UpdatedAt deja la entidad en Modified y el
+        // AuditSaveChangesInterceptor escribe una fila UPDATE espuria por cada
+        // GET. Como total = base + incrementos, comparar el total cubre además
+        // los cambios de base que llegan vía UpdateBaseAndRecalculate.
+        if (project.BacTotalHours != newTotalHours || project.BacTotalCost != newTotalCost)
+        {
+            project.BacTotalHours = newTotalHours;
+            project.BacTotalCost = newTotalCost;
+            project.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+        }
+
         return project;
     }
 
