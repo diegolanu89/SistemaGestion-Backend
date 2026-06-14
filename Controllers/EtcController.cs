@@ -56,6 +56,28 @@ public class EtcController : ControllerBase
                 .ThenBy(r => r.UserName)
                 .ToListAsync();
 
+        var userIds = records.Where(r => r.UserId.HasValue).Select(r => r.UserId!.Value).Distinct().ToList();
+        var usersById = await _db.ClockifyUsers
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id);
+
+        var recordDtos = records.Select(r => new EtcRecordDto
+        {
+            Id = r.Id,
+            ProjectId = r.ProjectId,
+            SnapshotId = r.SnapshotId,
+            UserId = r.UserId,
+            UserName = r.UserName,
+            MonthKey = r.MonthKey,
+            MonthLabel = r.MonthLabel,
+            Hours = r.Hours,
+            CreatedAt = r.CreatedAt,
+            UpdatedAt = r.UpdatedAt,
+            User = r.UserId.HasValue && usersById.TryGetValue(r.UserId.Value, out var u)
+                ? new EtcUserDto { Id = u.Id, Name = u.Name, Email = u.Email }
+                : null
+        }).ToList();
+
         return Ok(new
         {
             snapshot = etcSnapshot != null ? new
@@ -65,7 +87,7 @@ public class EtcController : ControllerBase
                 label = etcSnapshot.Label,
                 created_at = etcSnapshot.CreatedAt?.ToString("o")
             } : null,
-            records
+            records = recordDtos
         });
     }
 
