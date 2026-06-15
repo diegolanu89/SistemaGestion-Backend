@@ -547,9 +547,6 @@ public class ClockifySyncController : ControllerBase
     }
 
     // GET api/clockify/projects/{id}/sync-status
-    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-status
-    // a /api/clockify/projects/{id}/sync-status para mantener consistencia con el resto
-    // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpGet("projects/{id}/sync-status")]
     public async Task<IActionResult> GetSyncStatus(ulong id)
     {
@@ -609,9 +606,6 @@ public class ClockifySyncController : ControllerBase
     }
 
     // POST api/clockify/projects/{id}/sync-time-entries
-    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-time-entries
-    // a /api/clockify/projects/{id}/sync-time-entries para mantener consistencia con el resto
-    // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpPost("projects/{id}/sync-time-entries")]
     public async Task<IActionResult> SyncProjectTimeEntries(
         ulong id,
