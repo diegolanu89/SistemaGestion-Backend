@@ -37,37 +37,33 @@ public class ProjectsController : ControllerBase
     {
         try
         {
-            // TODO: Confirmar con el cliente si para algún rol específico o usuario
-            // se restringe la visibilidad de proyectos a nivel de registro
-            // (usando app_user_visible_projects). Por ahora la restricción se maneja
-            // únicamente por roles (RBAC), por lo que el filtro por visibilidad queda deshabilitado.
-            // var onlyVisible = only_visible.ToLower() != "false" && only_visible != "0";
-            // var userId = HttpContext.Items["UserId"] as ulong?;
+            var onlyVisible = only_visible.ToLower() != "false" && only_visible != "0";
+            var userId = HttpContext.Items["UserId"] as ulong?;
 
             var query = _db.ClockifyProjects
                 .Include(p => p.Client)
                 .Include(p => p.Filter)
                 .AsQueryable();
 
-            // if (onlyVisible)
-            // {
-            //     if (userId.HasValue)
-            //     {
-            //         var projectIds = await _db.AppUserVisibleProjects
-            //             .Where(v => v.UserId == userId.Value)
-            //             .Select(v => v.ProjectId)
-            //             .ToListAsync();
-            //
-            //         if (projectIds.Any())
-            //             query = query.Where(p => projectIds.Contains(p.Id));
-            //         else
-            //             query = query.Where(p => p.Filter != null);
-            //     }
-            //     else
-            //     {
-            //         query = query.Where(p => p.Filter != null);
-            //     }
-            // }
+            if (onlyVisible)
+            {
+                if (userId.HasValue)
+                {
+                    var projectIds = await _db.AppUserVisibleProjects
+                        .Where(v => v.UserId == userId.Value)
+                        .Select(v => v.ProjectId)
+                        .ToListAsync();
+
+                    if (projectIds.Any())
+                        query = query.Where(p => projectIds.Contains(p.Id));
+                    else
+                        query = query.Where(p => p.Filter != null);
+                }
+                else
+                {
+                    query = query.Where(p => p.Filter != null);
+                }
+            }
 
             if (!string.IsNullOrEmpty(search))
                 query = query.Where(p => p.Name.Contains(search));

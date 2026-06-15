@@ -8,6 +8,13 @@ public class EtcEntryDto
     public decimal Hours { get; set; }
 }
 
+public class EtcUserDto
+{
+    public ulong Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Email { get; set; }
+}
+
 public class EtcRecordDto
 {
     public ulong Id { get; set; }
@@ -20,6 +27,7 @@ public class EtcRecordDto
     public decimal Hours { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public EtcUserDto? User { get; set; }
 }
 
 public class CreateEtcRecordDto
