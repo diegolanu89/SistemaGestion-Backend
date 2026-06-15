@@ -4,6 +4,7 @@ using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
+using bdt_evm_app.Services;
 
 namespace bdt_evm_app.Controllers;
 
@@ -11,11 +12,13 @@ namespace bdt_evm_app.Controllers;
 public class EtcController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly EtcService _etcService;
     private readonly ILogger<EtcController> _logger;
 
-    public EtcController(AppDbContext db, ILogger<EtcController> logger)
+    public EtcController(AppDbContext db, EtcService etcService, ILogger<EtcController> logger)
     {
         _db = db;
+        _etcService = etcService;
         _logger = logger;
     }
 
@@ -29,32 +32,7 @@ public class EtcController : ControllerBase
             return NotFound(new { message = "Proyecto no encontrado" });
 
         var wantBaseline = snapshot == "baseline";
-        EtcSnapshot? etcSnapshot;
-
-        if (wantBaseline)
-            etcSnapshot = await _db.EtcSnapshots
-                .Where(s => s.ProjectId == projectId)
-                .OrderBy(s => s.Version)
-                .FirstOrDefaultAsync();
-        else
-            etcSnapshot = await _db.EtcSnapshots
-                .Where(s => s.ProjectId == projectId)
-                .OrderByDescending(s => s.Version)
-                .FirstOrDefaultAsync();
-
-        List<EtcRecord> records;
-        if (etcSnapshot != null)
-            records = await _db.EtcRecords
-                .Where(r => r.SnapshotId == etcSnapshot.Id)
-                .OrderBy(r => r.MonthKey)
-                .ThenBy(r => r.UserName)
-                .ToListAsync();
-        else
-            records = await _db.EtcRecords
-                .Where(r => r.ProjectId == projectId && r.SnapshotId == null)
-                .OrderBy(r => r.MonthKey)
-                .ThenBy(r => r.UserName)
-                .ToListAsync();
+        var (etcSnapshot, records) = await _etcService.GetRecordsForProject(projectId, wantBaseline);
 
         var userIds = records.Where(r => r.UserId.HasValue).Select(r => r.UserId!.Value).Distinct().ToList();
         var usersById = await _db.ClockifyUsers
@@ -102,30 +80,7 @@ public class EtcController : ControllerBase
             return NotFound(new { message = "Proyecto no encontrado" });
 
         var wantBaseline = snapshot == "baseline";
-        EtcSnapshot? etcSnapshot;
-
-        if (wantBaseline)
-            etcSnapshot = await _db.EtcSnapshots
-                .Where(s => s.ProjectId == projectId)
-                .OrderBy(s => s.Version)
-                .FirstOrDefaultAsync();
-        else
-            etcSnapshot = await _db.EtcSnapshots
-                .Where(s => s.ProjectId == projectId)
-                .OrderByDescending(s => s.Version)
-                .FirstOrDefaultAsync();
-
-        List<EtcRecord> records;
-        if (etcSnapshot != null)
-            records = await _db.EtcRecords
-                .Where(r => r.SnapshotId == etcSnapshot.Id)
-                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
-                .ToListAsync();
-        else
-            records = await _db.EtcRecords
-                .Where(r => r.ProjectId == projectId && r.SnapshotId == null)
-                .OrderBy(r => r.MonthKey).ThenBy(r => r.UserName)
-                .ToListAsync();
+        var (etcSnapshot, records) = await _etcService.GetRecordsForProject(projectId, wantBaseline);
 
         // Meses únicos ordenados cronológicamente
         var months = records.Select(r => r.MonthKey).Distinct().OrderBy(m => m).ToList();
