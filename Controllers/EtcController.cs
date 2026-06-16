@@ -5,6 +5,7 @@ using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
 using bdt_evm_app.Services;
+using bdt_evm_app.Helpers;
 
 namespace bdt_evm_app.Controllers;
 
@@ -141,7 +142,7 @@ public class EtcController : ControllerBase
         {
             UserName = u,
             MonthKey = dto.MonthKey,
-            MonthLabel = dto.MonthLabel,
+            MonthLabel = MonthHelper.GetMonthLabel(dto.MonthKey),
             Hours = dto.Hours
         }).ToList();
 
@@ -162,7 +163,7 @@ public class EtcController : ControllerBase
                 UserId = user?.Id,
                 UserName = userName,
                 MonthKey = dto.MonthKey,
-                MonthLabel = dto.MonthLabel,
+                MonthLabel = MonthHelper.GetMonthLabel(dto.MonthKey),
                 Hours = dto.Hours,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -208,7 +209,7 @@ public class EtcController : ControllerBase
                 return UnprocessableEntity(new
                 {
                     error = "Validación de capacidad",
-                    message = $"{dto.UserName} ({dto.MonthLabel}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres. No podés cargar más de {Math.Round(hoursFree, 2)}h."
+                    message = $"{dto.UserName} ({MonthHelper.GetMonthLabel(dto.MonthKey)}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres. No podés cargar más de {Math.Round(hoursFree, 2)}h."
                 });
 
             record.UserId = user.Id;
@@ -216,7 +217,7 @@ public class EtcController : ControllerBase
 
         record.UserName = dto.UserName;
         record.MonthKey = dto.MonthKey;
-        record.MonthLabel = dto.MonthLabel;
+        record.MonthLabel = MonthHelper.GetMonthLabel(dto.MonthKey);
         record.Hours = dto.Hours;
         record.UpdatedAt = DateTime.UtcNow;
 
@@ -392,7 +393,7 @@ public class EtcController : ControllerBase
                 UserId = user?.Id,
                 UserName = entry.UserName,
                 MonthKey = entry.MonthKey,
-                MonthLabel = entry.MonthLabel,
+                MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey),
                 Hours = entry.Hours,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -439,7 +440,7 @@ public class EtcController : ControllerBase
                 UserId = user?.Id,
                 UserName = entry.UserName,
                 MonthKey = entry.MonthKey,
-                MonthLabel = entry.MonthLabel,
+                MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey),
                 Hours = entry.Hours,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -596,7 +597,7 @@ public class EtcController : ControllerBase
 
             var hoursFree = Math.Max(0, capacity - hoursTaken);
             if (entry.Hours > hoursFree)
-                errors.Add(($"{entry.UserName} ({entry.MonthLabel}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres. No podés cargar más de {Math.Round(hoursFree, 2)}h.", entry.UserName, entry.MonthKey));
+                errors.Add(($"{entry.UserName} ({MonthHelper.GetMonthLabel(entry.MonthKey)}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres. No podés cargar más de {Math.Round(hoursFree, 2)}h.", entry.UserName, entry.MonthKey));
         }
 
         return errors;

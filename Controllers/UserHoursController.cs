@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
+using bdt_evm_app.Helpers;
 
 namespace bdt_evm_app.Controllers;
 
@@ -78,7 +79,7 @@ public class UserHoursController : ControllerBase
                 groupedByMonth[monthKey] = new
                 {
                     month_key = monthKey,
-                    month_label = GetMonthLabel(monthKey),
+                    month_label = MonthHelper.GetMonthLabel(monthKey),
                     users = new List<object>()
                 };
             }
@@ -93,18 +94,4 @@ public class UserHoursController : ControllerBase
         return Ok(groupedByMonth.Values.ToList());
     }
 
-    private static string GetMonthLabel(string monthKey)
-    {
-        try
-        {
-            var parts = monthKey.Split('-');
-            if (parts.Length != 2) return monthKey;
-            var date = new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), 1);
-            var culture = new System.Globalization.CultureInfo("es-AR");
-            return char.ToUpper(date.ToString("MMMM", culture)[0]) +
-                   date.ToString("MMMM", culture)[1..] +
-                   " de " + date.Year;
-        }
-        catch { return monthKey; }
-    }
 }

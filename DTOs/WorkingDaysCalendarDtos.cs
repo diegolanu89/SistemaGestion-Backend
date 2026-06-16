@@ -28,7 +28,7 @@ public class MonthOptionDto
 public class CreateWorkingDaysCalendarDto
 {
     public string MonthKey { get; set; } = string.Empty;
-    public string MonthLabel { get; set; } = string.Empty;
+    public string? MonthLabel { get; set; }
     public int Year { get; set; }
     public int Month { get; set; }
     public int TotalDays { get; set; }

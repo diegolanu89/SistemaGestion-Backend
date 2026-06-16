@@ -4,6 +4,7 @@ using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
+using bdt_evm_app.Helpers;
 
 namespace bdt_evm_app.Controllers;
 
@@ -200,7 +201,7 @@ public class WorkingDaysCalendarController : ControllerBase
             var calendar = new WorkingDaysCalendar
             {
                 MonthKey = dto.MonthKey,
-                MonthLabel = dto.MonthLabel,
+                MonthLabel = MonthHelper.GetMonthLabel(dto.MonthKey),
                 Year = dto.Year,
                 Month = dto.Month,
                 TotalDays = dto.TotalDays,
@@ -276,9 +277,8 @@ public class WorkingDaysCalendarController : ControllerBase
                 if (exists)
                     return UnprocessableEntity(new { success = false, message = "Ya existe un calendario para ese mes" });
                 calendar.MonthKey = dto.MonthKey;
+                calendar.MonthLabel = MonthHelper.GetMonthLabel(dto.MonthKey);
             }
-
-            if (dto.MonthLabel != null) calendar.MonthLabel = dto.MonthLabel;
             if (dto.Year.HasValue) calendar.Year = dto.Year.Value;
             if (dto.Month.HasValue) calendar.Month = dto.Month.Value;
             if (dto.TotalDays.HasValue) calendar.TotalDays = dto.TotalDays.Value;
