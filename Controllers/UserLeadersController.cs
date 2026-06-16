@@ -91,7 +91,7 @@ public class UserLeadersController : ControllerBase
         {
             var users = await _db.TimesheetUsers
                 .OrderBy(u => u.Name)
-                .Select(u => new ClockifyUserDto
+                .Select(u => new TimesheetUserResponseDto
                 {
                     Id = u.Id,
                     Name = u.Name,
@@ -345,13 +345,13 @@ public class UserLeadersController : ControllerBase
         Notes = ul.Notes,
         CreatedAt = ul.CreatedAt,
         UpdatedAt = ul.UpdatedAt,
-        User = ul.User != null ? new ClockifyUserDto
+        User = ul.User != null ? new TimesheetUserResponseDto
         {
             Id = ul.User.Id,
             Name = ul.User.Name,
             Email = ul.User.Email
         } : null,
-        Leader = ul.Leader != null ? new ClockifyUserDto
+        Leader = ul.Leader != null ? new TimesheetUserResponseDto
         {
             Id = ul.Leader.Id,
             Name = ul.Leader.Name,

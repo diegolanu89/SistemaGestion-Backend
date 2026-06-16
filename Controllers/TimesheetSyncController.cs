@@ -7,7 +7,7 @@ using bdt_evm_app.Services;
 namespace bdt_evm_app.Controllers;
 
 [ApiController]
-[Route("api/clockify")]
+[Route("api/timesheet")]
 [RequirePermission("ADMIN_ACCESS")]
 public class TimesheetSyncController : ControllerBase
 {
@@ -28,7 +28,7 @@ public class TimesheetSyncController : ControllerBase
         _logger = logger;
     }
 
-    // POST api/clockify/sync-clients
+    // POST api/timesheet/sync-clients
     [HttpPost("sync-clients")]
     public async Task<IActionResult> SyncClients()
     {
@@ -44,7 +44,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/sync-clients
+    // GET api/timesheet/sync-clients
     [HttpGet("sync-clients")]
     public async Task<IActionResult> GetClients()
     {
@@ -59,7 +59,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/sync-users
+    // POST api/timesheet/sync-users
     [HttpPost("sync-users")]
     public async Task<IActionResult> SyncUsers([FromQuery] bool only_active = false)
     {
@@ -75,7 +75,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/sync-users
+    // GET api/timesheet/sync-users
     [HttpGet("sync-users")]
     public async Task<IActionResult> GetUsers([FromQuery] bool only_active = false)
     {
@@ -90,7 +90,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/sync-time-entries
+    // POST api/timesheet/sync-time-entries
     [HttpPost("sync-time-entries")]
     public async Task<IActionResult> SyncTimeEntries([FromQuery] string? from, [FromQuery] string? to)
     {
@@ -113,7 +113,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/sync-time-entries-all
+    // POST api/timesheet/sync-time-entries-all
     [HttpPost("sync-time-entries-all")]
     public async Task<IActionResult> SyncTimeEntriesAll([FromQuery] string? from, [FromQuery] string? to)
     {
@@ -132,7 +132,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/sync-time-entries-by-project
+    // POST api/timesheet/sync-time-entries-by-project
     [HttpPost("sync-time-entries-by-project")]
     public async Task<IActionResult> SyncTimeEntriesByProject([FromQuery] string project_id, [FromQuery] string? from, [FromQuery] string? to)
     {
@@ -154,7 +154,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/sync-projects
+    // POST api/timesheet/sync-projects
     [HttpPost("sync-projects")]
     public async Task<IActionResult> SyncProjects()
     {
@@ -170,7 +170,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/sync-time-entries
+    // GET api/timesheet/sync-time-entries
     [HttpGet("sync-time-entries")]
     public async Task<IActionResult> GetTimeEntries(
         [FromQuery] string? from,
@@ -196,7 +196,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/sync-time-entries-all
+    // GET api/timesheet/sync-time-entries-all
     [HttpGet("sync-time-entries-all")]
     public async Task<IActionResult> GetTimeEntriesAll(
         [FromQuery] string? from,
@@ -244,7 +244,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/sync-time-entries-by-project
+    // GET api/timesheet/sync-time-entries-by-project
     [HttpGet("sync-time-entries-by-project")]
     public async Task<IActionResult> GetTimeEntriesByProject(
         [FromQuery] string project_id,
@@ -278,7 +278,7 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/estimate-time-entries
+    // GET api/timesheet/estimate-time-entries
     [HttpGet("estimate-time-entries")]
     public async Task<IActionResult> EstimateTimeEntries(
         [FromQuery] string? from,
@@ -311,9 +311,9 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // GET api/clockify/projects/{id}/sync-status
+    // GET api/timesheet/projects/{id}/sync-status
     // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-status
-    // a /api/clockify/projects/{id}/sync-status para mantener consistencia con el resto
+    // a /api/timesheet/projects/{id}/sync-status para mantener consistencia con el resto
     // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpGet("projects/{id}/sync-status")]
     public async Task<IActionResult> GetSyncStatus(ulong id)
@@ -328,9 +328,9 @@ public class TimesheetSyncController : ControllerBase
                 return Ok(new
                 {
                     project_id = status.ProjectId,
-                    clockify_project_id = status.ClockifyProjectId,
+                    timesheet_project_id = status.TimesheetProjectId,
                     time_entries_in_db = status.TimeEntriesInDb,
-                    time_entries_in_clockify = status.TimeEntriesInClockify,
+                    timesheet_time_entries = status.TimeEntriesInTimesheet,
                     needs_sync = status.NeedsSync,
                     missing_count = status.MissingCount,
                     error = status.Error
@@ -339,9 +339,9 @@ public class TimesheetSyncController : ControllerBase
             return Ok(new
             {
                 project_id = status.ProjectId,
-                clockify_project_id = status.ClockifyProjectId,
+                timesheet_project_id = status.TimesheetProjectId,
                 time_entries_in_db = status.TimeEntriesInDb,
-                time_entries_in_clockify = status.TimeEntriesInClockify,
+                timesheet_time_entries = status.TimeEntriesInTimesheet,
                 needs_sync = status.NeedsSync,
                 missing_count = status.MissingCount
             });
@@ -353,9 +353,9 @@ public class TimesheetSyncController : ControllerBase
         }
     }
 
-    // POST api/clockify/projects/{id}/sync-time-entries
+    // POST api/timesheet/projects/{id}/sync-time-entries
     // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-time-entries
-    // a /api/clockify/projects/{id}/sync-time-entries para mantener consistencia con el resto
+    // a /api/timesheet/projects/{id}/sync-time-entries para mantener consistencia con el resto
     // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpPost("projects/{id}/sync-time-entries")]
     public async Task<IActionResult> SyncProjectTimeEntries(
@@ -373,8 +373,8 @@ public class TimesheetSyncController : ControllerBase
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
-        if (string.IsNullOrEmpty(project.ClockifyProjectId?.Trim()))
-            return BadRequest(new { error = "El proyecto no tiene clockify_project_id configurado" });
+        if (string.IsNullOrEmpty(project.TimesheetProjectId?.Trim()))
+            return BadRequest(new { error = "El proyecto no tiene timesheet_project_id configurado" });
 
         try
         {
@@ -390,7 +390,7 @@ public class TimesheetSyncController : ControllerBase
                 updated = r.Updated,
                 skipped = r.Skipped,
                 deleted = r.Deleted,
-                params_used = new { mode = r.Mode, startIso = r.StartIso, endIso = r.EndIso, clockify_project_id = r.ClockifyProjectId }
+                params_used = new { mode = r.Mode, startIso = r.StartIso, endIso = r.EndIso, timesheet_project_id = r.TimesheetProjectId }
             });
         }
         catch (Exception e)

@@ -113,7 +113,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProjectIntakeRecord>()
             .HasOne(r => r.TimesheetProject)
             .WithMany()
-            .HasForeignKey(r => r.ClockifyRecordId)
+            .HasForeignKey(r => r.TimesheetRecordId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ProjectIntakeRecord>()
@@ -123,9 +123,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ProjectIntakeRecord>()
-            .HasOne(r => r.LeaderClockifyUser)
+            .HasOne(r => r.LeaderTimesheetUser)
             .WithMany()
-            .HasForeignKey(r => r.LeaderClockifyUserId)
+            .HasForeignKey(r => r.LeaderTimesheetUserId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ProjectTracking>()

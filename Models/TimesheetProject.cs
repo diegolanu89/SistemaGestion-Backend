@@ -8,7 +8,7 @@ public class TimesheetProject
     [Column("id")]
     public ulong Id { get; set; }
     [Column("timesheet_project_id")]
-    public string ClockifyProjectId { get; set; } = string.Empty;
+    public string TimesheetProjectId { get; set; } = string.Empty;
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("code")]

@@ -143,7 +143,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.StatusRef)
                 .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
-                .Include(r => r.LeaderClockifyUser)
+                .Include(r => r.LeaderTimesheetUser)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(project_type))
@@ -207,7 +207,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.StatusRef)
                 .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
-                .Include(r => r.LeaderClockifyUser)
+                .Include(r => r.LeaderTimesheetUser)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (record == null)
@@ -256,11 +256,11 @@ public class ProjectIntakesController : ControllerBase
                 resolvedClientName = client.Name;
             }
 
-            if (dto.LeaderClockifyUserId.HasValue)
+            if (dto.LeaderTimesheetUserId.HasValue)
             {
-                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderTimesheetUserId.Value);
                 if (!leaderExists)
-                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
+                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderTimesheetUserId}' no encontrado" });
             }
 
             var record = new ProjectIntakeRecord
@@ -278,9 +278,9 @@ public class ProjectIntakesController : ControllerBase
                 EstimatedEndDate = dto.EstimatedEndDate,
                 ActualEndDate = dto.ActualEndDate,
                 CommercialStatus = dto.CommercialStatus,
-                LeaderClockifyUserId = dto.LeaderClockifyUserId,
+                LeaderTimesheetUserId = dto.LeaderTimesheetUserId,
                 Observations = dto.Observations,
-                RequiresClockifyCreation = dto.RequiresClockifyCreation,
+                RequiresTimesheetCreation = dto.RequiresTimesheetCreation,
                 IsActive = true,
                 CreatedBy = userId,
                 UpdatedBy = userId,
@@ -290,13 +290,13 @@ public class ProjectIntakesController : ControllerBase
 
             string? clockifyMessage = null;
 
-            if (dto.RequiresClockifyCreation)
+            if (dto.RequiresTimesheetCreation)
             {
                 try
                 {
                     var clockifyName = $"{internalNumber} - {dto.ProjectName}";
                     var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, dto.ClientId);
-                    record.ClockifyRecordId = clockifyRecordId;
+                    record.TimesheetRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
                 catch (Exception ex)
@@ -317,12 +317,12 @@ public class ProjectIntakesController : ControllerBase
             await _db.Entry(record).Reference(r => r.TypeRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.CategoryRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.StatusRef).LoadAsync();
-            if (record.ClockifyRecordId.HasValue)
+            if (record.TimesheetRecordId.HasValue)
                 await _db.Entry(record).Reference(r => r.TimesheetProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
-            if (record.LeaderClockifyUserId.HasValue)
-                await _db.Entry(record).Reference(r => r.LeaderClockifyUser).LoadAsync();
+            if (record.LeaderTimesheetUserId.HasValue)
+                await _db.Entry(record).Reference(r => r.LeaderTimesheetUser).LoadAsync();
 
             return StatusCode(201, new
             {
@@ -373,25 +373,25 @@ public class ProjectIntakesController : ControllerBase
             if (dto.EstimatedEndDate.HasValue) record.EstimatedEndDate = dto.EstimatedEndDate;
             if (dto.ActualEndDate.HasValue) record.ActualEndDate = dto.ActualEndDate;
             if (dto.CommercialStatus != null) record.CommercialStatus = dto.CommercialStatus;
-            if (dto.LeaderClockifyUserId.HasValue)
+            if (dto.LeaderTimesheetUserId.HasValue)
             {
-                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderTimesheetUserId.Value);
                 if (!leaderExists)
-                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
-                record.LeaderClockifyUserId = dto.LeaderClockifyUserId;
+                    return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderTimesheetUserId}' no encontrado" });
+                record.LeaderTimesheetUserId = dto.LeaderTimesheetUserId;
             }
             if (dto.Observations != null) record.Observations = dto.Observations;
-            if (dto.RequiresClockifyCreation.HasValue) record.RequiresClockifyCreation = dto.RequiresClockifyCreation.Value;
+            if (dto.RequiresTimesheetCreation.HasValue) record.RequiresTimesheetCreation = dto.RequiresTimesheetCreation.Value;
 
             string? clockifyMessage = null;
 
-            if (dto.RequiresClockifyCreation == true && record.ClockifyRecordId == null)
+            if (dto.RequiresTimesheetCreation == true && record.TimesheetRecordId == null)
             {
                 try
                 {
                     var clockifyName = $"{record.InternalProjectNumber} - {record.ProjectName ?? string.Empty}";
                     var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, record.ClientId);
-                    record.ClockifyRecordId = clockifyRecordId;
+                    record.TimesheetRecordId = clockifyRecordId;
                     clockifyMessage = message;
                 }
                 catch (Exception ex)
@@ -414,12 +414,12 @@ public class ProjectIntakesController : ControllerBase
             await _db.Entry(record).Reference(r => r.TypeRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.CategoryRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.StatusRef).LoadAsync();
-            if (record.ClockifyRecordId.HasValue)
+            if (record.TimesheetRecordId.HasValue)
                 await _db.Entry(record).Reference(r => r.TimesheetProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
-            if (record.LeaderClockifyUserId.HasValue)
-                await _db.Entry(record).Reference(r => r.LeaderClockifyUser).LoadAsync();
+            if (record.LeaderTimesheetUserId.HasValue)
+                await _db.Entry(record).Reference(r => r.LeaderTimesheetUser).LoadAsync();
 
             return Ok(new
             {
@@ -483,11 +483,11 @@ public class ProjectIntakesController : ControllerBase
         EstimatedEndDate = r.EstimatedEndDate,
         ActualEndDate = r.ActualEndDate,
         CommercialStatus = r.CommercialStatus,
-        LeaderClockifyUserId = r.LeaderClockifyUserId,
-        LeaderName = r.LeaderClockifyUser?.Name,
+        LeaderTimesheetUserId = r.LeaderTimesheetUserId,
+        LeaderName = r.LeaderTimesheetUser?.Name,
         Observations = r.Observations,
-        RequiresClockifyCreation = r.RequiresClockifyCreation,
-        ClockifyRecordId = r.ClockifyRecordId,
+        RequiresTimesheetCreation = r.RequiresTimesheetCreation,
+        TimesheetRecordId = r.TimesheetRecordId,
         IsActive = r.IsActive,
         CreatedBy = r.CreatedBy,
         UpdatedBy = r.UpdatedBy,
@@ -523,6 +523,6 @@ public class ProjectIntakesController : ControllerBase
             Description = r.StatusRef.Description,
             IsActive = r.StatusRef.IsActive
         } : null,
-        ClockifyProjectName = r.TimesheetProject?.Name
+        TimesheetProjectName = r.TimesheetProject?.Name
     };
 }

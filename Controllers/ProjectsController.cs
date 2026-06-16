@@ -228,7 +228,7 @@ public class ProjectsController : ControllerBase
     private ProjectDto MapToDto(TimesheetProject p, decimal etcTotalHours = 0) => new()
     {
         Id = p.Id,
-        ClockifyProjectId = p.ClockifyProjectId,
+        TimesheetProjectId = p.TimesheetProjectId,
         Name = p.Name,
         Code = p.Code,
         ClientId = p.ClientId,

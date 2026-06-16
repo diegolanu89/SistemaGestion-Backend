@@ -53,11 +53,11 @@ public class ProjectIntakeRecordDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
-    public ulong? LeaderClockifyUserId { get; set; }
+    public ulong? LeaderTimesheetUserId { get; set; }
     public string? LeaderName { get; set; }
     public string? Observations { get; set; }
-    public bool RequiresClockifyCreation { get; set; }
-    public ulong? ClockifyRecordId { get; set; }
+    public bool RequiresTimesheetCreation { get; set; }
+    public ulong? TimesheetRecordId { get; set; }
     public bool IsActive { get; set; }
     public ulong? CreatedBy { get; set; }
     public ulong? UpdatedBy { get; set; }
@@ -68,7 +68,7 @@ public class ProjectIntakeRecordDto
     public ProjectIntakeTypeRefDto? TypeRef { get; set; }
     public ProjectIntakeCategoryRefDto? CategoryRef { get; set; }
     public ProjectIntakeStatusRefDto? StatusRef { get; set; }
-    public string? ClockifyProjectName { get; set; }
+    public string? TimesheetProjectName { get; set; }
 }
 
 // Request DTOs
@@ -86,9 +86,9 @@ public class CreateProjectIntakeDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
-    public ulong? LeaderClockifyUserId { get; set; }
+    public ulong? LeaderTimesheetUserId { get; set; }
     public string? Observations { get; set; }
-    public bool RequiresClockifyCreation { get; set; } = false;
+    public bool RequiresTimesheetCreation { get; set; } = false;
 }
 
 public class UpdateProjectIntakeDto
@@ -103,7 +103,7 @@ public class UpdateProjectIntakeDto
     public DateOnly? EstimatedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
-    public ulong? LeaderClockifyUserId { get; set; }
+    public ulong? LeaderTimesheetUserId { get; set; }
     public string? Observations { get; set; }
-    public bool? RequiresClockifyCreation { get; set; }
+    public bool? RequiresTimesheetCreation { get; set; }
 }

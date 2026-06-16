@@ -19,13 +19,13 @@ public record ProjectTimeEntriesSyncResult(
     string Mode,
     string? StartIso,
     string? EndIso,
-    string ClockifyProjectId);
+    string TimesheetProjectId);
 
 public record ProjectSyncStatus(
     ulong ProjectId,
-    string? ClockifyProjectId,
+    string? TimesheetProjectId,
     int TimeEntriesInDb,
-    int? TimeEntriesInClockify,
+    int? TimeEntriesInTimesheet,
     bool NeedsSync,
     int MissingCount,
     string? Error);
@@ -92,7 +92,7 @@ public class TimesheetSyncService
         {
             if (string.IsNullOrEmpty(u.ExternalId)) continue;
 
-            var existing = await _db.TimesheetUsers.FirstOrDefaultAsync(x => x.ClockifyUserId == u.ExternalId);
+            var existing = await _db.TimesheetUsers.FirstOrDefaultAsync(x => x.TimesheetUserId == u.ExternalId);
             if (existing != null)
             {
                 existing.Name = u.Name;
@@ -104,7 +104,7 @@ public class TimesheetSyncService
             {
                 _db.TimesheetUsers.Add(new TimesheetUser
                 {
-                    ClockifyUserId = u.ExternalId,
+                    TimesheetUserId = u.ExternalId,
                     Name = u.Name,
                     Email = u.Email,
                     Active = u.Active,
@@ -133,7 +133,7 @@ public class TimesheetSyncService
             }
 
             var status = p.Archived ? "cerrado" : "activo";
-            var existing = await _db.TimesheetProjects.FirstOrDefaultAsync(x => x.ClockifyProjectId == p.ExternalId);
+            var existing = await _db.TimesheetProjects.FirstOrDefaultAsync(x => x.TimesheetProjectId == p.ExternalId);
             if (existing != null)
             {
                 existing.Name = p.Name;
@@ -146,7 +146,7 @@ public class TimesheetSyncService
             {
                 _db.TimesheetProjects.Add(new TimesheetProject
                 {
-                    ClockifyProjectId = p.ExternalId,
+                    TimesheetProjectId = p.ExternalId,
                     Name = p.Name,
                     Code = p.Code,
                     Status = status,
@@ -205,11 +205,11 @@ public class TimesheetSyncService
     }
 
     /// <summary>Sincronización por proyecto local con modos all / missing / from_date.
-    /// Asume <paramref name="project"/> ya validado (existe y tiene ClockifyProjectId).</summary>
+    /// Asume <paramref name="project"/> ya validado (existe y tiene TimesheetProjectId).</summary>
     public async Task<ProjectTimeEntriesSyncResult> SyncProjectTimeEntriesAsync(TimesheetProject project, string mode, string? from)
     {
         var totalInDbBefore = await _db.TimesheetTimeEntries.CountAsync(t => t.ProjectId == project.Id);
-        var clockifyProjectId = project.ClockifyProjectId.Trim();
+        var clockifyProjectId = project.TimesheetProjectId.Trim();
 
         string? startIso = null, endIso = null;
 
@@ -236,7 +236,7 @@ public class TimesheetSyncService
         var existingIds = mode == "missing"
             ? await _db.TimesheetTimeEntries
                 .Where(t => t.ProjectId == project.Id)
-                .Select(t => t.ClockifyTimeEntryId)
+                .Select(t => t.TimesheetTimeEntryId)
                 .ToListAsync()
             : new List<string>();
 
@@ -263,7 +263,7 @@ public class TimesheetSyncService
                 }
 
                 var existsBefore = await _db.TimesheetTimeEntries
-                    .AnyAsync(t => t.ClockifyTimeEntryId == e.ExternalId);
+                    .AnyAsync(t => t.TimesheetTimeEntryId == e.ExternalId);
 
                 if (await UpsertEntryAsync(e))
                 {
@@ -281,7 +281,7 @@ public class TimesheetSyncService
         {
             deleted = await _db.TimesheetTimeEntries
                 .Where(t => t.ProjectId == project.Id &&
-                            !allExternalIds.Contains(t.ClockifyTimeEntryId))
+                            !allExternalIds.Contains(t.TimesheetTimeEntryId))
                 .ExecuteDeleteAsync();
         }
 
@@ -291,7 +291,7 @@ public class TimesheetSyncService
         return new ProjectTimeEntriesSyncResult(
             project.Id, totalInDbBefore, totalInDbAfter,
             added, updated, skipped, deleted,
-            mode, startIso, endIso, project.ClockifyProjectId);
+            mode, startIso, endIso, project.TimesheetProjectId);
     }
 
     /// <summary>Devuelve null si el proyecto no existe.</summary>
@@ -300,16 +300,16 @@ public class TimesheetSyncService
         var project = await _db.TimesheetProjects.FindAsync(id);
         if (project == null) return null;
 
-        if (string.IsNullOrEmpty(project.ClockifyProjectId))
+        if (string.IsNullOrEmpty(project.TimesheetProjectId))
             return new ProjectSyncStatus(project.Id, null, 0, null, false, 0,
-                "El proyecto no tiene clockify_project_id configurado");
+                "El proyecto no tiene timesheet_project_id configurado");
 
         var timeEntriesInDb = await _db.TimesheetTimeEntries.CountAsync(t => t.ProjectId == project.Id);
 
         int? timeEntriesInClockify = null;
         try
         {
-            var firstPage = await _provider.GetEntriesForProjectAsync(project.ClockifyProjectId.Trim(), null, null, 1, 100);
+            var firstPage = await _provider.GetEntriesForProjectAsync(project.TimesheetProjectId.Trim(), null, null, 1, 100);
             timeEntriesInClockify = firstPage.Count == 100 ? 100 : firstPage.Count;
         }
         catch (Exception ex)
@@ -320,7 +320,7 @@ public class TimesheetSyncService
         var needsSync = timeEntriesInClockify.HasValue && timeEntriesInClockify > timeEntriesInDb;
         var missingCount = needsSync ? Math.Max(0, timeEntriesInClockify!.Value - timeEntriesInDb) : 0;
 
-        return new ProjectSyncStatus(project.Id, project.ClockifyProjectId, timeEntriesInDb,
+        return new ProjectSyncStatus(project.Id, project.TimesheetProjectId, timeEntriesInDb,
             timeEntriesInClockify, needsSync, missingCount, null);
     }
 
@@ -359,12 +359,12 @@ public class TimesheetSyncService
             if (string.IsNullOrEmpty(dto.ProjectExternalId)) return false;
 
             var project = await _db.TimesheetProjects
-                .FirstOrDefaultAsync(p => p.ClockifyProjectId == dto.ProjectExternalId);
+                .FirstOrDefaultAsync(p => p.TimesheetProjectId == dto.ProjectExternalId);
             if (project == null) return false;
 
             TimesheetUser? user = null;
             if (!string.IsNullOrEmpty(dto.UserExternalId))
-                user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.ClockifyUserId == dto.UserExternalId);
+                user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.TimesheetUserId == dto.UserExternalId);
 
             if (dto.Start == null) return false;
             var startTime = dto.Start.Value;
@@ -373,7 +373,7 @@ public class TimesheetSyncService
             var description = dto.Description?[..Math.Min(dto.Description.Length, 255)];
 
             var existing = await _db.TimesheetTimeEntries
-                .FirstOrDefaultAsync(t => t.ClockifyTimeEntryId == dto.ExternalId);
+                .FirstOrDefaultAsync(t => t.TimesheetTimeEntryId == dto.ExternalId);
 
             if (existing != null)
             {
@@ -391,7 +391,7 @@ public class TimesheetSyncService
             {
                 _db.TimesheetTimeEntries.Add(new TimesheetTimeEntry
                 {
-                    ClockifyTimeEntryId = dto.ExternalId,
+                    TimesheetTimeEntryId = dto.ExternalId,
                     ProjectId = project.Id,
                     UserId = user?.Id,
                     Description = description,

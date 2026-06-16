@@ -39,7 +39,7 @@ public class ProjectFiltersController : ControllerBase
             Project = f.Project != null ? new ProjectDto
             {
                 Id = f.Project.Id,
-                ClockifyProjectId = f.Project.ClockifyProjectId,
+                TimesheetProjectId = f.Project.TimesheetProjectId,
                 Name = f.Project.Name,
                 Code = f.Project.Code,
                 ClientId = f.Project.ClientId,

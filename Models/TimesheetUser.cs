@@ -9,7 +9,7 @@ public class TimesheetUser
     [Column("id")]
     public ulong Id { get; set; }
     [Column("timesheet_user_id")]
-    public string? ClockifyUserId { get; set; }
+    public string? TimesheetUserId { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("email")]

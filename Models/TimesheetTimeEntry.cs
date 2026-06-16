@@ -9,7 +9,7 @@ public class TimesheetTimeEntry
     [Column("id")]
     public ulong Id { get; set; }
     [Column("timesheet_time_entry_id")]
-    public string ClockifyTimeEntryId { get; set; } = string.Empty;
+    public string TimesheetTimeEntryId { get; set; } = string.Empty;
     [Column("project_id")]
     public ulong ProjectId { get; set; }
     [Column("user_id")]

@@ -1,13 +1,13 @@
 namespace bdt_evm_app.DTOs;
 
-public class ClockifyUserDto
+public class TimesheetUserResponseDto
 {
     public ulong Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Email { get; set; }
 }
 
-public class CreateClockifyUserDto
+public class CreateTimesheetUserDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Email { get; set; }
@@ -16,9 +16,9 @@ public class CreateClockifyUserDto
     public decimal? DefaultMonthHours { get; set; }
 }
 
-public class UpdateClockifyUserDto
+public class UpdateTimesheetUserDto
 {
-    public string? ClockifyUserId { get; set; }
+    public string? TimesheetUserId { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public bool? Active { get; set; }

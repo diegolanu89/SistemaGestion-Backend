@@ -54,73 +54,71 @@ public class ProjectIntakeService
         return errors;
     }
 
-    // Crea el proyecto en Clockify y lo registra en clockify_projects
-    // Retorna el id interno (bigint) del registro creado en clockify_projects
-   public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(
-    string projectName,
-    ulong? clientId)
-{
-    string? clientExternalId = null;
-
-    if (clientId.HasValue)
+    // Crea el proyecto en Clockify y lo registra en timesheet_projects
+    // Retorna el id interno (bigint) del registro creado en timesheet_projects
+    public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(string projectName, ulong? clientId)
     {
-        var client = await _db.TimesheetClients.FindAsync(clientId.Value);
+        string? clientExternalId = null;
 
-        clientExternalId = client?.ExternalId;
+        if (clientId.HasValue)
+        {
+            var client = await _db.TimesheetClients.FindAsync(clientId.Value);
+
+            clientExternalId = client?.ExternalId;
+        }
+
+        var externalProject = await _clockify.CreateProjectAsync(projectName, clientExternalId);
+
+        if (!externalProject.TryGetProperty("id", out var idProp))
+            throw new Exception("Clockify no devolvió un id de proyecto válido");
+
+        var externalId = idProp.GetString()
+            ?? throw new Exception("Clockify devolvió un id vacío");
+
+        var existing = await _db.TimesheetProjects
+            .FirstOrDefaultAsync(p => p.TimesheetProjectId == externalId);
+
+        if (existing != null)
+            return (existing.Id, externalId, "Proyecto vinculado a registro existente en Clockify");
+
+        var parts = projectName.Split(" - ", 2);
+
+        var projectCode = parts.Length > 1
+            ? parts[0].Trim()
+            : null;
+
+        var projectDisplayName = parts.Length > 1
+            ? parts[1].Trim()
+            : projectName;
+
+        var timesheetProject = new TimesheetProject
+        {
+            TimesheetProjectId = externalId,
+
+            Code = projectCode,
+
+            Name = projectDisplayName,
+
+            Status = "activo",
+
+            CreatedAt = DateTime.UtcNow,
+
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _db.TimesheetProjects.Add(timesheetProject);
+
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Proyecto '{Name}' creado en Clockify con id externo {ExternalId}",
+            projectName,
+            externalId);
+
+        return (
+            timesheetProject.Id,
+            externalId,
+            "Proyecto creado exitosamente en Clockify"
+        );
     }
-
-    var externalProject = await _clockify.CreateProjectAsync(projectName, clientExternalId);
-
-    if (!externalProject.TryGetProperty("id", out var idProp))
-        throw new Exception("Clockify no devolvió un id de proyecto válido");
-
-    var externalId = idProp.GetString()
-        ?? throw new Exception("Clockify devolvió un id vacío");
-
-    var existing = await _db.TimesheetProjects
-        .FirstOrDefaultAsync(p => p.ClockifyProjectId == externalId);
-
-    if (existing != null)
-        return (existing.Id, externalId, "Proyecto vinculado a registro existente en Clockify");
-
-    var parts = projectName.Split(" - ", 2);
-
-    var projectCode = parts.Length > 1
-        ? parts[0].Trim()
-        : null;
-
-    var projectDisplayName = parts.Length > 1
-        ? parts[1].Trim()
-        : projectName;
-
-    var timesheetProject = new TimesheetProject
-    {
-        ClockifyProjectId = externalId,
-
-        Code = projectCode,
-
-        Name = projectDisplayName,
-
-        Status = "activo",
-
-        CreatedAt = DateTime.UtcNow,
-
-        UpdatedAt = DateTime.UtcNow
-    };
-
-    _db.TimesheetProjects.Add(timesheetProject);
-
-    await _db.SaveChangesAsync();
-
-    _logger.LogInformation(
-        "Proyecto '{Name}' creado en Clockify con id externo {ExternalId}",
-        projectName,
-        externalId);
-
-    return (
-        timesheetProject.Id,
-        externalId,
-        "Proyecto creado exitosamente en Clockify"
-    );
-}
 }
