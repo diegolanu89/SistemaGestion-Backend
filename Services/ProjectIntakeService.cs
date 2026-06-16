@@ -56,43 +56,71 @@ public class ProjectIntakeService
 
     // Crea el proyecto en Clockify y lo registra en clockify_projects
     // Retorna el id interno (bigint) del registro creado en clockify_projects
-    public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(string projectName, ulong? clientId)
+   public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(
+    string projectName,
+    ulong? clientId)
+{
+    string? clientExternalId = null;
+
+    if (clientId.HasValue)
     {
-        string? clientExternalId = null;
-        if (clientId.HasValue)
-        {
-            var client = await _db.ClockifyClients.FindAsync(clientId.Value);
-            clientExternalId = client?.ExternalId;
-        }
+        var client = await _db.ClockifyClients.FindAsync(clientId.Value);
 
-        var externalProject = await _clockify.CreateProjectAsync(projectName, clientExternalId);
-
-        if (!externalProject.TryGetProperty("id", out var idProp))
-            throw new Exception("Clockify no devolvió un id de proyecto válido");
-
-        var externalId = idProp.GetString() ?? throw new Exception("Clockify devolvió un id vacío");
-
-        // Verificar si ya existe en clockify_projects (por si el sync corrió antes)
-        var existing = await _db.ClockifyProjects
-            .FirstOrDefaultAsync(p => p.ClockifyProjectId == externalId);
-
-        if (existing != null)
-            return (existing.Id, externalId, "Proyecto vinculado a registro existente en Clockify");
-
-        var clockifyProject = new ClockifyProject
-        {
-            ClockifyProjectId = externalId,
-            Name = projectName,
-            Status = "activo",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        _db.ClockifyProjects.Add(clockifyProject);
-        await _db.SaveChangesAsync();
-
-        _logger.LogInformation("Proyecto '{Name}' creado en Clockify con id externo {ExternalId}", projectName, externalId);
-
-        return (clockifyProject.Id, externalId, "Proyecto creado exitosamente en Clockify");
+        clientExternalId = client?.ExternalId;
     }
+
+    var externalProject = await _clockify.CreateProjectAsync(projectName, clientExternalId);
+
+    if (!externalProject.TryGetProperty("id", out var idProp))
+        throw new Exception("Clockify no devolvió un id de proyecto válido");
+
+    var externalId = idProp.GetString()
+        ?? throw new Exception("Clockify devolvió un id vacío");
+
+    var existing = await _db.ClockifyProjects
+        .FirstOrDefaultAsync(p => p.ClockifyProjectId == externalId);
+
+    if (existing != null)
+        return (existing.Id, externalId, "Proyecto vinculado a registro existente en Clockify");
+
+    var parts = projectName.Split(" - ", 2);
+
+    var projectCode = parts.Length > 1
+        ? parts[0].Trim()
+        : null;
+
+    var projectDisplayName = parts.Length > 1
+        ? parts[1].Trim()
+        : projectName;
+
+    var clockifyProject = new ClockifyProject
+    {
+        ClockifyProjectId = externalId,
+
+        Code = projectCode,
+
+        Name = projectDisplayName,
+
+        Status = "activo",
+
+        CreatedAt = DateTime.UtcNow,
+
+        UpdatedAt = DateTime.UtcNow
+    };
+
+    _db.ClockifyProjects.Add(clockifyProject);
+
+    await _db.SaveChangesAsync();
+
+    _logger.LogInformation(
+        "Proyecto '{Name}' creado en Clockify con id externo {ExternalId}",
+        projectName,
+        externalId);
+
+    return (
+        clockifyProject.Id,
+        externalId,
+        "Proyecto creado exitosamente en Clockify"
+    );
+}
 }
