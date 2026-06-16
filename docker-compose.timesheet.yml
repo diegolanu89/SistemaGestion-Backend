@@ -1,0 +1,90 @@
+# ============================================================
+# Stack PARALELO y AISLADO para la versión renombrada (timesheet_*).
+# No toca el stack original (docker-compose.yml): usa otro contenedor,
+# otro volumen, otra red y otros puertos de host. Los dos pueden correr a la vez.
+#
+#   Original   -> DB :3306  | API :7100 | volumen mysql_data            (clockify_* con tus datos)
+#   Timesheet  -> DB :3307  | API :7101 | volumen mysql_data_timesheet  (schema timesheet_* limpio)
+#
+# Uso:
+#   docker compose -f docker-compose.timesheet.yml up -d --build
+#   # solo la base:   docker compose -f docker-compose.timesheet.yml up -d mysql-timesheet
+#   # bajar y borrar:  docker compose -f docker-compose.timesheet.yml down -v   (NO afecta al original)
+#
+# El init (./mysql/init, ya renombrado) crea la base pm_timesheet_evm con tablas timesheet_*.
+# Vive en otra instancia/volumen, totalmente aislada del stack original.
+# ============================================================
+
+services:
+
+  mysql-timesheet:
+    image: mysql:8.0
+    container_name: db_timesheet_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: pm_timesheet_evm
+      MYSQL_USER: bdt_user
+      MYSQL_PASSWORD: bdt_user
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data_timesheet:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "bdt_user", "-pbdt_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - timesheet_network
+
+  adminer-timesheet:
+    image: adminer:latest
+    container_name: adminer_timesheet
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql-timesheet
+    depends_on:
+      mysql-timesheet:
+        condition: service_healthy
+    networks:
+      - timesheet_network
+
+  backend-timesheet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bdt_dotnet_timesheet
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT_TIMESHEET:-7101}:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      AllowedOrigins: ${AllowedOrigins:-http://localhost:3001}
+      ConnectionStrings__Default: Server=mysql-timesheet;Port=3306;Database=pm_timesheet_evm;User=bdt_user;Password=bdt_user;
+      Clockify__ApiKey: ${CLOCKIFY_API_KEY}
+      Clockify__WorkspaceId: ${CLOCKIFY_WORKSPACE_ID}
+      Clockify__UserId: ${CLOCKIFY_USER_ID}
+    depends_on:
+      mysql-timesheet:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - timesheet_network
+
+volumes:
+  mysql_data_timesheet:
+
+networks:
+  timesheet_network:
+    driver: bridge

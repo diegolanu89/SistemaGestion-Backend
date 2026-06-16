@@ -20,10 +20,10 @@
 -- bac_base=600 y bac_total=600, ahora pasa a bac_base=540 + 60 hs de CRs).
 -- =====================================================================
 
-USE pm_clockify_evm;
+USE pm_timesheet_evm;
 
 -- p14: bac_base 600 -> 540 (con 2 CRs de 30 hs cada uno, bac_total queda 600 igual que antes)
-UPDATE `clockify_projects`
+UPDATE `timesheet_projects`
    SET `bac_base_hours` = 540.00,
        `bac_base_cost`  = 32400.00,
        `updated_at`     = NOW()

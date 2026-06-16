@@ -2,7 +2,7 @@
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_clients")]
+[Table("timesheet_clients")]
 public class TimesheetClient
 {
     [Column("id")]

@@ -2,7 +2,7 @@
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_project_filters")]
+[Table("timesheet_project_filters")]
 public class TimesheetProjectFilter
 {
     [Column("id")]

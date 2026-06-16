@@ -1,14 +1,14 @@
 -- MySQL dump 10.13  Distrib 8.0.45, for Linux (x86_64)
 --
--- Host: localhost    Database: pm_clockify_evm
+-- Host: localhost    Database: pm_timesheet_evm
 -- ------------------------------------------------------
 -- Server version	8.0.45
 
-CREATE DATABASE IF NOT EXISTS pm_clockify_evm
+CREATE DATABASE IF NOT EXISTS pm_timesheet_evm
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE pm_clockify_evm;
+USE pm_timesheet_evm;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -75,7 +75,7 @@ CREATE TABLE `change_requests` (
   UNIQUE KEY `uq_cr_project_code` (`project_id`,`code`),
   KEY `idx_cr_status` (`status`),
   KEY `idx_cr_requested_date` (`requested_date`),
-  CONSTRAINT `change_requests_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `change_requests_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -89,13 +89,13 @@ LOCK TABLES `change_requests` WRITE;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `clockify_clients`
+-- Estructura de la tabla `timesheet_clients`
 --
 
-DROP TABLE IF EXISTS `clockify_clients`;
+DROP TABLE IF EXISTS `timesheet_clients`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `clockify_clients` (
+CREATE TABLE `timesheet_clients` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `external_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -108,53 +108,53 @@ CREATE TABLE `clockify_clients` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Datos para la tabla `clockify_clients`
+-- Datos para la tabla `timesheet_clients`
 --
 
-LOCK TABLES `clockify_clients` WRITE;
-/*!40000 ALTER TABLE `clockify_clients` DISABLE KEYS */;
-INSERT INTO `clockify_clients` VALUES (3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
-/*!40000 ALTER TABLE `clockify_clients` ENABLE KEYS */;
+LOCK TABLES `timesheet_clients` WRITE;
+/*!40000 ALTER TABLE `timesheet_clients` DISABLE KEYS */;
+INSERT INTO `timesheet_clients` VALUES (3,'BDT Global','69dd703ead41c81887a57f77','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(4,'Cliente Test 1','69dd71cf6f055ba5e9dd2f7f','activo','2026-04-20 16:37:24','2026-04-27 19:55:13'),(5,'Google Inc','69e67b9070d51f23d4525390','activo','2026-04-21 21:10:52','2026-04-27 19:55:13'),(6,'Anthropic Testing Corp','69efbecf9b95089258bb1d51','activo','2026-04-27 19:55:13','2026-04-27 19:55:13');
+/*!40000 ALTER TABLE `timesheet_clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `clockify_project_filters`
+-- Estructura de la tabla `timesheet_project_filters`
 --
 
-DROP TABLE IF EXISTS `clockify_project_filters`;
+DROP TABLE IF EXISTS `timesheet_project_filters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `clockify_project_filters` (
+CREATE TABLE `timesheet_project_filters` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `project_id` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_project_filters_project` (`project_id`),
-  CONSTRAINT `clockify_project_filters_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `clockify_project_filters_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Datos para la tabla `clockify_project_filters`
+-- Datos para la tabla `timesheet_project_filters`
 --
 
-LOCK TABLES `clockify_project_filters` WRITE;
-/*!40000 ALTER TABLE `clockify_project_filters` DISABLE KEYS */;
-INSERT INTO `clockify_project_filters` VALUES (4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
-/*!40000 ALTER TABLE `clockify_project_filters` ENABLE KEYS */;
+LOCK TABLES `timesheet_project_filters` WRITE;
+/*!40000 ALTER TABLE `timesheet_project_filters` DISABLE KEYS */;
+INSERT INTO `timesheet_project_filters` VALUES (4,3,'2026-04-21 18:00:14','2026-04-21 18:00:14');
+/*!40000 ALTER TABLE `timesheet_project_filters` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `clockify_projects`
+-- Estructura de la tabla `timesheet_projects`
 --
 
-DROP TABLE IF EXISTS `clockify_projects`;
+DROP TABLE IF EXISTS `timesheet_projects`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `clockify_projects` (
+CREATE TABLE `timesheet_projects` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clockify_project_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `timesheet_project_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `client_id` bigint unsigned DEFAULT NULL,
@@ -171,33 +171,33 @@ CREATE TABLE `clockify_projects` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_projects_clockify` (`clockify_project_id`),
+  UNIQUE KEY `uq_projects_clockify` (`timesheet_project_id`),
   KEY `idx_projects_client` (`client_id`),
   KEY `idx_projects_status` (`status`),
-  CONSTRAINT `clockify_projects_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clockify_clients` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `clockify_projects_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `timesheet_clients` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Datos para la tabla `clockify_projects`
+-- Datos para la tabla `timesheet_projects`
 --
 
-LOCK TABLES `clockify_projects` WRITE;
-/*!40000 ALTER TABLE `clockify_projects` DISABLE KEYS */;
-INSERT INTO `clockify_projects` VALUES (3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46');
-/*!40000 ALTER TABLE `clockify_projects` ENABLE KEYS */;
+LOCK TABLES `timesheet_projects` WRITE;
+/*!40000 ALTER TABLE `timesheet_projects` DISABLE KEYS */;
+INSERT INTO `timesheet_projects` VALUES (3,'69dd7043ebaf76dec4b0a334','Gestion de Proyectos','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(4,'69dd723debaf76dec4b0d4ea','Migraci├│n','',3,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(5,'69dd71d1ebaf76dec4b0cade','Proyecto Test 1','',4,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-20 16:54:37','2026-04-21 21:10:53'),(6,'69e67bcc70d51f23d4525e9f','Gemini','',5,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-21 21:10:53','2026-04-21 21:10:53'),(7,'69efbc4e9e6197e396433793','Plataforma IA Interna',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 19:43:12','2026-04-27 19:43:12'),(8,'69efc4a403616156f982d73e','Plataforma IA Interna Audit',NULL,NULL,'activo',NULL,NULL,NULL,0.00,0.00,0.00,0.00,0.00,'manual','2026-04-27 20:18:46','2026-04-27 20:18:46');
+/*!40000 ALTER TABLE `timesheet_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `clockify_time_entries`
+-- Estructura de la tabla `timesheet_time_entries`
 --
 
-DROP TABLE IF EXISTS `clockify_time_entries`;
+DROP TABLE IF EXISTS `timesheet_time_entries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `clockify_time_entries` (
+CREATE TABLE `timesheet_time_entries` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clockify_time_entry_id` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `timesheet_time_entry_id` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `project_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -210,38 +210,38 @@ CREATE TABLE `clockify_time_entries` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_te_clockify` (`clockify_time_entry_id`),
+  UNIQUE KEY `uq_te_clockify` (`timesheet_time_entry_id`),
   KEY `idx_te_project` (`project_id`),
   KEY `idx_te_user` (`user_id`),
   KEY `idx_te_start_time` (`start_time`),
   KEY `idx_te_cr` (`change_request_id`),
   CONSTRAINT `clockify_time_entries_change_request_id_foreign` FOREIGN KEY (`change_request_id`) REFERENCES `change_requests` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `clockify_time_entries_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `clockify_time_entries_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_te_user` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `clockify_time_entries_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `clockify_time_entries_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_te_user` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Datos para la tabla `clockify_time_entries`
+-- Datos para la tabla `timesheet_time_entries`
 --
 
-LOCK TABLES `clockify_time_entries` WRITE;
-/*!40000 ALTER TABLE `clockify_time_entries` DISABLE KEYS */;
-INSERT INTO `clockify_time_entries` VALUES (3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
-/*!40000 ALTER TABLE `clockify_time_entries` ENABLE KEYS */;
+LOCK TABLES `timesheet_time_entries` WRITE;
+/*!40000 ALTER TABLE `timesheet_time_entries` DISABLE KEYS */;
+INSERT INTO `timesheet_time_entries` VALUES (3,'69dd72baebaf76dec4b0e0c5',3,8,'','2026-04-14 12:00:00','2026-04-14 17:00:00',5.000,1,NULL,'{\"id\": \"69dd72baebaf76dec4b0e0c5\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-14T17:00:00Z\", \"start\": \"2026-04-14T12:00:00Z\", \"duration\": \"PT5H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(4,'69dd72db07713d77a7ccbab8',3,8,'Migraci├│n de PHP a .NET','2026-04-13 22:48:59','2026-04-13 22:49:09',0.003,1,NULL,'{\"id\": \"69dd72db07713d77a7ccbab8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Migraci├│n de PHP a .NET\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T22:49:09Z\", \"start\": \"2026-04-13T22:48:59Z\", \"duration\": \"PT10S\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(5,'69dd72b382fef641e54c79b8',3,8,'Revision proyecto','2026-04-13 12:00:00','2026-04-13 21:00:00',9.000,1,NULL,'{\"id\": \"69dd72b382fef641e54c79b8\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dab2787617f51a958934e1\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd7043ebaf76dec4b0a334\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"Revision proyecto\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-13T21:00:00Z\", \"start\": \"2026-04-13T12:00:00Z\", \"duration\": \"PT9H\"}, \"customFieldValues\": []}','2026-04-20 17:12:52','2026-04-20 18:47:04'),(6,'69e677dfccba2f1f7bcc8680',4,5,'endpoints parte 1','2026-04-20 19:00:47','2026-04-20 19:13:36',0.214,1,NULL,'{\"id\": \"69e677dfccba2f1f7bcc8680\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T19:13:36Z\", \"start\": \"2026-04-20T19:00:47Z\", \"duration\": \"PT12M49S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55'),(7,'69e6771870d51f23d4517b67',4,5,'endpoints parte 1','2026-04-20 18:57:28','2026-04-20 18:58:40',0.020,1,NULL,'{\"id\": \"69e6771870d51f23d4517b67\", \"type\": \"REGULAR\", \"tagIds\": null, \"taskId\": null, \"userId\": \"69dabb567617f51a95898fe4\", \"kioskId\": null, \"billable\": true, \"costRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"isLocked\": false, \"projectId\": \"69dd723debaf76dec4b0d4ea\", \"hourlyRate\": {\"amount\": 0, \"currency\": \"USD\"}, \"description\": \"endpoints parte 1\", \"workspaceId\": \"69dab2777617f51a958934da\", \"timeInterval\": {\"end\": \"2026-04-20T18:58:40Z\", \"start\": \"2026-04-20T18:57:28Z\", \"duration\": \"PT1M12S\"}, \"customFieldValues\": []}','2026-04-21 21:10:55','2026-04-21 21:10:55');
+/*!40000 ALTER TABLE `timesheet_time_entries` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Estructura de la tabla `clockify_users`
+-- Estructura de la tabla `timesheet_users`
 --
 
-DROP TABLE IF EXISTS `clockify_users`;
+DROP TABLE IF EXISTS `timesheet_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `clockify_users` (
+CREATE TABLE `timesheet_users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clockify_user_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `timesheet_user_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -250,19 +250,19 @@ CREATE TABLE `clockify_users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_users_clockify` (`clockify_user_id`),
+  UNIQUE KEY `uq_users_clockify` (`timesheet_user_id`),
   KEY `idx_users_email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Datos para la tabla `clockify_users`
+-- Datos para la tabla `timesheet_users`
 --
 
-LOCK TABLES `clockify_users` WRITE;
-/*!40000 ALTER TABLE `clockify_users` DISABLE KEYS */;
-INSERT INTO `clockify_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
-/*!40000 ALTER TABLE `clockify_users` ENABLE KEYS */;
+LOCK TABLES `timesheet_users` WRITE;
+/*!40000 ALTER TABLE `timesheet_users` DISABLE KEYS */;
+INSERT INTO `timesheet_users` VALUES (4,'69dabb567617f51a95898fe6','Usuario sin nombre','christian.bass221@gmail.com',NULL,0,140.00,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(5,'69dabb567617f51a95898fe4','daniel.alcazar','danielalcazar54@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(6,'69dabb567617f51a95898fe8','diegolanus89','diegolanus89@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(7,'69dabb567617f51a95898fe5','haunau.lucia','haunau.lucia@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(8,'69dab2787617f51a958934e1','santiagoguerci96','santiagoguerci96@gmail.com',NULL,1,NULL,'2026-04-12 22:38:17','2026-04-21 21:10:54'),(15,'69dabb567617f51a95898fe7','Usuario sin nombre','aylenteresalee@gmail.com',NULL,0,NULL,'2026-04-21 21:10:54','2026-04-21 21:10:54');
+/*!40000 ALTER TABLE `timesheet_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -290,9 +290,9 @@ CREATE TABLE `etc_records` (
   KEY `idx_etc_project_month` (`project_id`,`month_key`),
   KEY `idx_etc_project_user_month` (`project_id`,`user_id`,`month_key`),
   KEY `etc_records_snapshot_id_index` (`snapshot_id`),
-  CONSTRAINT `etc_records_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `etc_records_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `etc_records_snapshot_id_foreign` FOREIGN KEY (`snapshot_id`) REFERENCES `etc_snapshots` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `etc_records_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `etc_records_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -321,7 +321,7 @@ CREATE TABLE `etc_snapshots` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `etc_snapshots_project_id_version_index` (`project_id`,`version`),
-  CONSTRAINT `etc_snapshots_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `etc_snapshots_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -494,7 +494,7 @@ CREATE TABLE `potencial_project_allocations` (
   KEY `potencial_alloc_project_month` (`potencial_project_id`,`month_key`),
   KEY `potencial_alloc_month` (`month_key`),
   CONSTRAINT `potencial_project_allocations_potencial_project_id_foreign` FOREIGN KEY (`potencial_project_id`) REFERENCES `potencial_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `potencial_project_allocations_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `potencial_project_allocations_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -622,10 +622,10 @@ CREATE TABLE `project_intake_records` (
   `estimated_end_date` date DEFAULT NULL,
   `actual_end_date` date DEFAULT NULL,
   `commercial_status` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `leader_clockify_user_id` bigint unsigned DEFAULT NULL,
+  `leader_timesheet_user_id` bigint unsigned DEFAULT NULL,
   `observations` text COLLATE utf8mb4_unicode_ci,
-  `requires_clockify_creation` tinyint(1) NOT NULL DEFAULT '0',
-  `clockify_record_id` bigint unsigned DEFAULT NULL,
+  `requires_timesheet_creation` tinyint(1) NOT NULL DEFAULT '0',
+  `timesheet_record_id` bigint unsigned DEFAULT NULL,
   `created_by` bigint unsigned DEFAULT NULL,
   `updated_by` bigint unsigned DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
@@ -635,15 +635,15 @@ CREATE TABLE `project_intake_records` (
   KEY `project_intake_records_project_type_created_at_index` (`project_type`,`created_at`),
   KEY `project_intake_records_project_status_code_index` (`project_status_code`),
   KEY `project_intake_records_category_code_index` (`category_code`),
-  KEY `project_intake_records_requires_clockify_creation_index` (`requires_clockify_creation`),
+  KEY `project_intake_records_requires_clockify_creation_index` (`requires_timesheet_creation`),
   KEY `idx_intake_is_active` (`is_active`),
-  KEY `fk_intake_clockify_project` (`clockify_record_id`),
+  KEY `fk_intake_clockify_project` (`timesheet_record_id`),
   KEY `idx_intake_client_id` (`client_id`),
-  KEY `idx_intake_leader` (`leader_clockify_user_id`),
+  KEY `idx_intake_leader` (`leader_timesheet_user_id`),
   CONSTRAINT `fk_intake_category_code` FOREIGN KEY (`category_code`) REFERENCES `project_intake_category_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_intake_client` FOREIGN KEY (`client_id`) REFERENCES `clockify_clients` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_intake_clockify_project` FOREIGN KEY (`clockify_record_id`) REFERENCES `clockify_projects` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_intake_leader` FOREIGN KEY (`leader_clockify_user_id`) REFERENCES `clockify_users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_intake_client` FOREIGN KEY (`client_id`) REFERENCES `timesheet_clients` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_intake_clockify_project` FOREIGN KEY (`timesheet_record_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_intake_leader` FOREIGN KEY (`leader_timesheet_user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_intake_project_type` FOREIGN KEY (`project_type`) REFERENCES `project_intake_type_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_status_code` FOREIGN KEY (`project_status_code`) REFERENCES `project_intake_status_refs` (`code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -772,7 +772,7 @@ CREATE TABLE `project_trackings` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_trackings_project_id_unique` (`project_id`),
-  CONSTRAINT `project_trackings_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `clockify_projects` (`id`) ON DELETE CASCADE
+  CONSTRAINT `project_trackings_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -878,8 +878,8 @@ CREATE TABLE `user_leaders` (
   KEY `idx_ul_leader` (`leader_id`),
   KEY `idx_ul_user_start` (`user_id`,`start_date`),
   KEY `idx_ul_leader_start` (`leader_id`,`start_date`),
-  CONSTRAINT `user_leaders_leader_id_foreign` FOREIGN KEY (`leader_id`) REFERENCES `clockify_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `user_leaders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `user_leaders_leader_id_foreign` FOREIGN KEY (`leader_id`) REFERENCES `timesheet_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_leaders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -911,7 +911,7 @@ CREATE TABLE `user_monthly_capacities` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_umc_user_month` (`user_id`,`month_key`),
   KEY `idx_umc_month_key` (`month_key`),
-  CONSTRAINT `user_monthly_capacities_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `user_monthly_capacities_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -951,7 +951,7 @@ CREATE TABLE `user_monthly_status` (
   KEY `idx_ums_user_year_month` (`user_id`,`year`,`month`),
   KEY `idx_ums_month_key` (`month_key`),
   KEY `idx_ums_status` (`status`),
-  CONSTRAINT `user_monthly_status_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `user_monthly_status_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -982,7 +982,7 @@ CREATE TABLE `user_vacation_periods` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_vacation_periods_user_id_date_from_index` (`user_id`,`date_from`),
-  CONSTRAINT `user_vacation_periods_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clockify_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `user_vacation_periods_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `timesheet_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

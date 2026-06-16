@@ -1,5 +1,5 @@
 
-USE pm_clockify_evm;
+USE pm_timesheet_evm;
 
 -- =====================================================================
 -- Módulos del sistema (RF-03).
@@ -11,7 +11,7 @@ USE pm_clockify_evm;
 --   Configuración  → SETTINGS
 -- =====================================================================
 
-CREATE TABLE IF NOT EXISTS pm_clockify_evm.modules (
+CREATE TABLE IF NOT EXISTS pm_timesheet_evm.modules (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     code VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(191) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS pm_clockify_evm.modules (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS pm_clockify_evm.actions (
+CREATE TABLE IF NOT EXISTS pm_timesheet_evm.actions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     code VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS pm_clockify_evm.actions (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS pm_clockify_evm.permissions (
+CREATE TABLE IF NOT EXISTS pm_timesheet_evm.permissions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     module_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(191) NOT NULL DEFAULT '',
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS pm_clockify_evm.permissions (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS pm_clockify_evm.profile_permissions (
+CREATE TABLE IF NOT EXISTS pm_timesheet_evm.profile_permissions (
     profile_id BIGINT UNSIGNED NOT NULL,
     permission_id BIGINT UNSIGNED NOT NULL,
     action_id BIGINT UNSIGNED NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS pm_clockify_evm.profile_permissions (
 -- Seed: módulos
 -- =====================================================================
 
-INSERT IGNORE INTO pm_clockify_evm.modules (code, name, description, active, created_at, updated_at)
+INSERT IGNORE INTO pm_timesheet_evm.modules (code, name, description, active, created_at, updated_at)
 VALUES
 ('PROJECTS',          'Gestión de Proyectos',   'Pantallas del módulo Operación — proyectos',         1, NOW(), NOW()),
 ('ETC',               'Carga ETC',              'Pantallas del módulo Operación — carga ETC',         1, NOW(), NOW()),
@@ -76,7 +76,7 @@ VALUES
 --   level 3 = acceso total (crear / editar / eliminar)
 -- =====================================================================
 
-INSERT IGNORE INTO pm_clockify_evm.actions (code, name, description, level, active, created_at, updated_at)
+INSERT IGNORE INTO pm_timesheet_evm.actions (code, name, description, level, active, created_at, updated_at)
 VALUES
 ('read_only', 'Sólo lectura', 'Permite ver la pantalla. No puede editar, crear ni eliminar.', 1, 1, NOW(), NOW()),
 ('edit',      'Edición',      'Permite ver y editar registros existentes.',                   2, 1, NOW(), NOW()),
@@ -88,7 +88,7 @@ VALUES
 
 -- Limpiar permisos anteriores para re-seedear limpio
 DELETE perm
-FROM pm_clockify_evm.permissions perm
+FROM pm_timesheet_evm.permissions perm
 WHERE perm.code IN (
     'PROJECTS_ACCESS',
     'PROJECTS_ASSIGN',
@@ -103,19 +103,19 @@ WHERE perm.code IN (
     'SETTINGS_ACCESS'
 );
 
-INSERT INTO pm_clockify_evm.permissions (module_id, name, code, description, active, created_at, updated_at)
+INSERT INTO pm_timesheet_evm.permissions (module_id, name, code, description, active, created_at, updated_at)
 VALUES
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'PROJECTS'),           'Visualizar Proyectos',          'PROJECTS_ACCESS',          'Acceder a la visualización de proyectos',          1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'PROJECTS'),           'Asignación de Proyectos',       'PROJECTS_ASSIGN',          'Acceder a la asignación de proyectos a usuarios',  1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'PROJECTS'),           'Alta de Proyectos',             'PROJECTS_CREATE',          'Crear y administrar altas de proyectos',           1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'ETC'),                'Carga ETC',                     'ETC_ACCESS',               'Acceder a la carga de ETC',                        1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'ETC'),                'Edición ETC',                   'ETC_EDIT',                 'Crear, modificar y eliminar registros ETC',        1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'ESTIMATED_PROJECTS'), 'Proyectos Estimados',           'ESTIMATED_PROJECTS_ACCESS','Acceder al flujo de proyectos estimados',          1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'DASHBOARD'),          'Dashboard EVM',                 'DASHBOARD_EVM_ACCESS',     'Acceder al dashboard EVM',                         1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'DASHBOARD'),          'Dashboard Horas',               'DASHBOARD_HOURS_ACCESS',   'Acceder al dashboard de horas',                    1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'REPORTS'),            'Reportes',                      'REPORTS_ACCESS',           'Acceder al módulo de reportes',                    1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'ADMINISTRATION'),     'Administración',                'ADMIN_ACCESS',             'Acceder a funcionalidades administrativas',        1, NOW(), NOW()),
-((SELECT id FROM pm_clockify_evm.modules WHERE code = 'SETTINGS'),           'Configuración',                 'SETTINGS_ACCESS',          'Acceder a configuración del sistema',              1, NOW(), NOW());
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'PROJECTS'),           'Visualizar Proyectos',          'PROJECTS_ACCESS',          'Acceder a la visualización de proyectos',          1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'PROJECTS'),           'Asignación de Proyectos',       'PROJECTS_ASSIGN',          'Acceder a la asignación de proyectos a usuarios',  1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'PROJECTS'),           'Alta de Proyectos',             'PROJECTS_CREATE',          'Crear y administrar altas de proyectos',           1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'ETC'),                'Carga ETC',                     'ETC_ACCESS',               'Acceder a la carga de ETC',                        1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'ETC'),                'Edición ETC',                   'ETC_EDIT',                 'Crear, modificar y eliminar registros ETC',        1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'ESTIMATED_PROJECTS'), 'Proyectos Estimados',           'ESTIMATED_PROJECTS_ACCESS','Acceder al flujo de proyectos estimados',          1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'DASHBOARD'),          'Dashboard EVM',                 'DASHBOARD_EVM_ACCESS',     'Acceder al dashboard EVM',                         1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'DASHBOARD'),          'Dashboard Horas',               'DASHBOARD_HOURS_ACCESS',   'Acceder al dashboard de horas',                    1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'REPORTS'),            'Reportes',                      'REPORTS_ACCESS',           'Acceder al módulo de reportes',                    1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'ADMINISTRATION'),     'Administración',                'ADMIN_ACCESS',             'Acceder a funcionalidades administrativas',        1, NOW(), NOW()),
+((SELECT id FROM pm_timesheet_evm.modules WHERE code = 'SETTINGS'),           'Configuración',                 'SETTINGS_ACCESS',          'Acceder a configuración del sistema',              1, NOW(), NOW());
 
 -- =====================================================================
 -- Seed: profile_permissions — matriz RF-03
@@ -137,15 +137,15 @@ VALUES
 
 -- Limpiar asignaciones anteriores para re-seedear limpio
 DELETE pp
-FROM pm_clockify_evm.profile_permissions pp
-INNER JOIN pm_clockify_evm.profiles p ON p.id = pp.profile_id
+FROM pm_timesheet_evm.profile_permissions pp
+INNER JOIN pm_timesheet_evm.profiles p ON p.id = pp.profile_id
 WHERE p.code IN ('admin', 'soporte', 'ops_gerente', 'ops_lider', 'administracion');
 
-INSERT INTO pm_clockify_evm.profile_permissions (profile_id, permission_id, action_id, created_at, updated_at)
+INSERT INTO pm_timesheet_evm.profile_permissions (profile_id, permission_id, action_id, created_at, updated_at)
 SELECT p.id, perm.id, a.id, NOW(), NOW()
-FROM pm_clockify_evm.profiles p
-CROSS JOIN pm_clockify_evm.permissions perm
-CROSS JOIN pm_clockify_evm.actions a
+FROM pm_timesheet_evm.profiles p
+CROSS JOIN pm_timesheet_evm.permissions perm
+CROSS JOIN pm_timesheet_evm.actions a
 WHERE a.code = 'create'
 AND (
     -- Administrador: acceso total a todos los módulos

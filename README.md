@@ -44,7 +44,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 2. **Configurar User Secrets** (nunca se commitean)
    ```bash
-   dotnet user-secrets set "ConnectionStrings:Default" "Server=localhost;Port=3306;Database=pm_clockify_evm;User=tu_user;Password=tu_password;"
+   dotnet user-secrets set "ConnectionStrings:Default" "Server=localhost;Port=3306;Database=pm_timesheet_evm;User=tu_user;Password=tu_password;"
    dotnet user-secrets set "Clockify:ApiKey" "tu_api_key"
    dotnet user-secrets set "Clockify:WorkspaceId" "tu_workspace_id"
    dotnet user-secrets set "Clockify:UserId" "tu_user_id"
@@ -78,7 +78,7 @@ El compose levanta **dos contenedores** en una red interna compartida:
 
    El `.env` mínimo necesario:
    ```env
-   DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=pm_clockify_evm;User=bdt_user;Password=bdt_user;
+   DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=pm_timesheet_evm;User=bdt_user;Password=bdt_user;
    CLOCKIFY_API_KEY=tu_api_key
    CLOCKIFY_WORKSPACE_ID=tu_workspace_id
    CLOCKIFY_USER_ID=tu_user_id
@@ -136,7 +136,7 @@ El compose levanta **dos contenedores** en una red interna compartida:
 | Acción | Comando |
 |---|---|
 | Ver logs de MySQL | `docker compose logs -f mysql` |
-| Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_clockify_evm` |
+| Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_timesheet_evm` |
 | Resetear la DB (borra y re-crea con el schema) | `docker compose down -v && docker compose up -d` |
 
 > ⚠️ `docker compose down -v` elimina el volumen de datos. Usarlo solo cuando querés empezar desde cero con el schema limpio.

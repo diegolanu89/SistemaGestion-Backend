@@ -33,13 +33,13 @@ public class ProjectIntakeRecord
     public string? CommercialStatus { get; set; }
     [Column("client_id")]
     public ulong? ClientId { get; set; }
-    [Column("leader_clockify_user_id")]
+    [Column("leader_timesheet_user_id")]
     public ulong? LeaderClockifyUserId { get; set; }
     [Column("observations")]
     public string? Observations { get; set; }
-    [Column("requires_clockify_creation")]
+    [Column("requires_timesheet_creation")]
     public bool RequiresClockifyCreation { get; set; } = false;
-    [Column("clockify_record_id")]
+    [Column("timesheet_record_id")]
     public ulong? ClockifyRecordId { get; set; }
     [Column("is_active")]
     public bool IsActive { get; set; } = true;

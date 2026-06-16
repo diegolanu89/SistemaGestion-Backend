@@ -5,7 +5,7 @@
 -- se gestionan en 04_schema.sql que es la fuente de verdad del RBAC.
 -- =====================================================================
 
-USE pm_clockify_evm;
+USE pm_timesheet_evm;
 
 -- =====================================================================
 -- modules — taxonomía de módulos del sistema (RF-03).

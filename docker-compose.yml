@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: pm_clockify_evm
+      MYSQL_DATABASE: pm_timesheet_evm
       MYSQL_USER: bdt_user
       MYSQL_PASSWORD: bdt_user
     ports:

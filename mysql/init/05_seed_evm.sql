@@ -3,8 +3,8 @@
 -- Seed adicional para el Dashboard EVM (RF-10).
 --
 -- Carga 8 proyectos nuevos con datos completos:
---   - clockify_projects con BAC base/total > 0 y hourly_rate definido
---   - clockify_time_entries para que AC sea > 0 (suma reportada por Clockify)
+--   - timesheet_projects con BAC base/total > 0 y hourly_rate definido
+--   - timesheet_time_entries para que AC sea > 0 (suma reportada por Clockify)
 --   - etc_snapshots + etc_records para que ETC sea > 0 (snapshot vigente)
 --   - project_trackings + project_tracking_updates para "Control de cambios"
 --
@@ -14,8 +14,8 @@
 --   - Proyectos con N>0 updates                          -> "Sí (N)"  (N=1,2,3,4)
 --
 -- IDs reservados:
---   clockify_projects:        11..18
---   clockify_time_entries:    8..40
+--   timesheet_projects:        11..18
+--   timesheet_time_entries:    8..40
 --   etc_snapshots:            5..12
 --   etc_records:              14..40
 --   project_trackings:        3..9
@@ -28,13 +28,13 @@
 --   6 = Anthropic Testing Corp
 -- =====================================================================
 
-USE pm_clockify_evm;
+USE pm_timesheet_evm;
 
 -- ---------------------------------------------------------------------
--- clockify_projects
+-- timesheet_projects
 -- ---------------------------------------------------------------------
-INSERT INTO `clockify_projects`
-  (`id`, `clockify_project_id`, `name`, `code`, `client_id`, `status`,
+INSERT INTO `timesheet_projects`
+  (`id`, `timesheet_project_id`, `name`, `code`, `client_id`, `status`,
    `start_date`, `end_date_planned`, `end_date_actual`,
    `bac_base_hours`, `bac_base_cost`, `bac_total_hours`, `bac_total_cost`,
    `hourly_rate`, `etc_calculation_mode`, `created_at`, `updated_at`)
@@ -72,12 +72,12 @@ VALUES
        250.00,  15000.00,  250.00,  15000.00, 60.00, 'manual',    '2026-02-20 10:00:00', '2026-04-12 10:00:00');
 
 -- ---------------------------------------------------------------------
--- clockify_time_entries (drive AC real)
+-- timesheet_time_entries (drive AC real)
 -- Distribución pensada para que cada proyecto tenga horas razonables vs BAC.
 -- user_id existentes: 4,5,6,7,8,15
 -- ---------------------------------------------------------------------
-INSERT INTO `clockify_time_entries`
-  (`id`, `clockify_time_entry_id`, `project_id`, `user_id`, `description`,
+INSERT INTO `timesheet_time_entries`
+  (`id`, `timesheet_time_entry_id`, `project_id`, `user_id`, `description`,
    `start_time`, `end_time`, `duration_hours`, `billable`,
    `change_request_id`, `source_raw`, `created_at`, `updated_at`)
 VALUES

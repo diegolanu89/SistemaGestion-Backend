@@ -2,12 +2,12 @@
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_projects")]
+[Table("timesheet_projects")]
 public class TimesheetProject
 {
     [Column("id")]
     public ulong Id { get; set; }
-    [Column("clockify_project_id")]
+    [Column("timesheet_project_id")]
     public string ClockifyProjectId { get; set; } = string.Empty;
     [Column("name")]
     public string Name { get; set; } = string.Empty;
