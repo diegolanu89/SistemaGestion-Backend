@@ -4,6 +4,7 @@ using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
+using bdt_evm_app.Helpers;
 
 namespace bdt_evm_app.Controllers;
 
@@ -73,7 +74,7 @@ public class UserMonthlyCapacityController : ControllerBase
 
             if (existing != null)
             {
-                existing.MonthLabel = entry.MonthLabel;
+                existing.MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey);
                 existing.Hours = entry.Hours;
                 existing.UpdatedAt = DateTime.UtcNow;
             }
@@ -83,7 +84,7 @@ public class UserMonthlyCapacityController : ControllerBase
                 {
                     UserId = userId,
                     MonthKey = entry.MonthKey,
-                    MonthLabel = entry.MonthLabel,
+                    MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey),
                     Hours = entry.Hours,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow

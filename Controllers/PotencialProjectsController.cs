@@ -4,6 +4,7 @@ using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
 using bdt_evm_app.Models;
+using bdt_evm_app.Helpers;
 
 namespace bdt_evm_app.Controllers;
 
@@ -164,7 +165,7 @@ public class PotencialProjectsController : ControllerBase
             {
                 PotencialProjectId = id,
                 MonthKey = entry.MonthKey,
-                MonthLabel = entry.MonthLabel,
+                MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey),
                 UserId = userId,
                 UserName = entry.UserName,
                 Hours = entry.Hours,
@@ -242,7 +243,7 @@ public class PotencialProjectsController : ControllerBase
 
             var userName = entry.UserName.Trim();
             var monthKey = entry.MonthKey;
-            var monthLabel = entry.MonthLabel ?? monthKey;
+            var monthLabel = MonthHelper.GetMonthLabel(monthKey);
             var userId = capacityData.NameToUserId.GetValueOrDefault(userName);
 
             if (!userId.HasValue)

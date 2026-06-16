@@ -4,7 +4,7 @@ public class EtcEntryDto
 {
     public string UserName { get; set; } = string.Empty;
     public string MonthKey { get; set; } = string.Empty;
-    public string MonthLabel { get; set; } = string.Empty;
+    public string? MonthLabel { get; set; }
     public decimal Hours { get; set; }
 }
 
@@ -34,7 +34,7 @@ public class CreateEtcRecordDto
 {
     public List<string> Users { get; set; } = new();
     public string MonthKey { get; set; } = string.Empty;
-    public string MonthLabel { get; set; } = string.Empty;
+    public string? MonthLabel { get; set; }
     public decimal Hours { get; set; }
 }
 
@@ -42,7 +42,7 @@ public class UpdateEtcRecordDto
 {
     public string UserName { get; set; } = string.Empty;
     public string MonthKey { get; set; } = string.Empty;
-    public string MonthLabel { get; set; } = string.Empty;
+    public string? MonthLabel { get; set; }
     public decimal Hours { get; set; }
 }
 
