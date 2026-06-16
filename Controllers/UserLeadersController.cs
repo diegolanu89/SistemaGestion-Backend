@@ -89,7 +89,7 @@ public class UserLeadersController : ControllerBase
     {
         try
         {
-            var users = await _db.ClockifyUsers
+            var users = await _db.TimesheetUsers
                 .OrderBy(u => u.Name)
                 .Select(u => new ClockifyUserDto
                 {
@@ -158,8 +158,8 @@ public class UserLeadersController : ControllerBase
             if (dto.UserId == dto.LeaderId)
                 return UnprocessableEntity(new { success = false, message = "El usuario y el líder no pueden ser el mismo" });
 
-            var userExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.UserId);
-            var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderId);
+            var userExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.UserId);
+            var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderId);
 
             if (!userExists || !leaderExists)
                 return UnprocessableEntity(new { success = false, message = "Usuario o líder no encontrado" });
@@ -218,7 +218,7 @@ public class UserLeadersController : ControllerBase
             if (dto.UserIds == null || !dto.UserIds.Any())
                 return UnprocessableEntity(new { success = false, message = "user_ids es requerido" });
 
-            var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderId);
+            var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderId);
             if (!leaderExists)
                 return UnprocessableEntity(new { success = false, message = "Líder no encontrado" });
 

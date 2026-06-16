@@ -23,7 +23,7 @@ public class ProjectFiltersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var filters = await _db.ClockifyProjectFilters
+        var filters = await _db.TimesheetProjectFilters
             .Include(f => f.Project)
                 .ThenInclude(p => p!.Client)
             .OrderBy(f => f.Project!.Code == null || f.Project.Code == "" ? 1 : 0)
@@ -62,14 +62,14 @@ public class ProjectFiltersController : ControllerBase
         if (dto.ProjectIds == null || !dto.ProjectIds.Any())
             return UnprocessableEntity(new { message = "project_ids es requerido" });
 
-        var results = new List<ClockifyProjectFilter>();
+        var results = new List<TimesheetProjectFilter>();
 
         foreach (var projectId in dto.ProjectIds)
         {
-            var projectExists = await _db.ClockifyProjects.AnyAsync(p => p.Id == projectId);
+            var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
             if (!projectExists) continue;
 
-            var existing = await _db.ClockifyProjectFilters
+            var existing = await _db.TimesheetProjectFilters
                 .FirstOrDefaultAsync(f => f.ProjectId == projectId);
 
             if (existing != null)
@@ -78,13 +78,13 @@ public class ProjectFiltersController : ControllerBase
             }
             else
             {
-                var filter = new ClockifyProjectFilter
+                var filter = new TimesheetProjectFilter
                 {
                     ProjectId = projectId,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
-                _db.ClockifyProjectFilters.Add(filter);
+                _db.TimesheetProjectFilters.Add(filter);
                 results.Add(filter);
             }
         }
@@ -102,11 +102,11 @@ public class ProjectFiltersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(ulong id)
     {
-        var filter = await _db.ClockifyProjectFilters.FindAsync(id);
+        var filter = await _db.TimesheetProjectFilters.FindAsync(id);
         if (filter == null)
             return NotFound(new { message = "Filtro no encontrado" });
 
-        _db.ClockifyProjectFilters.Remove(filter);
+        _db.TimesheetProjectFilters.Remove(filter);
         await _db.SaveChangesAsync();
 
         return Ok(new { message = "Filtro eliminado correctamente" });

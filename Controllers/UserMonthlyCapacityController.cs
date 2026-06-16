@@ -26,7 +26,7 @@ public class UserMonthlyCapacityController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(ulong userId)
     {
-        var user = await _db.ClockifyUsers.FindAsync(userId);
+        var user = await _db.TimesheetUsers.FindAsync(userId);
         if (user == null)
             return NotFound(new { success = false, message = "Usuario no encontrado" });
 
@@ -42,7 +42,7 @@ public class UserMonthlyCapacityController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Store(ulong userId, [FromBody] CreateUserMonthlyCapacityDto dto)
     {
-        var user = await _db.ClockifyUsers.FindAsync(userId);
+        var user = await _db.TimesheetUsers.FindAsync(userId);
         if (user == null)
             return NotFound(new { success = false, message = "Usuario no encontrado" });
 

@@ -22,6 +22,6 @@ public class ProjectTracking
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 
-    public ClockifyProject? Project { get; set; }
+    public TimesheetProject? Project { get; set; }
     public List<ProjectTrackingUpdate> Updates { get; set; } = new();
 }

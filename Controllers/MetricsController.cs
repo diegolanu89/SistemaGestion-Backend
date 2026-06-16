@@ -28,7 +28,7 @@ public class MetricsController : ControllerBase
     {
         try
         {
-            var project = await _db.ClockifyProjects.FindAsync(id);
+            var project = await _db.TimesheetProjects.FindAsync(id);
             if (project == null)
                 return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -63,7 +63,7 @@ public class MetricsController : ControllerBase
 
         try
         {
-            var projects = await _db.ClockifyProjects
+            var projects = await _db.TimesheetProjects
                 .Where(p => ids.Contains(p.Id))
                 .ToListAsync();
 

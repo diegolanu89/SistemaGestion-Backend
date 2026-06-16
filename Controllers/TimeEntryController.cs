@@ -25,7 +25,7 @@ public class TimeEntryController : ControllerBase
     {
         try
         {
-            var lastDate = await _db.ClockifyTimeEntries
+            var lastDate = await _db.TimesheetTimeEntries
                 .MaxAsync(t => (DateTime?)t.StartTime);
 
             return Ok(new

@@ -99,7 +99,7 @@ public class ProjectIntakesController : ControllerBase
                 })
                 .ToListAsync();
 
-            var clients = await _db.ClockifyClients
+            var clients = await _db.TimesheetClients
                 .Where(c => c.Status == "activo")
                 .OrderBy(c => c.Name)
                 .Select(c => new { c.Id, c.Name, c.ExternalId })
@@ -141,7 +141,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.TypeRef)
                 .Include(r => r.CategoryRef)
                 .Include(r => r.StatusRef)
-                .Include(r => r.ClockifyProject)
+                .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
                 .Include(r => r.LeaderClockifyUser)
                 .AsQueryable();
@@ -205,7 +205,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.TypeRef)
                 .Include(r => r.CategoryRef)
                 .Include(r => r.StatusRef)
-                .Include(r => r.ClockifyProject)
+                .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
                 .Include(r => r.LeaderClockifyUser)
                 .FirstOrDefaultAsync(r => r.Id == id);
@@ -250,7 +250,7 @@ public class ProjectIntakesController : ControllerBase
             string? resolvedClientName = null;
             if (dto.ClientId.HasValue)
             {
-                var client = await _db.ClockifyClients.FindAsync(dto.ClientId.Value);
+                var client = await _db.TimesheetClients.FindAsync(dto.ClientId.Value);
                 if (client == null)
                     return UnprocessableEntity(new { success = false, message = $"Cliente con id '{dto.ClientId}' no encontrado" });
                 resolvedClientName = client.Name;
@@ -258,7 +258,7 @@ public class ProjectIntakesController : ControllerBase
 
             if (dto.LeaderClockifyUserId.HasValue)
             {
-                var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
                 if (!leaderExists)
                     return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
             }
@@ -318,7 +318,7 @@ public class ProjectIntakesController : ControllerBase
             await _db.Entry(record).Reference(r => r.CategoryRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.StatusRef).LoadAsync();
             if (record.ClockifyRecordId.HasValue)
-                await _db.Entry(record).Reference(r => r.ClockifyProject).LoadAsync();
+                await _db.Entry(record).Reference(r => r.TimesheetProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
             if (record.LeaderClockifyUserId.HasValue)
@@ -360,7 +360,7 @@ public class ProjectIntakesController : ControllerBase
             if (dto.RegistrationDate.HasValue) record.RegistrationDate = dto.RegistrationDate;
             if (dto.ClientId.HasValue)
             {
-                var client = await _db.ClockifyClients.FindAsync(dto.ClientId.Value);
+                var client = await _db.TimesheetClients.FindAsync(dto.ClientId.Value);
                 if (client == null)
                     return UnprocessableEntity(new { success = false, message = $"Cliente con id '{dto.ClientId}' no encontrado" });
                 record.ClientId = dto.ClientId;
@@ -375,7 +375,7 @@ public class ProjectIntakesController : ControllerBase
             if (dto.CommercialStatus != null) record.CommercialStatus = dto.CommercialStatus;
             if (dto.LeaderClockifyUserId.HasValue)
             {
-                var leaderExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
+                var leaderExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == dto.LeaderClockifyUserId.Value);
                 if (!leaderExists)
                     return UnprocessableEntity(new { success = false, message = $"Líder con id '{dto.LeaderClockifyUserId}' no encontrado" });
                 record.LeaderClockifyUserId = dto.LeaderClockifyUserId;
@@ -415,7 +415,7 @@ public class ProjectIntakesController : ControllerBase
             await _db.Entry(record).Reference(r => r.CategoryRef).LoadAsync();
             await _db.Entry(record).Reference(r => r.StatusRef).LoadAsync();
             if (record.ClockifyRecordId.HasValue)
-                await _db.Entry(record).Reference(r => r.ClockifyProject).LoadAsync();
+                await _db.Entry(record).Reference(r => r.TimesheetProject).LoadAsync();
             if (record.ClientId.HasValue)
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
             if (record.LeaderClockifyUserId.HasValue)
@@ -523,6 +523,6 @@ public class ProjectIntakesController : ControllerBase
             Description = r.StatusRef.Description,
             IsActive = r.StatusRef.IsActive
         } : null,
-        ClockifyProjectName = r.ClockifyProject?.Name
+        ClockifyProjectName = r.TimesheetProject?.Name
     };
 }

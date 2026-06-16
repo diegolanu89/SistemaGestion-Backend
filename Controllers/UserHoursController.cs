@@ -27,11 +27,11 @@ public class UserHoursController : ControllerBase
         [FromQuery] string? from,
         [FromQuery] string? to)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
-        var query = _db.ClockifyTimeEntries
+        var query = _db.TimesheetTimeEntries
             .Where(t => t.ProjectId == projectId);
 
         if (!string.IsNullOrEmpty(from) && DateOnly.TryParse(from, out var fromDate))
@@ -62,7 +62,7 @@ public class UserHoursController : ControllerBase
             .Distinct()
             .ToList();
 
-        var users = await _db.ClockifyUsers
+        var users = await _db.TimesheetUsers
             .Where(u => userIds.Contains(u.Id))
             .ToDictionaryAsync(u => u.Id, u => u.Name);
 

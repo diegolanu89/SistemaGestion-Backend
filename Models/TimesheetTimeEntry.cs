@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace bdt_evm_app.Models;
 
 [Table("clockify_time_entries")]
-public class ClockifyTimeEntry
+public class TimesheetTimeEntry
 {
     [Column("id")]
     public ulong Id { get; set; }

@@ -42,7 +42,7 @@ public class ProjectsController : ControllerBase
             var onlyVisible = only_visible.ToLower() != "false" && only_visible != "0";
             var userId = HttpContext.Items["UserId"] as ulong?;
 
-            var query = _db.ClockifyProjects
+            var query = _db.TimesheetProjects
                 .Include(p => p.Client)
                 .Include(p => p.Filter)
                 .AsQueryable();
@@ -135,7 +135,7 @@ public class ProjectsController : ControllerBase
     [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetById(ulong id)
     {
-        var project = await _db.ClockifyProjects
+        var project = await _db.TimesheetProjects
             .Include(p => p.Client)
             .Include(p => p.Filter)
             .Include(p => p.ChangeRequests)
@@ -155,7 +155,7 @@ public class ProjectsController : ControllerBase
     [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> UpdateBac(ulong id, [FromBody] UpdateBacDto dto)
     {
-        var project = await _db.ClockifyProjects.FindAsync(id);
+        var project = await _db.TimesheetProjects.FindAsync(id);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -185,11 +185,11 @@ public class ProjectsController : ControllerBase
     [RequirePermission("PROJECTS_CREATE")]
     public async Task<IActionResult> RecalculateHours(ulong id)
     {
-        var project = await _db.ClockifyProjects.FindAsync(id);
+        var project = await _db.TimesheetProjects.FindAsync(id);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
-        var timeEntries = await _db.ClockifyTimeEntries
+        var timeEntries = await _db.TimesheetTimeEntries
             .Where(t => t.ProjectId == project.Id &&
                         (t.DurationHours == 0))
             .ToListAsync();
@@ -215,7 +215,7 @@ public class ProjectsController : ControllerBase
         }
 
         await _db.SaveChangesAsync();
-        var totalEntries = await _db.ClockifyTimeEntries.CountAsync(t => t.ProjectId == project.Id);
+        var totalEntries = await _db.TimesheetTimeEntries.CountAsync(t => t.ProjectId == project.Id);
 
         return Ok(new
         {
@@ -225,7 +225,7 @@ public class ProjectsController : ControllerBase
         });
     }
 
-    private ProjectDto MapToDto(ClockifyProject p, decimal etcTotalHours = 0) => new()
+    private ProjectDto MapToDto(TimesheetProject p, decimal etcTotalHours = 0) => new()
     {
         Id = p.Id,
         ClockifyProjectId = p.ClockifyProjectId,

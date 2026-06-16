@@ -55,7 +55,7 @@ public class ProjectIntakeRecord
     public ProjectIntakeTypeRef? TypeRef { get; set; }
     public ProjectIntakeCategoryRef? CategoryRef { get; set; }
     public ProjectIntakeStatusRef? StatusRef { get; set; }
-    public ClockifyProject? ClockifyProject { get; set; }
-    public ClockifyClient? Client { get; set; }
-    public ClockifyUser? LeaderClockifyUser { get; set; }
+    public TimesheetProject? TimesheetProject { get; set; }
+    public TimesheetClient? Client { get; set; }
+    public TimesheetUser? LeaderClockifyUser { get; set; }
 }

@@ -64,7 +64,7 @@ public class AppUserVisibleProjectsController : ControllerBase
         if (dto?.ProjectIds == null)
             return UnprocessableEntity(new { message = "project_ids es requerido" });
 
-        var existingIds = await _db.ClockifyProjects
+        var existingIds = await _db.TimesheetProjects
             .Where(p => dto.ProjectIds.Contains(p.Id))
             .Select(p => p.Id)
             .ToListAsync();

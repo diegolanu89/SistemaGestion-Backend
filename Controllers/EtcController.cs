@@ -28,7 +28,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId, [FromQuery] string? snapshot)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -76,7 +76,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_ACCESS")]
     public async Task<IActionResult> GetSummary(ulong projectId, [FromQuery] string? snapshot)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -128,7 +128,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] CreateEtcRecordDto dto)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -155,7 +155,7 @@ public class EtcController : ControllerBase
 
         foreach (var userName in dto.Users)
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == userName.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == userName.Trim());
             var record = new EtcRecord
             {
                 ProjectId = projectId,
@@ -185,7 +185,7 @@ public class EtcController : ControllerBase
         if (record == null)
             return NotFound(new { message = "Registro no encontrado" });
 
-        var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == dto.UserName.Trim());
+        var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == dto.UserName.Trim());
         if (user == null)
             return UnprocessableEntity(new { error = "Validación de capacidad", message = $"El usuario \"{dto.UserName}\" no está en usuarios clocky." });
 
@@ -244,7 +244,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> DeleteByProject(ulong projectId)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -283,7 +283,7 @@ public class EtcController : ControllerBase
             .Distinct()
             .ToListAsync();
 
-        var projects = await _db.ClockifyProjects
+        var projects = await _db.TimesheetProjects
             .Include(p => p.Client)
             .Where(p => projectIds.Contains(p.Id))
             .OrderBy(p => p.Name)
@@ -304,7 +304,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> FinalizeBaseline(ulong projectId)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -353,7 +353,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> CreateSnapshot(ulong projectId, [FromBody] CreateSnapshotDto dto)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -385,7 +385,7 @@ public class EtcController : ControllerBase
         var records = new List<EtcRecord>();
         foreach (var entry in dto.Entries)
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
             var record = new EtcRecord
             {
                 ProjectId = projectId,
@@ -419,7 +419,7 @@ public class EtcController : ControllerBase
         if (dto.Entries == null || !dto.Entries.Any())
             return UnprocessableEntity(new { error = "entries es requerido" });
 
-        var project = await _db.ClockifyProjects.FindAsync(dto.ProjectId);
+        var project = await _db.TimesheetProjects.FindAsync(dto.ProjectId);
         if (project == null)
             return UnprocessableEntity(new { error = "Proyecto no encontrado" });
 
@@ -432,7 +432,7 @@ public class EtcController : ControllerBase
 
         foreach (var entry in dto.Entries)
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
             var record = new EtcRecord
             {
                 ProjectId = dto.ProjectId,
@@ -579,7 +579,7 @@ public class EtcController : ControllerBase
             .ToListAsync();
 
         var projectIds = records.Select(r => r.ProjectId).Distinct().ToList();
-        var projects = await _db.ClockifyProjects
+        var projects = await _db.TimesheetProjects
             .Where(p => projectIds.Contains(p.Id))
             .ToDictionaryAsync(p => p.Id);
 
@@ -650,10 +650,10 @@ public class EtcController : ControllerBase
             .Where(c => monthKeys.Contains(c.MonthKey))
             .ToDictionaryAsync(c => c.MonthKey);
 
-        var nameToUser = new Dictionary<string, ClockifyUser?>();
+        var nameToUser = new Dictionary<string, TimesheetUser?>();
         foreach (var name in userNames)
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == name.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == name.Trim());
             nameToUser[name] = user;
         }
 

@@ -30,7 +30,7 @@ public class ProjectTrackingsController : ControllerBase
     {
         try
         {
-            var projectExists = await _db.ClockifyProjects.AnyAsync(p => p.Id == projectId);
+            var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
             if (!projectExists)
                 return NotFound(new { success = false, message = "Proyecto no encontrado" });
 
@@ -63,7 +63,7 @@ public class ProjectTrackingsController : ControllerBase
             if (dto.PlannedEndDate == default)
                 return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
 
-            var projectExists = await _db.ClockifyProjects.AnyAsync(p => p.Id == projectId);
+            var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
             if (!projectExists)
                 return NotFound(new { success = false, message = "Proyecto no encontrado" });
 

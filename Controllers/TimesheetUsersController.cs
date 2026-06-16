@@ -10,12 +10,12 @@ namespace bdt_evm_app.Controllers;
 [ApiController]
 [Route("api/clockify-users")]
 [RequirePermission("ADMIN_ACCESS")]
-public class ClockifyUsersController : ControllerBase
+public class TimesheetUsersController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly ILogger<ClockifyUsersController> _logger;
+    private readonly ILogger<TimesheetUsersController> _logger;
 
-    public ClockifyUsersController(AppDbContext db, ILogger<ClockifyUsersController> logger)
+    public TimesheetUsersController(AppDbContext db, ILogger<TimesheetUsersController> logger)
     {
         _db = db;
         _logger = logger;
@@ -31,7 +31,7 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var query = _db.ClockifyUsers.AsQueryable();
+            var query = _db.TimesheetUsers.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
                 query = query.Where(u =>
@@ -78,7 +78,7 @@ public class ClockifyUsersController : ControllerBase
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return UnprocessableEntity(new { success = false, message = "El nombre es requerido" });
 
-            var user = new ClockifyUser
+            var user = new TimesheetUser
             {
                 ClockifyUserId = null,
                 Name = dto.Name,
@@ -90,7 +90,7 @@ public class ClockifyUsersController : ControllerBase
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _db.ClockifyUsers.Add(user);
+            _db.TimesheetUsers.Add(user);
             await _db.SaveChangesAsync();
 
             return StatusCode(201, new { success = true, data = user });
@@ -108,13 +108,13 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var user = await _db.ClockifyUsers.FindAsync(id);
+            var user = await _db.TimesheetUsers.FindAsync(id);
             if (user == null)
                 return NotFound(new { success = false, message = "Usuario no encontrado" });
 
             if (!string.IsNullOrEmpty(dto.ClockifyUserId) && dto.ClockifyUserId != user.ClockifyUserId)
             {
-                var exists = await _db.ClockifyUsers
+                var exists = await _db.TimesheetUsers
                     .AnyAsync(u => u.ClockifyUserId == dto.ClockifyUserId && u.Id != id);
                 if (exists)
                     return UnprocessableEntity(new { success = false, message = "El clockify_user_id ya existe" });
@@ -145,11 +145,11 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var user = await _db.ClockifyUsers.FindAsync(id);
+            var user = await _db.TimesheetUsers.FindAsync(id);
             if (user == null)
                 return NotFound(new { success = false, message = "Usuario no encontrado" });
 
-            _db.ClockifyUsers.Remove(user);
+            _db.TimesheetUsers.Remove(user);
             await _db.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Usuario eliminado correctamente" });
@@ -169,7 +169,7 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var query = _db.ClockifyUsers.AsQueryable();
+            var query = _db.TimesheetUsers.AsQueryable();
             if (active)
                 query = query.Where(u => u.Active);
             var users = await query

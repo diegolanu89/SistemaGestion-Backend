@@ -3,7 +3,7 @@
 namespace bdt_evm_app.Models;
 
 [Table("clockify_clients")]
-public class ClockifyClient
+public class TimesheetClient
 {
     [Column("id")]
     public ulong Id { get; set; }

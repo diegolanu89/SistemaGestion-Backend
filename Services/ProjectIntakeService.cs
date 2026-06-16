@@ -64,7 +64,7 @@ public class ProjectIntakeService
 
     if (clientId.HasValue)
     {
-        var client = await _db.ClockifyClients.FindAsync(clientId.Value);
+        var client = await _db.TimesheetClients.FindAsync(clientId.Value);
 
         clientExternalId = client?.ExternalId;
     }
@@ -77,7 +77,7 @@ public class ProjectIntakeService
     var externalId = idProp.GetString()
         ?? throw new Exception("Clockify devolvió un id vacío");
 
-    var existing = await _db.ClockifyProjects
+    var existing = await _db.TimesheetProjects
         .FirstOrDefaultAsync(p => p.ClockifyProjectId == externalId);
 
     if (existing != null)
@@ -93,7 +93,7 @@ public class ProjectIntakeService
         ? parts[1].Trim()
         : projectName;
 
-    var clockifyProject = new ClockifyProject
+    var timesheetProject = new TimesheetProject
     {
         ClockifyProjectId = externalId,
 
@@ -108,7 +108,7 @@ public class ProjectIntakeService
         UpdatedAt = DateTime.UtcNow
     };
 
-    _db.ClockifyProjects.Add(clockifyProject);
+    _db.TimesheetProjects.Add(timesheetProject);
 
     await _db.SaveChangesAsync();
 
@@ -118,7 +118,7 @@ public class ProjectIntakeService
         externalId);
 
     return (
-        clockifyProject.Id,
+        timesheetProject.Id,
         externalId,
         "Proyecto creado exitosamente en Clockify"
     );
