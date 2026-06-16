@@ -184,12 +184,12 @@ public class EtcController : ControllerBase
         if (record == null)
             return NotFound(new { message = "Registro no encontrado" });
 
+        var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == dto.UserName.Trim());
+        if (user == null)
+            return UnprocessableEntity(new { error = "Validación de capacidad", message = $"El usuario \"{dto.UserName}\" no está en usuarios clocky." });
+
         if (dto.Hours > 0)
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == dto.UserName.Trim());
-            if (user == null)
-                return UnprocessableEntity(new { error = "Validación de capacidad", message = $"El usuario \"{dto.UserName}\" no está en usuarios clocky." });
-
             var capacity = await GetUserCapacity(user.Id, dto.MonthKey);
             var latestSnapshotIds = await GetLatestSnapshotIdsPerProject();
             var projectIdsWithSnapshots = await _db.EtcSnapshots
@@ -208,7 +208,7 @@ public class EtcController : ControllerBase
                 return UnprocessableEntity(new
                 {
                     error = "Validación de capacidad",
-                    message = $"{dto.UserName} ({dto.MonthLabel}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres."
+                    message = $"{dto.UserName} ({dto.MonthLabel}): tiene {Math.Round(hoursTaken, 2)}h tomadas y {Math.Round(hoursFree, 2)}h libres. No podés cargar más de {Math.Round(hoursFree, 2)}h."
                 });
 
             record.UserId = user.Id;
@@ -358,6 +358,10 @@ public class EtcController : ControllerBase
 
         if (dto.Entries == null || !dto.Entries.Any())
             return UnprocessableEntity(new { error = "entries es requerido" });
+
+        var capacityErrors = await ValidateCapacityForEntries((int)projectId, dto.Entries);
+        if (capacityErrors.Any())
+            return UnprocessableEntity(new { error = "Validación de capacidad", message = string.Join("\n", capacityErrors.Select(e => e.Message)) });
 
         var lastSnapshot = await _db.EtcSnapshots
             .Where(s => s.ProjectId == projectId)
