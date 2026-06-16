@@ -18,6 +18,7 @@ public class ProjectDto
     public decimal BacTotalCost { get; set; }
     public decimal HourlyRate { get; set; }
     public string EtcCalculationMode { get; set; } = string.Empty;
+    public decimal EtcTotalHours { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public object? Filter { get; set; }

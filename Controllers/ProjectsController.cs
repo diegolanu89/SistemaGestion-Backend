@@ -14,12 +14,14 @@ public class ProjectsController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly ProjectBacService _bacService;
+    private readonly EtcService _etcService;
     private readonly ILogger<ProjectsController> _logger;
 
-    public ProjectsController(AppDbContext db, ProjectBacService bacService, ILogger<ProjectsController> logger)
+    public ProjectsController(AppDbContext db, ProjectBacService bacService, EtcService etcService, ILogger<ProjectsController> logger)
     {
         _db = db;
         _bacService = bacService;
+        _etcService = etcService;
         _logger = logger;
     }
 
@@ -98,11 +100,13 @@ public class ProjectsController : ControllerBase
                 }
             }
 
+            var etcTotals = await _etcService.GetTotalHoursByProjectIds(items.Select(p => p.Id));
+
             var lastPage = (int)Math.Ceiling((double)total / per_page);
 
             return Ok(new
             {
-                data = items.Select(p => MapToDto(p)),
+                data = items.Select(p => MapToDto(p, etcTotals.GetValueOrDefault(p.Id, 0))),
                 current_page = page,
                 per_page,
                 total,
@@ -221,7 +225,7 @@ public class ProjectsController : ControllerBase
         });
     }
 
-    private ProjectDto MapToDto(ClockifyProject p) => new()
+    private ProjectDto MapToDto(ClockifyProject p, decimal etcTotalHours = 0) => new()
     {
         Id = p.Id,
         ClockifyProjectId = p.ClockifyProjectId,
@@ -239,6 +243,7 @@ public class ProjectsController : ControllerBase
         BacTotalCost = p.BacTotalCost,
         HourlyRate = p.HourlyRate,
         EtcCalculationMode = p.EtcCalculationMode,
+        EtcTotalHours = etcTotalHours,
         CreatedAt = p.CreatedAt,
         UpdatedAt = p.UpdatedAt,
         Filter = p.Filter != null ? new { p.Filter.Id, p.Filter.ProjectId } : null
