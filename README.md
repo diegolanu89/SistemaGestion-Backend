@@ -155,6 +155,42 @@ Si el volumen ya existe (arranques posteriores), MySQL **no** vuelve a ejecutar 
 
 ---
 
+## Rename `clockify` → `timesheet` y carpeta `mysql/migrations/`
+
+El sistema renombró el dominio de persistencia `clockify_*` → `timesheet_*` (tablas, columnas **y el nombre de la base**: `pm_clockify_evm` → `pm_timesheet_evm`). Hay **dos caminos** para tener una base en el estado nuevo, según si la base ya tiene datos o no:
+
+### Caso 1 — Base nueva / dev (lo normal): ya está en el schema
+
+El rename **ya está horneado en `mysql/init/`**. No hay que renombrar nada: las tablas nacen con el nombre final y la base se crea directamente como `pm_timesheet_evm` (`01_schema.sql` líneas 7-11: `CREATE DATABASE pm_timesheet_evm; USE pm_timesheet_evm;`). Por eso alcanza con:
+
+```bash
+docker compose down -v && docker compose up -d --build
+```
+
+> En un equipo nuevo (sin volumen) el `down -v` no hace falta. En uno que ya tenía la app, el `down -v` es lo que aplica el schema renombrado (el init **solo corre al crear el volumen**).
+
+### Caso 2 — Base con datos existentes (staging/prod): usar `mysql/migrations/`
+
+Cuando NO se puede hacer `down -v` (hay datos que conservar), está el script **`mysql/migrations/2026_06_16_rename_clockify_to_timesheet.sql`**, que transforma la base existente in-place:
+
+- **Paso 1** (el `.sql`): `RENAME TABLE clockify_* TO timesheet_*` + `RENAME COLUMN ...` sobre la base actual. MySQL 8 actualiza FKs/índices solos.
+- **Paso 2** (shell, documentado como comentario en el archivo): MySQL **no tiene `RENAME DATABASE`**, así que el nombre de la base se cambia por dump/restore (`mysqldump pm_clockify_evm | mysql pm_timesheet_evm`) y luego `DROP DATABASE pm_clockify_evm`.
+
+### Por qué la migración NO va en `mysql/init/`
+
+`mysql/init/` corre sobre una base **vacía/nueva**, donde `01_schema.sql` ya creó `timesheet_*` y `clockify_*` no existe → un `RENAME TABLE clockify_...` ahí **fallaría** y rompería el arranque de todo el equipo. La carpeta `migrations/` **no** está montada en `/docker-entrypoint-initdb.d/`, justamente para que no se ejecute sola: es una operación manual, de un solo uso, solo para bases con datos.
+
+| | `mysql/init/` (schema) | `mysql/migrations/` |
+|---|---|---|
+| Cuándo corre | automático, primer boot del volumen | a mano, una sola vez |
+| Sobre qué base | vacía / nueva | base existente con datos `clockify_*` |
+| Contenido | estado final (`CREATE TABLE timesheet_*`, `CREATE DATABASE pm_timesheet_evm`) | transformación (`RENAME clockify_ → timesheet_` + dump/restore de la base) |
+| A quién sirve | todo el equipo en dev | staging / prod que no pueden recrear el volumen |
+
+> Las constraints/índices conservan nombres internos `clockify_*` (solo identificadores, inocuo): así una base fresca (init) y una migrada quedan funcionalmente idénticas.
+
+---
+
 ## Agregar una nueva variable de entorno
 
 Cuando agregás una nueva configuración al proyecto, seguir este flujo:
