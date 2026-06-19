@@ -313,7 +313,7 @@ public class DashboardHoursController : ControllerBase
                 gMonths[monthKey] = new
                 {
                     hours = gEx.hours + hours,
-                    expected = gEx.expected + hours
+                   expected = 0m
                 };
 
                 if (!detailsByKey[groupKey].ContainsKey(detailKey))
@@ -347,7 +347,7 @@ public class DashboardHoursController : ControllerBase
                 dMonths[monthKey] = new
                 {
                     hours = dEx.hours + hours,
-                    expected = dEx.expected + hours
+                    expected = 0m
                 };
             }
 
@@ -424,7 +424,7 @@ public class DashboardHoursController : ControllerBase
                 gMonths[monthKey] = new
                 {
                     hours = gEx.hours + hours,
-                    expected = gEx.expected + hours
+                    expected = 0m
                 };
 
                 if (!detailsByKey[groupKey].ContainsKey(detailKey))
@@ -458,7 +458,7 @@ public class DashboardHoursController : ControllerBase
                 dMonths[monthKey] = new
                 {
                     hours = dEx.hours + hours,
-                    expected = dEx.expected + hours
+                   expected = 0m
                 };
             }
 
@@ -505,6 +505,19 @@ public class DashboardHoursController : ControllerBase
             var rolesByUser = await _db.ClockifyUsers
                 .Where(u => userIdsForKpi.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id, u => u.Role);
+
+            var capacityRecords = await _db.UserMonthlyCapacities
+                .Where(c => userIdsForKpi.Contains(c.UserId))
+                .ToListAsync();
+
+            var userCapacityMap = capacityRecords
+                .GroupBy(c => c.UserId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToDictionary(c => c.MonthKey, c => c.Hours)
+                );              
+
+                
 
             // =========================================================
             // 🔹 RESULT
@@ -581,7 +594,28 @@ public class DashboardHoursController : ControllerBase
                             ? $"Varios ({details.Count})"
                             : firstDetail?["client_name"],
 
-                    months = g["months"],
+                    months =
+                        ((IDictionary<string, object>)g["months"]!)
+                            .ToDictionary(
+                                month => month.Key,
+                                month =>
+                                {
+                                    dynamic data = month.Value;
+
+                                    decimal expected =
+                                        firstUserId.HasValue &&
+                                        userCapacityMap.TryGetValue(firstUserId.Value, out var userCapacity) &&
+                                        userCapacity.TryGetValue(month.Key, out var capacity)
+                                            ? capacity
+                                            : 0m;
+
+                                    return new
+                                    {
+                                        hours = (decimal)data.hours,
+                                        expected
+                                    };
+                                }
+                            ),
 
                     details = details.Select(d => new
                     {
@@ -589,7 +623,29 @@ public class DashboardHoursController : ControllerBase
                         client_name = d["client_name"],
                         project_name = d["project_name"],
                         project_type = d["project_type"],
-                        months = d["months"]
+
+                        months =
+                            ((IDictionary<string, object>)d["months"]!)
+                                .ToDictionary(
+                                    month => month.Key,
+                                    month =>
+                                    {
+                                        dynamic data = month.Value;
+
+                                        decimal expected =
+                                            firstUserId.HasValue &&
+                                            userCapacityMap.TryGetValue(firstUserId.Value, out var userCapacity) &&
+                                            userCapacity.TryGetValue(month.Key, out var capacity)
+                                                ? capacity
+                                                : 0m;
+
+                                        return new
+                                        {
+                                            hours = (decimal)data.hours,
+                                            expected
+                                        };
+                                    }
+                                )
                     }).ToList()
                 });
             }
@@ -602,8 +658,8 @@ public class DashboardHoursController : ControllerBase
             {
                 result = result.Where(r =>
                 {
-                    var rowMonths =
-                        (Dictionary<string, object>)((dynamic)r).months;
+                    dynamic rowMonths =
+                        ((dynamic)r).months;
 
                     return monthKeysList.Any(mk =>
                         rowMonths.ContainsKey(mk));
@@ -817,12 +873,16 @@ public class DashboardHoursController : ControllerBase
 
                 foreach (var mk in allMonths)
                 {
-                    var rowMonths =
-                        (Dictionary<string, object>)dynRow.months;
+                    dynamic rowMonths =
 
-                    var need =
-                        rowMonths.TryGetValue(mk, out var mData)
-                            ? (decimal)((dynamic)mData).hours
+                        dynRow.months;
+
+                    decimal need =
+
+                        rowMonths.ContainsKey(mk)
+
+                            ? (decimal)rowMonths[mk].hours
+
                             : 0m;
 
                     var availability =
