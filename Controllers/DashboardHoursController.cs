@@ -25,7 +25,9 @@ public class DashboardHoursController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Index(
         [FromQuery] string? leader_id,
-        [FromQuery] string? project_id)
+        [FromQuery] string? project_id,
+         [FromQuery] string? source_type)
+        
     {
         var month_keys = Request.Query
             .Where(q => q.Key == "month_keys" || q.Key == "month_keys[]")
@@ -47,6 +49,18 @@ public class DashboardHoursController : ControllerBase
 
             var filterByProject =
                 !string.IsNullOrEmpty(project_id);
+
+            var onlyEtc =
+                string.Equals(
+                    source_type,
+                    "ETC",
+                    StringComparison.OrdinalIgnoreCase);
+
+            var onlyPotential =
+                string.Equals(
+                    source_type,
+                    "POTENTIAL",
+                    StringComparison.OrdinalIgnoreCase);           
 
             var monthKeysList =
                 filterByMonths
@@ -244,8 +258,11 @@ public class DashboardHoursController : ControllerBase
             // 🔹 ETC LOOP
             // =========================================================
 
-            foreach (var item in etcData)
+            if (!onlyPotential)
             {
+                foreach (var item in etcData)
+
+                {
                 var userName =
                     (item.UserName ?? "Sin usuario").Trim();
 
@@ -350,11 +367,13 @@ public class DashboardHoursController : ControllerBase
                     expected = 0m
                 };
             }
+            }
 
             // =========================================================
             // 🔹 POTENTIAL LOOP
             // =========================================================
-
+            if (!onlyEtc)
+            {
             foreach (var item in potencialData)
             {
                 var userName =
@@ -461,7 +480,7 @@ public class DashboardHoursController : ControllerBase
                    expected = 0m
                 };
             }
-
+            }
             // =========================================================
             // 🔹 USER IDS
             // =========================================================
