@@ -453,6 +453,100 @@ public class EtcController : ControllerBase
         return StatusCode(201, new { message = "Registros ETC creados exitosamente", records });
     }
 
+    // PUT api/etc/bulk
+    [HttpPut("api/etc/bulk")]
+    [RequirePermission("ETC_EDIT")]
+    public async Task<IActionResult> UpdateBulk([FromBody] BulkUpdateEtcDto dto)
+    {
+        var project = await _db.ClockifyProjects.FindAsync(dto.ProjectId);
+        if (project == null)
+            return UnprocessableEntity(new { error = "Proyecto no encontrado" });
+
+        EtcSnapshot snapshot;
+        if (dto.SnapshotId.HasValue)
+        {
+            var requestedSnapshot = await _db.EtcSnapshots.FindAsync(dto.SnapshotId.Value);
+            if (requestedSnapshot == null)
+                return UnprocessableEntity(new { error = "Snapshot no encontrado" });
+            if (requestedSnapshot.ProjectId != dto.ProjectId)
+                return UnprocessableEntity(new { error = "El snapshot no pertenece al proyecto indicado" });
+            snapshot = requestedSnapshot;
+        }
+        else
+        {
+            snapshot = await GetOrCreateCurrentSnapshot((int)dto.ProjectId);
+        }
+
+        var existingRecords = await _db.EtcRecords
+            .Where(r => r.SnapshotId == snapshot.Id)
+            .ToDictionaryAsync(r => r.Id);
+
+        var entriesWithId = dto.Entries.Where(e => e.Id.HasValue).ToList();
+        foreach (var entry in entriesWithId)
+        {
+            if (!existingRecords.ContainsKey(entry.Id!.Value))
+                return NotFound(new { error = $"Registro con id {entry.Id} no encontrado en el snapshot actual" });
+        }
+
+        var entriesForValidation = dto.Entries
+            .Select(e => new EtcEntryDto { UserName = e.UserName, MonthKey = e.MonthKey, Hours = e.Hours })
+            .ToList();
+
+        if (entriesForValidation.Any(e => e.Hours > 0))
+        {
+            var capacityErrors = await ValidateCapacityForEntries((int)dto.ProjectId, entriesForValidation);
+            if (capacityErrors.Any())
+                return UnprocessableEntity(new { error = "Validación de capacidad", message = string.Join("\n", capacityErrors.Select(e => e.Message)) });
+        }
+
+        var incomingIds = entriesWithId.Select(e => e.Id!.Value).ToHashSet();
+        var recordsToDelete = existingRecords.Values.Where(r => !incomingIds.Contains(r.Id)).ToList();
+        _db.EtcRecords.RemoveRange(recordsToDelete);
+
+        var result = new List<EtcRecord>();
+
+        foreach (var entry in entriesWithId)
+        {
+            var record = existingRecords[entry.Id!.Value];
+            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+
+            record.UserName = entry.UserName;
+            record.MonthKey = entry.MonthKey;
+            record.MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey);
+            record.Hours = entry.Hours;
+            record.UserId = user?.Id;
+            record.UpdatedAt = DateTime.UtcNow;
+            result.Add(record);
+        }
+
+        foreach (var entry in dto.Entries.Where(e => !e.Id.HasValue))
+        {
+            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+            var record = new EtcRecord
+            {
+                ProjectId = dto.ProjectId,
+                SnapshotId = snapshot.Id,
+                UserId = user?.Id,
+                UserName = entry.UserName,
+                MonthKey = entry.MonthKey,
+                MonthLabel = MonthHelper.GetMonthLabel(entry.MonthKey),
+                Hours = entry.Hours,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _db.EtcRecords.Add(record);
+            result.Add(record);
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new
+        {
+            message = "Registros ETC sincronizados exitosamente",
+            records = result,
+            deleted = recordsToDelete.Count
+        });
+    }
+
     // POST api/etc/validate-capacity
     [HttpPost("api/etc/validate-capacity")]
     [RequirePermission("ETC_ACCESS")]

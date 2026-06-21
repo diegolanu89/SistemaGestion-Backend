@@ -52,6 +52,22 @@ public class BulkEtcDto
     public List<EtcEntryDto> Entries { get; set; } = new();
 }
 
+public class BulkUpdateEtcEntryDto
+{
+    public ulong? Id { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public string MonthKey { get; set; } = string.Empty;
+    public string? MonthLabel { get; set; }
+    public decimal Hours { get; set; }
+}
+
+public class BulkUpdateEtcDto
+{
+    public ulong ProjectId { get; set; }
+    public ulong? SnapshotId { get; set; }
+    public List<BulkUpdateEtcEntryDto> Entries { get; set; } = new();
+}
+
 public class CreateSnapshotDto
 {
     public List<EtcEntryDto> Entries { get; set; } = new();
