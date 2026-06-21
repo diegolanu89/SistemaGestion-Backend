@@ -762,4 +762,75 @@ public class ClockifySyncController : ControllerBase
         }
         catch { return 0; }
     }
+
+    // GET api/clockify/projects/{id}/hours-summary
+[HttpGet("projects/{id}/hours-summary")]
+public async Task<IActionResult> GetProjectHoursSummary(ulong id)
+{
+    try
+    {
+        var project = await _db.ClockifyProjects
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (project == null)
+            return NotFound(new { message = "Proyecto no encontrado" });
+
+        var entries = await _db.ClockifyTimeEntries
+            .Where(t => t.ProjectId == id)
+            .ToListAsync();
+
+        var users = await _db.ClockifyUsers.ToListAsync();
+
+        var months = entries
+            .Select(e => e.StartTime.ToString("yyyy-MM"))
+            .Distinct()
+            .OrderBy(x => x)
+            .ToList();
+
+        var result = entries
+            .GroupBy(e => e.UserId)
+            .Select(g =>
+            {
+                var user = users.FirstOrDefault(u => u.Id == g.Key);
+
+                var monthData = g
+                    .GroupBy(x => x.StartTime.ToString("yyyy-MM"))
+                    .ToDictionary(
+                        x => x.Key,
+                        x => Math.Round(x.Sum(v => v.DurationHours), 2)
+                    );
+
+                return new
+                {
+                    user_id = g.Key,
+                    user_name = user?.Name ?? "Usuario sin identificar",
+                    total_hours = Math.Round(g.Sum(x => x.DurationHours), 2),
+                    months = monthData
+                };
+            })
+            .OrderBy(x => x.user_name)
+            .ToList();
+
+        return Ok(new
+        {
+            project_id = project.Id,
+            project_name = project.Name,
+            total_entries = entries.Count,
+            months,
+            data = result
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex,
+            "Error obteniendo resumen de horas del proyecto {Id}",
+            id);
+
+        return StatusCode(500, new
+        {
+            error = "Error obteniendo horas del proyecto",
+            message = ex.Message
+        });
+    }
+}
 }
