@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using bdt_evm_app.Attributes;
 using bdt_evm_app.Data;
 using bdt_evm_app.DTOs;
@@ -312,9 +313,6 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/projects/{id}/sync-status
-    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-status
-    // a /api/timesheet/projects/{id}/sync-status para mantener consistencia con el resto
-    // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpGet("projects/{id}/sync-status")]
     public async Task<IActionResult> GetSyncStatus(ulong id)
     {
@@ -354,9 +352,6 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/projects/{id}/sync-time-entries
-    // TODO: Revisar con el cliente el cambio de ruta original /api/projects/{id}/sync-time-entries
-    // a /api/timesheet/projects/{id}/sync-time-entries para mantener consistencia con el resto
-    // de endpoints de Clockify. Requiere actualizar el frontend React.
     [HttpPost("projects/{id}/sync-time-entries")]
     public async Task<IActionResult> SyncProjectTimeEntries(
         ulong id,
@@ -397,6 +392,64 @@ public class TimesheetSyncController : ControllerBase
         {
             _logger.LogError(e, "Error al sincronizar time entries del proyecto {Id}", id);
             return StatusCode(500, new { error = "Error al sincronizar time entries", message = e.Message });
+        }
+    }
+
+    // GET api/timesheet/projects/{id}/hours-summary
+    [HttpGet("projects/{id}/hours-summary")]
+    public async Task<IActionResult> GetProjectHoursSummary(ulong id)
+    {
+        try
+        {
+            var project = await _db.TimesheetProjects.FirstOrDefaultAsync(p => p.Id == id);
+            if (project == null)
+                return NotFound(new { message = "Proyecto no encontrado" });
+
+            var entries = await _db.TimesheetTimeEntries
+                .Where(t => t.ProjectId == id)
+                .ToListAsync();
+
+            var users = await _db.TimesheetUsers.ToListAsync();
+
+            var months = entries
+                .Select(e => e.StartTime.ToString("yyyy-MM"))
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            var result = entries
+                .GroupBy(e => e.UserId)
+                .Select(g =>
+                {
+                    var user = users.FirstOrDefault(u => u.Id == g.Key);
+                    var monthData = g
+                        .GroupBy(x => x.StartTime.ToString("yyyy-MM"))
+                        .ToDictionary(x => x.Key, x => Math.Round(x.Sum(v => v.DurationHours), 2));
+
+                    return new
+                    {
+                        user_id = g.Key,
+                        user_name = user?.Name ?? "Usuario sin identificar",
+                        total_hours = Math.Round(g.Sum(x => x.DurationHours), 2),
+                        months = monthData
+                    };
+                })
+                .OrderBy(x => x.user_name)
+                .ToList();
+
+            return Ok(new
+            {
+                project_id = project.Id,
+                project_name = project.Name,
+                total_entries = entries.Count,
+                months,
+                data = result
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error obteniendo resumen de horas del proyecto {Id}", id);
+            return StatusCode(500, new { error = "Error obteniendo horas del proyecto", message = e.Message });
         }
     }
 }

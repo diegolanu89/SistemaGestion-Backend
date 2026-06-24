@@ -65,3 +65,15 @@ INSERT INTO `user_vacation_periods` (`id`, `user_id`, `date_from`, `date_to`, `t
 INSERT INTO `potencial_clients` (`id`, `name`, `created_at`, `updated_at`) VALUES
   (2, 'Banco Galicia', '2026-04-16 21:56:52', '2026-04-16 21:56:52');
 
+-- ── Intake de proyectos ───────────────────────────────────────
+
+INSERT INTO `project_intake_records`
+  (`id`, `project_type`, `internal_project_number`, `secondary_project_number`, `registration_date`,
+   `client_name`, `client_id`, `project_name`, `category_code`, `project_status_code`,
+   `business_status_date`, `estimated_end_date`, `actual_end_date`, `commercial_status`,
+   `leader_timesheet_user_id`, `observations`, `requires_timesheet_creation`,
+   `timesheet_record_id`, `created_by`, `updated_by`, `is_active`, `created_at`, `updated_at`)
+VALUES
+  (1, '30', '30.001', '124062026',  NULL, 'BDT Global', 3, 'Demostración',   'DES', 'EN_CURSO', '2026-06-01', '2026-06-30', NULL, NULL,    5, NULL, 1, NULL, 2, 2, 1, '2026-06-24 18:11:58', '2026-06-24 18:41:43'),
+  (2, '30', '30.002', '224062026', NULL, 'BDT Global', 3, 'Comercial Test', 'DES', 'EN_CURSO', '2026-06-01', '2026-06-30', NULL, NULL, NULL, NULL, 1, NULL, 2, 2, 1, '2026-06-24 18:15:02', '2026-06-24 18:15:24');
+
