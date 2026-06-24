@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using bdt_evm_app.Models;
 
 namespace bdt_evm_app.Data;
@@ -41,6 +42,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasCharSet("utf8mb4", DelegationModes.ApplyToColumns);
         modelBuilder.Entity<TimesheetProject>()
             .HasMany(p => p.ChangeRequests)
             .WithOne()

@@ -93,7 +93,7 @@ El compose levanta **dos contenedores** en una red interna compartida:
    docker compose up --build -d
    ```
 
-   En el primer arranque MySQL ejecuta automáticamente todos los scripts de `mysql/init/` en orden, creando las tablas y cargando los datos mock.
+   En el primer arranque MySQL ejecuta automáticamente los 3 scripts de `mysql/init/` en orden: crea las 35 tablas (`01`), carga los datos de sistema como RBAC y calendario (`02`), y carga los datos mock de desarrollo (`03`).
 
 4. **Verificar que todo funciona**
    ```bash
@@ -138,9 +138,9 @@ El compose levanta **dos contenedores** en una red interna compartida:
 |---|---|
 | Ver logs de MySQL | `docker compose logs -f mysql` |
 | Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_timesheet_evm` |
-| Resetear la DB (borra y re-crea con el schema) | `docker compose down -v && docker compose up -d` |
+| Resetear la DB (borra el volumen y re-aplica los 3 init scripts) | `docker compose down -v && docker compose up -d` |
 
-> `docker compose down -v` elimina el volumen de datos. Usarlo solo cuando querés empezar desde cero con el schema limpio.
+> `docker compose down -v` elimina el volumen de datos. Los scripts de `mysql/init/` solo corren sobre volumen vacío, así que esto es necesario cuando cambian los init files o querés empezar desde cero.
 
 ---
 
@@ -152,12 +152,9 @@ La carpeta `mysql/init/` contiene los scripts que MySQL ejecuta automáticamente
 
 | Archivo | Contenido |
 |---|---|
-| `01_schema.sql` | Todas las tablas del sistema + datos mock base |
-| `02_schema.sql` | Tablas RBAC (modules, actions, permissions, profile_permissions) |
-| `03_schema.sql` | Tabla de auditoría (change_audit_log) |
-| `04_schema.sql` | Seed del RBAC (módulos, permisos y asignaciones por perfil) |
-| `05_seed_evm.sql` | Proyectos mock con datos EVM para el dashboard |
-| `06_seed_change_requests.sql` | Change requests asociados a los proyectos mock |
+| `01_schema.sql` | DDL completo del sistema — 35 tablas, sin datos |
+| `02_seed_system.sql` | Datos de sistema: perfiles, RBAC, calendario laboral 2026, refs de intake |
+| `03_seed_mock.sql` | Datos mock de desarrollo: usuarios, proyectos, imputaciones, EVM, change requests |
 
 Si el volumen ya existe (arranques posteriores), MySQL **no** vuelve a ejecutar los scripts — los datos persisten entre reinicios.
 
