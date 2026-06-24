@@ -36,7 +36,7 @@ public class EtcController : ControllerBase
         var (etcSnapshot, records) = await _etcService.GetRecordsForProject(projectId, wantBaseline);
 
         var userIds = records.Where(r => r.UserId.HasValue).Select(r => r.UserId!.Value).Distinct().ToList();
-        var usersById = await _db.ClockifyUsers
+        var usersById = await _db.TimesheetUsers
             .Where(u => userIds.Contains(u.Id))
             .ToDictionaryAsync(u => u.Id);
 
@@ -458,7 +458,7 @@ public class EtcController : ControllerBase
     [RequirePermission("ETC_EDIT")]
     public async Task<IActionResult> UpdateBulk([FromBody] BulkUpdateEtcDto dto)
     {
-        var project = await _db.ClockifyProjects.FindAsync(dto.ProjectId);
+        var project = await _db.TimesheetProjects.FindAsync(dto.ProjectId);
         if (project == null)
             return UnprocessableEntity(new { error = "Proyecto no encontrado" });
 
@@ -508,7 +508,7 @@ public class EtcController : ControllerBase
         foreach (var entry in entriesWithId)
         {
             var record = existingRecords[entry.Id!.Value];
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
 
             record.UserName = entry.UserName;
             record.MonthKey = entry.MonthKey;
@@ -521,7 +521,7 @@ public class EtcController : ControllerBase
 
         foreach (var entry in dto.Entries.Where(e => !e.Id.HasValue))
         {
-            var user = await _db.ClockifyUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
+            var user = await _db.TimesheetUsers.FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
             var record = new EtcRecord
             {
                 ProjectId = dto.ProjectId,
