@@ -53,6 +53,8 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 );
 
 builder.Services.AddScoped<ClockifyService>();
+builder.Services.AddScoped<ITimesheetProvider, ClockifyProvider>();
+builder.Services.AddScoped<TimesheetSyncService>();
 builder.Services.AddScoped<ProjectBacService>();
 builder.Services.AddScoped<ProjectMetricsService>();
 builder.Services.AddScoped<ProjectIntakeService>();

@@ -50,7 +50,7 @@ public class UserVacationPeriodsController : ControllerBase
 
         foreach (var entry in dto.Entries)
         {
-            var userExists = await _db.ClockifyUsers.AnyAsync(u => u.Id == entry.UserId);
+            var userExists = await _db.TimesheetUsers.AnyAsync(u => u.Id == entry.UserId);
             if (!userExists)
                 return UnprocessableEntity(new { message = $"Usuario {entry.UserId} no encontrado" });
 

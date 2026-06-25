@@ -9,7 +9,7 @@ using bdt_evm_app.Helpers;
 namespace bdt_evm_app.Controllers;
 
 [ApiController]
-[Route("api/clockify-users/{userId}/capacities")]
+[Route("api/timesheet-users/{userId}/capacities")]
 [RequirePermission("SETTINGS_ACCESS")]
 public class UserMonthlyCapacityController : ControllerBase
 {
@@ -22,11 +22,11 @@ public class UserMonthlyCapacityController : ControllerBase
         _logger = logger;
     }
 
-    // GET api/clockify-users/{userId}/capacities
+    // GET api/timesheet-users/{userId}/capacities
     [HttpGet]
     public async Task<IActionResult> GetAll(ulong userId)
     {
-        var user = await _db.ClockifyUsers.FindAsync(userId);
+        var user = await _db.TimesheetUsers.FindAsync(userId);
         if (user == null)
             return NotFound(new { success = false, message = "Usuario no encontrado" });
 
@@ -38,11 +38,11 @@ public class UserMonthlyCapacityController : ControllerBase
         return Ok(new { success = true, data = records });
     }
 
-    // POST api/clockify-users/{userId}/capacities
+    // POST api/timesheet-users/{userId}/capacities
     [HttpPost]
     public async Task<IActionResult> Store(ulong userId, [FromBody] CreateUserMonthlyCapacityDto dto)
     {
-        var user = await _db.ClockifyUsers.FindAsync(userId);
+        var user = await _db.TimesheetUsers.FindAsync(userId);
         if (user == null)
             return NotFound(new { success = false, message = "Usuario no encontrado" });
 

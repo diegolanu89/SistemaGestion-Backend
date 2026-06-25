@@ -10,7 +10,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 | Componente | Tecnología |
 |---|---|
 | Framework | ASP.NET Core 9.0 |
-| Base de datos | MySQL (Pomelo EF Core) |
+| Base de datos | MySQL 8.0 (Pomelo EF Core) |
 | ORM | Entity Framework Core 9.0 |
 | Auth | Tokens tipo Sanctum + BCrypt |
 | Integración | Clockify API |
@@ -21,13 +21,15 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 ## Prerrequisitos
 
-### Sin Docker (desarrollo local)
+### Sin Docker
+
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9)
 - MySQL 8.0 corriendo en el host
 - Visual Studio 2022 / Rider / VS Code
 
 ### Con Docker
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows o Mac)
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows / Mac)
 - Nada más — MySQL corre como contenedor junto con el backend
 
 ---
@@ -44,7 +46,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 
 2. **Configurar User Secrets** (nunca se commitean)
    ```bash
-   dotnet user-secrets set "ConnectionStrings:Default" "Server=localhost;Port=3306;Database=pm_clockify_evm;User=tu_user;Password=tu_password;"
+   dotnet user-secrets set "ConnectionStrings:Default" "Server=localhost;Port=3306;Database=pm_timesheet_evm;User=tu_user;Password=tu_password;"
    dotnet user-secrets set "Clockify:ApiKey" "tu_api_key"
    dotnet user-secrets set "Clockify:WorkspaceId" "tu_workspace_id"
    dotnet user-secrets set "Clockify:UserId" "tu_user_id"
@@ -53,7 +55,7 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 3. **Correr la aplicación**
    ```bash
    dotnet run
-   # La app levanta en http://localhost:5000 (o el puerto configurado ver launchSettings.json)
+   # La app levanta en http://localhost:5000 (ver launchSettings.json)
    ```
 
 ---
@@ -61,8 +63,8 @@ Migración del sistema original Laravel a **ASP.NET Core 9.0**.
 ### Opción B — Con Docker (recomendada)
 
 El compose levanta **dos contenedores** en una red interna compartida:
-- `db_clockify_mysql` — MySQL 8.0 con las tablas y datos mock ya cargados
-- `bdt_dotnet` — el backend .NET (espera a que MySQL esté healthy antes de iniciar)
+- `db_clockify_mysql` — MySQL 8.0 con todas las tablas y datos mock ya cargados
+- `bdt_dotnet` — backend .NET (espera a que MySQL esté healthy antes de iniciar)
 
 1. **Clonar el repositorio**
    ```bash
@@ -73,12 +75,12 @@ El compose levanta **dos contenedores** en una red interna compartida:
 2. **Configurar variables de entorno**
    ```bash
    cp .env.example .env
-   # Editá .env con tus valores reales (Clockify keys)
+   # Editá .env con tus valores reales (Clockify keys, etc.)
    ```
 
    El `.env` mínimo necesario:
    ```env
-   DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=pm_clockify_evm;User=bdt_user;Password=bdt_user;
+   DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=pm_timesheet_evm;User=bdt_user;Password=bdt_user;
    CLOCKIFY_API_KEY=tu_api_key
    CLOCKIFY_WORKSPACE_ID=tu_workspace_id
    CLOCKIFY_USER_ID=tu_user_id
@@ -91,16 +93,15 @@ El compose levanta **dos contenedores** en una red interna compartida:
    docker compose up --build -d
    ```
 
-   En el primer arranque, MySQL ejecuta automáticamente `mysql/init/01_schema.sql`
-   que crea todas las tablas y carga los datos mock de base.
+   En el primer arranque MySQL ejecuta automáticamente los 3 scripts de `mysql/init/` en orden: crea las 35 tablas (`01`), carga los datos de sistema como RBAC y calendario (`02`), y carga los datos mock de desarrollo (`03`).
 
 4. **Verificar que todo funciona**
    ```bash
    curl http://localhost:5000/api/health
-   # Respuesta esperada: { "status": "ok", "database": "ok" }
+   # { "status": "ok", "database": "ok" }
    ```
 
-> **Nota:** el backend tarda unos segundos extra en iniciar porque espera a que MySQL pase su healthcheck antes de arrancar.
+> El backend tarda unos segundos extra en iniciar porque espera a que MySQL pase su healthcheck antes de arrancar.
 
 ---
 
@@ -127,7 +128,7 @@ El compose levanta **dos contenedores** en una red interna compartida:
 | Levantar sin reconstruir | `docker compose up -d` |
 | Bajar los contenedores | `docker compose down` |
 | Reiniciar (solo cambios de variables) | `docker compose down && docker compose up -d` |
-| Ver logs del backend en tiempo real | `docker compose logs -f backend` |
+| Ver logs en tiempo real | `docker compose logs -f backend` |
 | Ver estado de los contenedores | `docker compose ps` |
 | Entrar al contenedor del backend | `docker compose exec backend sh` |
 
@@ -136,55 +137,118 @@ El compose levanta **dos contenedores** en una red interna compartida:
 | Acción | Comando |
 |---|---|
 | Ver logs de MySQL | `docker compose logs -f mysql` |
-| Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_clockify_evm` |
-| Resetear la DB (borra y re-crea con el schema) | `docker compose down -v && docker compose up -d` |
+| Entrar a la consola MySQL | `docker compose exec mysql mysql -u bdt_user -pbdt_user pm_timesheet_evm` |
+| Resetear la DB (borra el volumen y re-aplica los 3 init scripts) | `docker compose down -v && docker compose up -d` |
 
-> ⚠️ `docker compose down -v` elimina el volumen de datos. Usarlo solo cuando querés empezar desde cero con el schema limpio.
+> `docker compose down -v` elimina el volumen de datos. Los scripts de `mysql/init/` solo corren sobre volumen vacío, así que esto es necesario cuando cambian los init files o querés empezar desde cero.
 
 ---
 
-## Base de datos — schema e init
+## Base de datos
 
-El archivo `mysql/init/01_schema.sql` se ejecuta automáticamente la primera vez que se levanta el contenedor de MySQL (cuando el volumen `mysql_data` no existe).
+### Init — entorno de desarrollo
 
-Incluye:
-- Creación de las 32 tablas del sistema
-- Datos mock de base (usuarios, clientes, configuraciones iniciales)
+La carpeta `mysql/init/` contiene los scripts que MySQL ejecuta automáticamente al crear el volumen por primera vez (orden alfabético):
 
-Si el volumen ya existe (arranques posteriores), MySQL **no** vuelve a ejecutar el script — los datos persisten entre reinicios.
+| Archivo | Contenido |
+|---|---|
+| `01_schema.sql` | DDL completo del sistema — 35 tablas, sin datos |
+| `02_seed_system.sql` | Datos de sistema: perfiles, RBAC, calendario laboral 2026, refs de intake |
+| `03_seed_mock.sql` | Datos mock de desarrollo: usuarios, proyectos, imputaciones, EVM, change requests |
+
+Si el volumen ya existe (arranques posteriores), MySQL **no** vuelve a ejecutar los scripts — los datos persisten entre reinicios.
+
+Para resetear la base a su estado inicial:
+
+```bash
+docker compose down -v && docker compose up -d
+```
+
+### Migraciones — clientes con datos preexistentes
+
+La carpeta `mysql/migrations/` contiene el sistema de migraciones para aplicar cambios estructurales sobre una base que ya tiene datos, donde no es posible recrear el volumen.
+
+Los scripts de `migrations/` **nunca se ejecutan solos** — no están montados en el contenedor. Se aplican manualmente corriendo `mysql/migrate.sh` con las credenciales de la BD del cliente.
+
+#### Archivos de migración
+
+| Archivo | Tipo | Qué hace |
+|---|---|---|
+| `001_create_schema_migrations.sql` | DDL | Crea la tabla de tracking `schema_migrations` |
+| `002_rename_clockify_to_timesheet.sql` | DDL | Renombra tablas/columnas `clockify_*` → `timesheet_*` (solo si aplica) |
+| `003_add_rbac_tables.sql` | DDL | Crea las tablas RBAC |
+| `004_add_audit_log.sql` | DDL | Crea `change_audit_log` |
+| `005_add_intake_tables.sql` | DDL | Crea las tablas de Intake de proyectos |
+| `005b_seed_intake_refs.sql` | Seed | Carga las tablas de referencia del Intake (categorías, tipos, estados) |
+| `006_add_project_tracking_tables.sql` | DDL | Crea `project_trackings` y `project_tracking_updates` |
+| `007_seed_rbac_data.sql` | Seed | Carga módulos, acciones, permisos y asignaciones por perfil |
+
+Todas las migraciones son **idempotentes**: se pueden correr varias veces sin efecto duplicado.
+
+#### Uso
+
+1. **Diagnóstico** — verificar el estado actual de la base del cliente:
+
+   ```bash
+   mysql -h HOST -u bdt_user -pbdt_user pm_timesheet_evm < mysql/detect_state.sql
+   ```
+
+   Muestra qué tablas existen, cuáles faltan y qué migraciones ya se aplicaron.
+
+2. **Migrar** — aplicar los cambios pendientes:
+
+   ```bash
+   chmod +x mysql/migrate.sh
+   ./mysql/migrate.sh -h HOST -u bdt_user -p bdt_user
+   ```
+
+   O usando variables de entorno:
+
+   ```bash
+   DB_HOST=HOST DB_PASSWORD=xxx ./mysql/migrate.sh
+   ```
+
+   El runner aplica solo las migraciones pendientes en orden, registra cada una en `schema_migrations` y se detiene ante el primer error. Al volver a correr, saltea las que ya están aplicadas.
+
+#### Diferencia entre init y migrations
+
+| | `mysql/init/` | `mysql/migrations/` |
+|---|---|---|
+| Cuándo corre | Automático, primer boot del volumen | Manual, con `migrate.sh` |
+| Sobre qué base | Vacía / nueva | Existente con datos |
+| A quién sirve | Equipo de desarrollo | Clientes en producción |
 
 ---
 
 ## Agregar una nueva variable de entorno
 
-Cuando agregás una nueva configuración al proyecto, seguir este flujo:
+1. **Documentar en `.env.example`** *(va al repo)*
+   ```env
+   MI_NUEVA_VAR=
+   ```
 
-**1. Documentar en `.env.example`** *(va al repo)*
-```env
-MI_NUEVA_VAR=
-```
+2. **Agregar valor en `.env`** *(no va al repo)*
+   ```env
+   MI_NUEVA_VAR=valor_real
+   ```
 
-**2. Agregar valor en `.env`** *(no va al repo)*
-```env
-MI_NUEVA_VAR=valor_real
-```
+3. **Inyectar en `docker-compose.yml`**
+   ```yaml
+   environment:
+     Mi__NuevaVar: ${MI_NUEVA_VAR}
+   ```
 
-**3. Inyectar en `docker-compose.yml`**
-```yaml
-environment:
-  Mi__NuevaVar: ${MI_NUEVA_VAR}
-```
-> En .NET el separador `__` mapea a jerarquía de configuración: `Mi__NuevaVar` → `Mi:NuevaVar`
+   > En .NET el separador `__` mapea a jerarquía de configuración: `Mi__NuevaVar` → `Mi:NuevaVar`
 
-**4. Agregar en User Secrets** *(para desarrollo sin Docker)*
-```bash
-dotnet user-secrets set "Mi:NuevaVar" "valor_real"
-```
+4. **Agregar en User Secrets** *(para desarrollo sin Docker)*
+   ```bash
+   dotnet user-secrets set "Mi:NuevaVar" "valor_real"
+   ```
 
-**5. Reiniciar el contenedor**
-```bash
-docker compose down && docker compose up -d
-```
+5. **Reiniciar el contenedor**
+   ```bash
+   docker compose down && docker compose up -d
+   ```
 
 ---
 
@@ -202,9 +266,9 @@ Desde ahí podés explorar todos los endpoints, ver los esquemas de request/resp
 
 Los endpoints protegidos requieren un token Bearer. Para autenticarte:
 
-1. Llamar a `POST /api/auth/login` o `POST /api/auth/login-with-profile` desde Swagger (no requieren token)
+1. Llamar a `POST /api/auth/login` o `POST /api/auth/login-with-profile` (no requieren token)
 2. Copiar el valor del campo `token` de la respuesta
-3. Hacer clic en el botón **Authorize** (arriba a la derecha)
+3. Hacer clic en el botón **Authorize** (arriba a la derecha en Swagger)
 4. Ingresar el token con el formato: `Bearer <token>`
 5. Confirmar con **Authorize** — a partir de ese momento todas las llamadas incluyen el header automáticamente
 

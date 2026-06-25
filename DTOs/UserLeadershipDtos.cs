@@ -10,8 +10,8 @@ public class UserLeaderDto
     public string? Notes { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public ClockifyUserDto? User { get; set; }
-    public ClockifyUserDto? Leader { get; set; }
+    public TimesheetUserResponseDto? User { get; set; }
+    public TimesheetUserResponseDto? Leader { get; set; }
 }
 
 public class CreateUserLeaderDto

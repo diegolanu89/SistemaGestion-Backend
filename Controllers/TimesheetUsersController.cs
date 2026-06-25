@@ -8,20 +8,20 @@ using bdt_evm_app.Models;
 namespace bdt_evm_app.Controllers;
 
 [ApiController]
-[Route("api/clockify-users")]
+[Route("api/timesheet-users")]
 [RequirePermission("ADMIN_ACCESS")]
-public class ClockifyUsersController : ControllerBase
+public class TimesheetUsersController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly ILogger<ClockifyUsersController> _logger;
+    private readonly ILogger<TimesheetUsersController> _logger;
 
-    public ClockifyUsersController(AppDbContext db, ILogger<ClockifyUsersController> logger)
+    public TimesheetUsersController(AppDbContext db, ILogger<TimesheetUsersController> logger)
     {
         _db = db;
         _logger = logger;
     }
 
-    // GET api/clockify-users
+    // GET api/timesheet-users
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? search,
@@ -31,7 +31,7 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var query = _db.ClockifyUsers.AsQueryable();
+            var query = _db.TimesheetUsers.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
                 query = query.Where(u =>
@@ -64,23 +64,23 @@ public class ClockifyUsersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al listar clockify_users");
+            _logger.LogError(e, "Error al listar timesheet_users");
             return StatusCode(500, new { success = false, message = "Error al obtener los usuarios" });
         }
     }
 
-    // POST api/clockify-users
+    // POST api/timesheet-users
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateClockifyUserDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateTimesheetUserDto dto)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return UnprocessableEntity(new { success = false, message = "El nombre es requerido" });
 
-            var user = new ClockifyUser
+            var user = new TimesheetUser
             {
-                ClockifyUserId = null,
+                TimesheetUserId = null,
                 Name = dto.Name,
                 Email = dto.Email,
                 Active = dto.Active,
@@ -90,35 +90,35 @@ public class ClockifyUsersController : ControllerBase
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _db.ClockifyUsers.Add(user);
+            _db.TimesheetUsers.Add(user);
             await _db.SaveChangesAsync();
 
             return StatusCode(201, new { success = true, data = user });
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al crear clockify_user");
+            _logger.LogError(e, "Error al crear timesheet_user");
             return StatusCode(500, new { success = false, message = "Error al crear el usuario" });
         }
     }
 
-    // PUT api/clockify-users/{id}
+    // PUT api/timesheet-users/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(ulong id, [FromBody] UpdateClockifyUserDto dto)
+    public async Task<IActionResult> Update(ulong id, [FromBody] UpdateTimesheetUserDto dto)
     {
         try
         {
-            var user = await _db.ClockifyUsers.FindAsync(id);
+            var user = await _db.TimesheetUsers.FindAsync(id);
             if (user == null)
                 return NotFound(new { success = false, message = "Usuario no encontrado" });
 
-            if (!string.IsNullOrEmpty(dto.ClockifyUserId) && dto.ClockifyUserId != user.ClockifyUserId)
+            if (!string.IsNullOrEmpty(dto.TimesheetUserId) && dto.TimesheetUserId != user.TimesheetUserId)
             {
-                var exists = await _db.ClockifyUsers
-                    .AnyAsync(u => u.ClockifyUserId == dto.ClockifyUserId && u.Id != id);
+                var exists = await _db.TimesheetUsers
+                    .AnyAsync(u => u.TimesheetUserId == dto.TimesheetUserId && u.Id != id);
                 if (exists)
-                    return UnprocessableEntity(new { success = false, message = "El clockify_user_id ya existe" });
-                user.ClockifyUserId = dto.ClockifyUserId;
+                    return UnprocessableEntity(new { success = false, message = "El timesheet_user_id ya existe" });
+                user.TimesheetUserId = dto.TimesheetUserId;
             }
 
             if (dto.Name != null) user.Name = dto.Name;
@@ -134,34 +134,34 @@ public class ClockifyUsersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al actualizar clockify_user {Id}", id);
+            _logger.LogError(e, "Error al actualizar timesheet_user {Id}", id);
             return StatusCode(500, new { success = false, message = "Error al actualizar el usuario" });
         }
     }
 
-    // DELETE api/clockify-users/{id}
+    // DELETE api/timesheet-users/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(ulong id)
     {
         try
         {
-            var user = await _db.ClockifyUsers.FindAsync(id);
+            var user = await _db.TimesheetUsers.FindAsync(id);
             if (user == null)
                 return NotFound(new { success = false, message = "Usuario no encontrado" });
 
-            _db.ClockifyUsers.Remove(user);
+            _db.TimesheetUsers.Remove(user);
             await _db.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Usuario eliminado correctamente" });
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al eliminar clockify_user {Id}", id);
+            _logger.LogError(e, "Error al eliminar timesheet_user {Id}", id);
             return StatusCode(500, new { success = false, message = "Error al eliminar el usuario" });
         }
     }
 
-    // GET api/clockify-users/options
+    // GET api/timesheet-users/options
     // Devuelve lista plana sin paginar, pensada para poblar dropdowns/selects.
     // Por defecto trae solo activos; pasar ?active=false para incluir también inactivos.
     [HttpGet("options")]
@@ -169,12 +169,12 @@ public class ClockifyUsersController : ControllerBase
     {
         try
         {
-            var query = _db.ClockifyUsers.AsQueryable();
+            var query = _db.TimesheetUsers.AsQueryable();
             if (active)
                 query = query.Where(u => u.Active);
             var users = await query
                 .OrderBy(u => u.Name)
-                .Select(u => new ClockifyUserDto
+                .Select(u => new TimesheetUserResponseDto
                 {
                     Id = u.Id,
                     Name = u.Name,
@@ -185,7 +185,7 @@ public class ClockifyUsersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al obtener opciones de clockify_users");
+            _logger.LogError(e, "Error al obtener opciones de timesheet_users");
             return StatusCode(500, new { success = false, message = "Error al obtener las opciones", error = e.Message });
         }
     }

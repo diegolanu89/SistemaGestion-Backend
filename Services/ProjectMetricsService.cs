@@ -13,14 +13,14 @@ public class ProjectMetricsService
         _db = db;
     }
 
-    public async Task<object> CalculateEVM(ClockifyProject project, string? from = null, string? to = null)
+    public async Task<object> CalculateEVM(TimesheetProject project, string? from = null, string? to = null)
     {
         // AC — todas las horas trabajadas sin filtro de fecha
-        var acBase = await _db.ClockifyTimeEntries
+        var acBase = await _db.TimesheetTimeEntries
             .Where(t => t.ProjectId == project.Id && t.ChangeRequestId == null)
             .SumAsync(t => t.DurationHours);
 
-        var acCc = await _db.ClockifyTimeEntries
+        var acCc = await _db.TimesheetTimeEntries
             .Where(t => t.ProjectId == project.Id && t.ChangeRequestId != null)
             .SumAsync(t => t.DurationHours);
 
@@ -70,7 +70,7 @@ public class ProjectMetricsService
         };
     }
 
-    private async Task<decimal> CalculateEtc(ClockifyProject project)
+    private async Task<decimal> CalculateEtc(TimesheetProject project)
     {
         var calculationMode = project.EtcCalculationMode ?? "manual";
 

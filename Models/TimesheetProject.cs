@@ -2,13 +2,13 @@
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_projects")]
-public class ClockifyProject
+[Table("timesheet_projects")]
+public class TimesheetProject
 {
     [Column("id")]
     public ulong Id { get; set; }
-    [Column("clockify_project_id")]
-    public string ClockifyProjectId { get; set; } = string.Empty;
+    [Column("timesheet_project_id")]
+    public string TimesheetProjectId { get; set; } = string.Empty;
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("code")]
@@ -39,7 +39,7 @@ public class ClockifyProject
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
-    public ClockifyClient? Client { get; set; }
-    public ClockifyProjectFilter? Filter { get; set; }
+    public TimesheetClient? Client { get; set; }
+    public TimesheetProjectFilter? Filter { get; set; }
     public List<ChangeRequest> ChangeRequests { get; set; } = new();
 }

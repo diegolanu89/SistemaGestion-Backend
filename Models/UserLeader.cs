@@ -21,6 +21,6 @@ public class UserLeader
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
-    public ClockifyUser? User { get; set; }
-    public ClockifyUser? Leader { get; set; }
+    public TimesheetUser? User { get; set; }
+    public TimesheetUser? Leader { get; set; }
 }

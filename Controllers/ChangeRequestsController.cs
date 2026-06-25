@@ -30,7 +30,7 @@ public class ChangeRequestsController : ControllerBase
     [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> GetByProject(ulong projectId)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -49,7 +49,7 @@ public class ChangeRequestsController : ControllerBase
     [RequirePermission("ADMIN_ACCESS")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] CreateChangeRequestDto dto)
     {
-        var project = await _db.ClockifyProjects.FindAsync(projectId);
+        var project = await _db.TimesheetProjects.FindAsync(projectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -111,7 +111,7 @@ public class ChangeRequestsController : ControllerBase
         if (cr == null)
             return NotFound(new { message = "Solicitud de cambio no encontrada" });
 
-        var project = await _db.ClockifyProjects.FindAsync(cr.ProjectId);
+        var project = await _db.TimesheetProjects.FindAsync(cr.ProjectId);
         if (project == null)
             return NotFound(new { message = "Proyecto no encontrado" });
 
@@ -183,7 +183,7 @@ public class ChangeRequestsController : ControllerBase
         if (cr.ProjectId != projectId)
             return BadRequest(new { error = "La solicitud de cambio no pertenece a este proyecto" });
 
-        var project = await _db.ClockifyProjects.FindAsync(cr.ProjectId);
+        var project = await _db.TimesheetProjects.FindAsync(cr.ProjectId);
 
         _db.ChangeRequests.Remove(cr);
         await _db.SaveChangesAsync();
@@ -205,7 +205,7 @@ public class ChangeRequestsController : ControllerBase
     // diff crudo del ChangeRequest; esta entrada agrega lo que pidió negocio:
     // la SUMATORIA de horas del proyecto, la pantalla de origen y un comentario
     // legible. Todo viaja en new_value (sin cambios de schema).
-    private async Task LogHoursAdjustmentAsync(ClockifyProject project, ChangeRequest cr, decimal previousHours, string action)
+    private async Task LogHoursAdjustmentAsync(TimesheetProject project, ChangeRequest cr, decimal previousHours, string action)
     {
         // Sumatoria real al momento del log: suma de incrementos de TODOS los
         // controles de cambio del proyecto (independiente de su estado, igual

@@ -156,7 +156,7 @@ public class PotencialProjectsController : ControllerBase
             var userId = entry.UserId;
             if (!userId.HasValue && !string.IsNullOrEmpty(entry.UserName))
             {
-                var user = await _db.ClockifyUsers
+                var user = await _db.TimesheetUsers
                     .FirstOrDefaultAsync(u => u.Name.Trim() == entry.UserName.Trim());
                 userId = user?.Id;
             }
@@ -296,7 +296,7 @@ public class PotencialProjectsController : ControllerBase
         var nameToUserId = new Dictionary<string, ulong?>();
         foreach (var name in userNames)
         {
-            var user = await _db.ClockifyUsers
+            var user = await _db.TimesheetUsers
                 .FirstOrDefaultAsync(u => u.Name.Trim() == name.Trim());
             nameToUserId[name] = user?.Id;
         }
@@ -358,7 +358,7 @@ public class PotencialProjectsController : ControllerBase
             var uid = row.UserId;
             if (!uid.HasValue && !string.IsNullOrEmpty(row.UserName))
             {
-                var user = await _db.ClockifyUsers
+                var user = await _db.TimesheetUsers
                     .FirstOrDefaultAsync(u => u.Name.Trim() == row.UserName.Trim());
                 uid = user?.Id;
             }

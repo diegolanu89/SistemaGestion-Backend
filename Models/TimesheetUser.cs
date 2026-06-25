@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_users")]
-public class ClockifyUser
+[Table("timesheet_users")]
+public class TimesheetUser
 {
     [Column("id")]
     public ulong Id { get; set; }
-    [Column("clockify_user_id")]
-    public string? ClockifyUserId { get; set; }
+    [Column("timesheet_user_id")]
+    public string? TimesheetUserId { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("email")]

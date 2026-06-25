@@ -33,14 +33,14 @@ public class ProjectIntakeRecord
     public string? CommercialStatus { get; set; }
     [Column("client_id")]
     public ulong? ClientId { get; set; }
-    [Column("leader_clockify_user_id")]
-    public ulong? LeaderClockifyUserId { get; set; }
+    [Column("leader_timesheet_user_id")]
+    public ulong? LeaderTimesheetUserId { get; set; }
     [Column("observations")]
     public string? Observations { get; set; }
-    [Column("requires_clockify_creation")]
-    public bool RequiresClockifyCreation { get; set; } = false;
-    [Column("clockify_record_id")]
-    public ulong? ClockifyRecordId { get; set; }
+    [Column("requires_timesheet_creation")]
+    public bool RequiresTimesheetCreation { get; set; } = false;
+    [Column("timesheet_record_id")]
+    public ulong? TimesheetRecordId { get; set; }
     [Column("is_active")]
     public bool IsActive { get; set; } = true;
     [Column("created_by")]
@@ -55,7 +55,7 @@ public class ProjectIntakeRecord
     public ProjectIntakeTypeRef? TypeRef { get; set; }
     public ProjectIntakeCategoryRef? CategoryRef { get; set; }
     public ProjectIntakeStatusRef? StatusRef { get; set; }
-    public ClockifyProject? ClockifyProject { get; set; }
-    public ClockifyClient? Client { get; set; }
-    public ClockifyUser? LeaderClockifyUser { get; set; }
+    public TimesheetProject? TimesheetProject { get; set; }
+    public TimesheetClient? Client { get; set; }
+    public TimesheetUser? LeaderTimesheetUser { get; set; }
 }

@@ -23,11 +23,11 @@ public static class AuditModuleMap
         ["ProfilePermission"]    = "administration",
 
         // Operación — proyectos, horas, ETC, intake
-        ["ClockifyClient"]               = "operations",
-        ["ClockifyProject"]              = "operations",
-        ["ClockifyProjectFilter"]        = "operations",
-        ["ClockifyTimeEntry"]            = "operations",
-        ["ClockifyUser"]                 = "operations",
+        ["TimesheetClient"]               = "operations",
+        ["TimesheetProject"]              = "operations",
+        ["TimesheetProjectFilter"]        = "operations",
+        ["TimesheetTimeEntry"]            = "operations",
+        ["TimesheetUser"]                 = "operations",
         ["ChangeRequest"]                = "operations",
         ["EtcSnapshot"]                  = "operations",
         ["EtcRecord"]                    = "operations",

@@ -15,5 +15,5 @@ public class AppUserVisibleProject
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
-    public ClockifyProject? Project { get; set; }
+    public TimesheetProject? Project { get; set; }
 }

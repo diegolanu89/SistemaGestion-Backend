@@ -2,8 +2,8 @@
 
 namespace bdt_evm_app.Models;
 
-[Table("clockify_project_filters")]
-public class ClockifyProjectFilter
+[Table("timesheet_project_filters")]
+public class TimesheetProjectFilter
 {
     [Column("id")]
     public ulong Id { get; set; }
@@ -13,5 +13,5 @@ public class ClockifyProjectFilter
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
-    public ClockifyProject? Project { get; set; }
+    public TimesheetProject? Project { get; set; }
 }

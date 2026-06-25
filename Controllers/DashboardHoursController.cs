@@ -115,7 +115,7 @@ public class DashboardHoursController : ControllerBase
                 .Distinct()
                 .ToList();
 
-            var leadersMap = await _db.ClockifyUsers
+            var leadersMap = await _db.TimesheetUsers
                 .Where(u => leaderIdsForMap.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id);
 
@@ -169,7 +169,7 @@ public class DashboardHoursController : ControllerBase
                 .Distinct()
                 .ToList();
 
-            var etcProjects = await _db.ClockifyProjects
+            var etcProjects = await _db.TimesheetProjects
                 .Include(p => p.Client)
                 .Where(p => etcProjectIds.Contains(p.Id))
                 .ToDictionaryAsync(p => p.Id);
@@ -289,7 +289,7 @@ public class DashboardHoursController : ControllerBase
                             ? leaderByUser.GetValueOrDefault(item.UserId.Value)
                             : null;
 
-                    ClockifyUser? leader =
+                    TimesheetUser? leader =
                         leaderRow != null
                             ? leadersMap.GetValueOrDefault(leaderRow.LeaderId)
                             : null;
@@ -402,7 +402,7 @@ public class DashboardHoursController : ControllerBase
                             ? leaderByUser.GetValueOrDefault(item.UserId.Value)
                             : null;
 
-                    ClockifyUser? leader =
+                    TimesheetUser? leader =
                         leaderRow != null
                             ? leadersMap.GetValueOrDefault(leaderRow.LeaderId)
                             : null;
@@ -499,7 +499,7 @@ public class DashboardHoursController : ControllerBase
                         uName != "Sin usuario")
                     {
                         var u =
-                            await _db.ClockifyUsers
+                            await _db.TimesheetUsers
                                 .FirstOrDefaultAsync(cu =>
                                     cu.Name.Trim() == uName.Trim());
 
@@ -521,7 +521,7 @@ public class DashboardHoursController : ControllerBase
                 .Distinct()
                 .ToList();
 
-            var rolesByUser = await _db.ClockifyUsers
+            var rolesByUser = await _db.TimesheetUsers
                 .Where(u => userIdsForKpi.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id, u => u.Role);
 
@@ -749,7 +749,7 @@ public class DashboardHoursController : ControllerBase
                 .Distinct()
                 .ToListAsync();
 
-            var leadersForFilter = await _db.ClockifyUsers
+            var leadersForFilter = await _db.TimesheetUsers
                 .Where(u => leaderIdsInUse.Contains(u.Id))
                 .OrderBy(u => u.Name)
                 .Select(u => new
@@ -792,7 +792,7 @@ public class DashboardHoursController : ControllerBase
             // 🔹 REAL PROJECTS FOR FILTER
             // =========================================================
 
-            var realProjects = await _db.ClockifyProjects
+            var realProjects = await _db.TimesheetProjects
                 .Where(p => allRealProjectIds.Contains(p.Id))
                 .OrderBy(p => p.Name)
                 .Select(p => new

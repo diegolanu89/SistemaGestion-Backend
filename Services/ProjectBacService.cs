@@ -13,7 +13,7 @@ public class ProjectBacService
         _db = db;
     }
 
-    public async Task<ClockifyProject> RecalculateTotal(ClockifyProject project)
+    public async Task<TimesheetProject> RecalculateTotal(TimesheetProject project)
     {
         var increments = await _db.ChangeRequests
             .Where(cr => cr.ProjectId == project.Id &&
@@ -49,7 +49,7 @@ public class ProjectBacService
         return project;
     }
 
-    public async Task<ClockifyProject> UpdateBaseAndRecalculate(ClockifyProject project, decimal? bacBaseHours, decimal? bacBaseCost)
+    public async Task<TimesheetProject> UpdateBaseAndRecalculate(TimesheetProject project, decimal? bacBaseHours, decimal? bacBaseCost)
     {
         if (bacBaseHours.HasValue) project.BacBaseHours = bacBaseHours.Value;
         if (bacBaseCost.HasValue) project.BacBaseCost = bacBaseCost.Value;

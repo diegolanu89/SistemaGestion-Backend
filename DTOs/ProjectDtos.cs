@@ -3,7 +3,7 @@ namespace bdt_evm_app.DTOs;
 public class ProjectDto
 {
     public ulong Id { get; set; }
-    public string ClockifyProjectId { get; set; } = string.Empty;
+    public string TimesheetProjectId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string? Code { get; set; }
     public ulong? ClientId { get; set; }
