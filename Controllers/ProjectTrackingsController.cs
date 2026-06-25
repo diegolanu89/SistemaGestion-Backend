@@ -7,9 +7,6 @@ using bdt_evm_app.Models;
 
 namespace bdt_evm_app.Controllers;
 
-// RF-10: PROJECTS_CREATE se exige por método (POST/PUT/DELETE). El GET
-// usa PROJECTS_ACCESS porque el Dashboard EVM lo lee para mostrar "Control
-// de cambios" y abrir el modal de seguimiento.
 [ApiController]
 [Route("api/project-trackings")]
 public class ProjectTrackingsController : ControllerBase
@@ -23,101 +20,48 @@ public class ProjectTrackingsController : ControllerBase
         _logger = logger;
     }
 
-    // GET /api/project-trackings/{projectId}
-    [HttpGet("{projectId}")]
+    // GET /api/project-trackings/{trackingId}
+    [HttpGet("{trackingId}")]
     [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> GetByProject(ulong projectId)
+    public async Task<IActionResult> GetById(ulong trackingId)
     {
         try
         {
-            var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
-            if (!projectExists)
-                return NotFound(new { success = false, message = "Proyecto no encontrado" });
-
             var tracking = await _db.ProjectTrackings
                 .Include(t => t.Updates.OrderByDescending(u => u.CreatedAt))
-                .FirstOrDefaultAsync(t => t.ProjectId == projectId);
+                .FirstOrDefaultAsync(t => t.Id == trackingId);
 
             if (tracking == null)
-                return Ok(new { success = true, data = (object?)null });
+                return NotFound(new { success = false, message = "Seguimiento no encontrado" });
 
             return Ok(new { success = true, data = MapToDto(tracking) });
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al obtener tracking del proyecto {ProjectId}", projectId);
+            _logger.LogError(e, "Error al obtener tracking {TrackingId}", trackingId);
             return StatusCode(500, new { success = false, message = "Error al obtener el seguimiento", error = e.Message });
         }
     }
 
-    // POST /api/project-trackings/{projectId}
-    // Crea el tracking de fechas base (solo si no existe)
-    [HttpPost("{projectId}")]
+    // PUT /api/project-trackings/{trackingId}
+    // Actualiza las fechas base (Bloque 1) — creación vía ProjectIntake o sync Clockify
+    [HttpPut("{trackingId}")]
     [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> Create(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
-    {
-        try
-        {
-            if (dto.StartDate is null)
-                return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
-            if (dto.PlannedEndDate is null)
-                return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
-
-            var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
-            if (!projectExists)
-                return NotFound(new { success = false, message = "Proyecto no encontrado" });
-
-            var alreadyExists = await _db.ProjectTrackings.AnyAsync(t => t.ProjectId == projectId);
-            if (alreadyExists)
-                return UnprocessableEntity(new { success = false, message = "El proyecto ya tiene un seguimiento registrado. Usá PUT para actualizar." });
-
-            var tracking = new ProjectTracking
-            {
-                ProjectId = projectId,
-                StartDate = dto.StartDate,
-                PlannedEndDate = dto.PlannedEndDate,
-                ActualEndDate = dto.ActualEndDate,
-                ImplementationDate = dto.ImplementationDate,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _db.ProjectTrackings.Add(tracking);
-            await _db.SaveChangesAsync();
-
-            return StatusCode(201, new { success = true, message = "Seguimiento creado exitosamente", data = MapToDto(tracking) });
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error al crear tracking del proyecto {ProjectId}", projectId);
-            return StatusCode(500, new { success = false, message = "Error al crear el seguimiento", error = e.Message });
-        }
-    }
-
-    // PUT /api/project-trackings/{projectId}
-    // Actualiza las fechas base (Bloque 1)
-    [HttpPut("{projectId}")]
-    [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> Update(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
+    public async Task<IActionResult> Update(ulong trackingId, [FromBody] UpsertProjectTrackingDto dto)
     {
         try
         {
             var tracking = await _db.ProjectTrackings
                 .Include(t => t.Updates.OrderByDescending(u => u.CreatedAt))
-                .FirstOrDefaultAsync(t => t.ProjectId == projectId);
+                .FirstOrDefaultAsync(t => t.Id == trackingId);
 
             if (tracking == null)
-                return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado. Usá POST para crear." });
+                return NotFound(new { success = false, message = "Seguimiento no encontrado" });
 
-            if (dto.StartDate is null)
-                return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
-            if (dto.PlannedEndDate is null)
-                return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
-
-            tracking.StartDate = dto.StartDate;
-            tracking.PlannedEndDate = dto.PlannedEndDate;
-            tracking.ActualEndDate = dto.ActualEndDate;
-            tracking.ImplementationDate = dto.ImplementationDate;
+            if (dto.StartDate.HasValue)          tracking.StartDate          = dto.StartDate;
+            if (dto.PlannedEndDate.HasValue)     tracking.PlannedEndDate     = dto.PlannedEndDate;
+            if (dto.ActualEndDate.HasValue)      tracking.ActualEndDate      = dto.ActualEndDate;
+            if (dto.ImplementationDate.HasValue) tracking.ImplementationDate = dto.ImplementationDate;
             tracking.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
@@ -126,34 +70,32 @@ public class ProjectTrackingsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al actualizar tracking del proyecto {ProjectId}", projectId);
+            _logger.LogError(e, "Error al actualizar tracking {TrackingId}", trackingId);
             return StatusCode(500, new { success = false, message = "Error al actualizar el seguimiento", error = e.Message });
         }
     }
 
-    // POST /api/project-trackings/{projectId}/updates
+    // POST /api/project-trackings/{trackingId}/updates
     // Agrega un registro al historial de desvíos (Bloque 2)
-    [HttpPost("{projectId}/updates")]
+    [HttpPost("{trackingId}/updates")]
     [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> AddUpdate(ulong projectId, [FromBody] CreateTrackingUpdateDto dto)
+    public async Task<IActionResult> AddUpdate(ulong trackingId, [FromBody] CreateTrackingUpdateDto dto)
     {
         try
         {
-            if (dto.ChangeEndDate is null)
-                return UnprocessableEntity(new { success = false, message = "change_end_date es obligatorio" });
+            if (dto.MilestoneDate == default)
+                return UnprocessableEntity(new { success = false, message = "milestone_date es obligatorio" });
             if (string.IsNullOrWhiteSpace(dto.Observations))
                 return UnprocessableEntity(new { success = false, message = "Las observaciones son obligatorias" });
 
-            var tracking = await _db.ProjectTrackings
-                .FirstOrDefaultAsync(t => t.ProjectId == projectId);
-
-            if (tracking == null)
-                return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado. Creá primero las fechas base." });
+            var trackingExists = await _db.ProjectTrackings.AnyAsync(t => t.Id == trackingId);
+            if (!trackingExists)
+                return NotFound(new { success = false, message = "Seguimiento no encontrado" });
 
             var update = new ProjectTrackingUpdate
             {
-                ProjectTrackingId = tracking.Id,
-                ChangeEndDate = dto.ChangeEndDate,
+                ProjectTrackingId = trackingId,
+                MilestoneDate = dto.MilestoneDate,
                 Observations = dto.Observations,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -166,32 +108,26 @@ public class ProjectTrackingsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al agregar update al tracking del proyecto {ProjectId}", projectId);
+            _logger.LogError(e, "Error al agregar update al tracking {TrackingId}", trackingId);
             return StatusCode(500, new { success = false, message = "Error al agregar al historial", error = e.Message });
         }
     }
 
-    // PUT /api/project-trackings/{projectId}/updates/{updateId}
+    // PUT /api/project-trackings/{trackingId}/updates/{updateId}
     // Edita un registro del historial
-    [HttpPut("{projectId}/updates/{updateId}")]
+    [HttpPut("{trackingId}/updates/{updateId}")]
     [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> EditUpdate(ulong projectId, ulong updateId, [FromBody] UpdateTrackingUpdateDto dto)
+    public async Task<IActionResult> EditUpdate(ulong trackingId, ulong updateId, [FromBody] UpdateTrackingUpdateDto dto)
     {
         try
         {
-            var tracking = await _db.ProjectTrackings
-                .FirstOrDefaultAsync(t => t.ProjectId == projectId);
-
-            if (tracking == null)
-                return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado" });
-
             var update = await _db.ProjectTrackingUpdates
-                .FirstOrDefaultAsync(u => u.Id == updateId && u.ProjectTrackingId == tracking.Id);
+                .FirstOrDefaultAsync(u => u.Id == updateId && u.ProjectTrackingId == trackingId);
 
             if (update == null)
                 return NotFound(new { success = false, message = "Registro del historial no encontrado" });
 
-            if (dto.ChangeEndDate.HasValue) update.ChangeEndDate = dto.ChangeEndDate;
+            if (dto.MilestoneDate.HasValue) update.MilestoneDate = dto.MilestoneDate;
             if (dto.Observations != null) update.Observations = dto.Observations;
             update.UpdatedAt = DateTime.UtcNow;
 
@@ -201,27 +137,21 @@ public class ProjectTrackingsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al editar update {UpdateId} del proyecto {ProjectId}", updateId, projectId);
+            _logger.LogError(e, "Error al editar update {UpdateId} del tracking {TrackingId}", updateId, trackingId);
             return StatusCode(500, new { success = false, message = "Error al editar el registro", error = e.Message });
         }
     }
 
-    // DELETE /api/project-trackings/{projectId}/updates/{updateId}
-    // Elimina un registro del historial (eliminación física — el historial es auditoría)
-    [HttpDelete("{projectId}/updates/{updateId}")]
+    // DELETE /api/project-trackings/{trackingId}/updates/{updateId}
+    // Eliminación física — el historial es auditoría
+    [HttpDelete("{trackingId}/updates/{updateId}")]
     [RequirePermission("PROJECTS_ACCESS")]
-    public async Task<IActionResult> DeleteUpdate(ulong projectId, ulong updateId)
+    public async Task<IActionResult> DeleteUpdate(ulong trackingId, ulong updateId)
     {
         try
         {
-            var tracking = await _db.ProjectTrackings
-                .FirstOrDefaultAsync(t => t.ProjectId == projectId);
-
-            if (tracking == null)
-                return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado" });
-
             var update = await _db.ProjectTrackingUpdates
-                .FirstOrDefaultAsync(u => u.Id == updateId && u.ProjectTrackingId == tracking.Id);
+                .FirstOrDefaultAsync(u => u.Id == updateId && u.ProjectTrackingId == trackingId);
 
             if (update == null)
                 return NotFound(new { success = false, message = "Registro del historial no encontrado" });
@@ -233,7 +163,7 @@ public class ProjectTrackingsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al eliminar update {UpdateId} del proyecto {ProjectId}", updateId, projectId);
+            _logger.LogError(e, "Error al eliminar update {UpdateId} del tracking {TrackingId}", updateId, trackingId);
             return StatusCode(500, new { success = false, message = "Error al eliminar el registro", error = e.Message });
         }
     }
@@ -241,7 +171,6 @@ public class ProjectTrackingsController : ControllerBase
     private static ProjectTrackingDto MapToDto(ProjectTracking t) => new()
     {
         Id = t.Id,
-        ProjectId = t.ProjectId,
         StartDate = t.StartDate,
         PlannedEndDate = t.PlannedEndDate,
         ActualEndDate = t.ActualEndDate,
@@ -255,7 +184,7 @@ public class ProjectTrackingsController : ControllerBase
     {
         Id = u.Id,
         ProjectTrackingId = u.ProjectTrackingId,
-        ChangeEndDate = u.ChangeEndDate,
+        MilestoneDate = u.MilestoneDate,
         Observations = u.Observations,
         CreatedAt = u.CreatedAt,
         UpdatedAt = u.UpdatedAt

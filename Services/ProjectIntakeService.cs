@@ -42,9 +42,6 @@ public class ProjectIntakeService
     {
         var errors = new List<string>();
 
-        if (typeRef.RequiresBusinessStatusDate && dto.BusinessStatusDate == null)
-            errors.Add($"business_status_date es obligatorio para el tipo '{typeRef.Label}'");
-
         if (typeRef.RequiresActualEndDate && dto.ActualEndDate == null)
             errors.Add($"actual_end_date es obligatorio para el tipo '{typeRef.Label}'");
 
@@ -56,7 +53,7 @@ public class ProjectIntakeService
 
     // Crea el proyecto en Clockify y lo registra en timesheet_projects
     // Retorna el id interno (bigint) del registro creado en timesheet_projects
-    public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(string projectName, ulong? clientId)
+    public async Task<(ulong clockifyRecordId, string clockifyExternalId, string message)> CreateInClockifyAsync(string projectName, ulong? clientId, ulong? projectTrackingId = null)
     {
         string? clientExternalId = null;
 
@@ -100,6 +97,8 @@ public class ProjectIntakeService
             Name = projectDisplayName,
 
             Status = "activo",
+
+            ProjectTrackingId = projectTrackingId,
 
             CreatedAt = DateTime.UtcNow,
 

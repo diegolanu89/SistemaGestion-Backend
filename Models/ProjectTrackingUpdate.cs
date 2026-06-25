@@ -9,8 +9,8 @@ public class ProjectTrackingUpdate
     public ulong Id { get; set; }
     [Column("project_tracking_id")]
     public ulong ProjectTrackingId { get; set; }
-    [Column("change_end_date")]
-    public DateOnly? ChangeEndDate { get; set; }
+    [Column("milestone_date")]
+    public DateOnly? MilestoneDate { get; set; }
     [Column("observations")]
     public string? Observations { get; set; }
     [Column("created_at")]

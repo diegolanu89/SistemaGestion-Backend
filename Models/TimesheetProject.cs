@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bdt_evm_app.Models;
 
@@ -17,12 +17,6 @@ public class TimesheetProject
     public ulong? ClientId { get; set; }
     [Column("status")]
     public string Status { get; set; } = "activo";
-    [Column("start_date")]
-    public DateOnly? StartDate { get; set; }
-    [Column("end_date_planned")]
-    public DateOnly? EndDatePlanned { get; set; }
-    [Column("end_date_actual")]
-    public DateOnly? EndDateActual { get; set; }
     [Column("bac_base_hours")]
     public decimal BacBaseHours { get; set; }
     [Column("bac_base_cost")]
@@ -35,11 +29,14 @@ public class TimesheetProject
     public decimal HourlyRate { get; set; }
     [Column("etc_calculation_mode")]
     public string EtcCalculationMode { get; set; } = "manual";
+    [Column("project_tracking_id")]
+    public ulong? ProjectTrackingId { get; set; }
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
     public TimesheetClient? Client { get; set; }
     public TimesheetProjectFilter? Filter { get; set; }
+    public ProjectTracking? ProjectTracking { get; set; }
     public List<ChangeRequest> ChangeRequests { get; set; } = new();
 }

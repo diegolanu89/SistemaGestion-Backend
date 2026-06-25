@@ -130,11 +130,17 @@ public class AppDbContext : DbContext
             .HasForeignKey(r => r.LeaderTimesheetUserId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        modelBuilder.Entity<ProjectTracking>()
-            .HasOne(t => t.Project)
+        modelBuilder.Entity<TimesheetProject>()
+            .HasOne(p => p.ProjectTracking)
             .WithMany()
-            .HasForeignKey(t => t.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(p => p.ProjectTrackingId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<ProjectIntakeRecord>()
+            .HasOne(r => r.ProjectTracking)
+            .WithMany()
+            .HasForeignKey(r => r.ProjectTrackingId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ProjectTrackingUpdate>()
             .HasOne(u => u.ProjectTracking)
