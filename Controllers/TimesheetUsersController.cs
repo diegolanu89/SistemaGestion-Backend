@@ -9,7 +9,6 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/timesheet-users")]
-[RequirePermission("ADMIN_ACCESS")]
 public class TimesheetUsersController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -22,6 +21,7 @@ public class TimesheetUsersController : ControllerBase
     }
 
     // GET api/timesheet-users
+    [RequirePermission("SETTINGS_ACCESS", "ETC_ACCESS", "ESTIMATED_PROJECTS_ACCESS", "REPORTS_ACCESS")]
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? search,
@@ -70,6 +70,7 @@ public class TimesheetUsersController : ControllerBase
     }
 
     // POST api/timesheet-users
+    [RequirePermission("SETTINGS_ACCESS")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTimesheetUserDto dto)
     {
@@ -103,6 +104,7 @@ public class TimesheetUsersController : ControllerBase
     }
 
     // PUT api/timesheet-users/{id}
+    [RequirePermission("SETTINGS_ACCESS")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(ulong id, [FromBody] UpdateTimesheetUserDto dto)
     {
@@ -140,6 +142,7 @@ public class TimesheetUsersController : ControllerBase
     }
 
     // DELETE api/timesheet-users/{id}
+    [RequirePermission("SETTINGS_ACCESS")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(ulong id)
     {
@@ -164,6 +167,7 @@ public class TimesheetUsersController : ControllerBase
     // GET api/timesheet-users/options
     // Devuelve lista plana sin paginar, pensada para poblar dropdowns/selects.
     // Por defecto trae solo activos; pasar ?active=false para incluir también inactivos.
+    [RequirePermission("SETTINGS_ACCESS", "ETC_ACCESS", "ESTIMATED_PROJECTS_ACCESS", "REPORTS_ACCESS")]
     [HttpGet("options")]
     public async Task<IActionResult> GetOptions([FromQuery] bool active = true)
     {

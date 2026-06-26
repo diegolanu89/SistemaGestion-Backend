@@ -53,7 +53,7 @@ public class ProjectTrackingsController : ControllerBase
     // POST /api/project-trackings/{projectId}
     // Crea el tracking de fechas base (solo si no existe)
     [HttpPost("{projectId}")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> Create(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
     {
         try
@@ -97,7 +97,7 @@ public class ProjectTrackingsController : ControllerBase
     // PUT /api/project-trackings/{projectId}
     // Actualiza las fechas base (Bloque 1)
     [HttpPut("{projectId}")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> Update(ulong projectId, [FromBody] UpsertProjectTrackingDto dto)
     {
         try
@@ -134,7 +134,7 @@ public class ProjectTrackingsController : ControllerBase
     // POST /api/project-trackings/{projectId}/updates
     // Agrega un registro al historial de desvíos (Bloque 2)
     [HttpPost("{projectId}/updates")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> AddUpdate(ulong projectId, [FromBody] CreateTrackingUpdateDto dto)
     {
         try
@@ -174,7 +174,7 @@ public class ProjectTrackingsController : ControllerBase
     // PUT /api/project-trackings/{projectId}/updates/{updateId}
     // Edita un registro del historial
     [HttpPut("{projectId}/updates/{updateId}")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> EditUpdate(ulong projectId, ulong updateId, [FromBody] UpdateTrackingUpdateDto dto)
     {
         try
@@ -209,7 +209,7 @@ public class ProjectTrackingsController : ControllerBase
     // DELETE /api/project-trackings/{projectId}/updates/{updateId}
     // Elimina un registro del historial (eliminación física — el historial es auditoría)
     [HttpDelete("{projectId}/updates/{updateId}")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> DeleteUpdate(ulong projectId, ulong updateId)
     {
         try

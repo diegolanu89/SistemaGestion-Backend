@@ -8,7 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/projects")]
-[RequirePermission("DASHBOARD_EVM_ACCESS")]
+[RequirePermission("DASHBOARD_EVM_ACCESS", "REPORTS_ACCESS")]
 public class MetricsController : ControllerBase
 {
     private readonly AppDbContext _db;

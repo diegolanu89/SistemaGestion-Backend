@@ -561,7 +561,7 @@ public class EtcController : ControllerBase
 
     // GET api/etc/export-capacities
     [HttpGet("api/etc/export-capacities")]
-    [RequirePermission("ETC_ACCESS")]
+    [RequirePermission("ETC_ACCESS", "REPORTS_ACCESS")]
     public async Task<IActionResult> ExportCapacities()
     {
         var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");

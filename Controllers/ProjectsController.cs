@@ -152,7 +152,7 @@ public class ProjectsController : ControllerBase
 
     // PATCH api/projects/{id}/bac
     [HttpPatch("{id}/bac")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> UpdateBac(ulong id, [FromBody] UpdateBacDto dto)
     {
         var project = await _db.TimesheetProjects.FindAsync(id);
@@ -182,7 +182,7 @@ public class ProjectsController : ControllerBase
 
     // POST api/projects/{id}/recalculate-hours
     [HttpPost("{id}/recalculate-hours")]
-    [RequirePermission("PROJECTS_CREATE")]
+    [RequirePermission("PROJECTS_ACCESS")]
     public async Task<IActionResult> RecalculateHours(ulong id)
     {
         var project = await _db.TimesheetProjects.FindAsync(id);

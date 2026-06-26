@@ -9,7 +9,6 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/timesheet")]
-[RequirePermission("ADMIN_ACCESS")]
 public class TimesheetSyncController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -30,6 +29,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-clients
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpPost("sync-clients")]
     public async Task<IActionResult> SyncClients()
     {
@@ -46,6 +46,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/sync-clients
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("sync-clients")]
     public async Task<IActionResult> GetClients()
     {
@@ -61,6 +62,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-users
+    [RequirePermission("PROJECTS_ACCESS", "SETTINGS_ACCESS")]
     [HttpPost("sync-users")]
     public async Task<IActionResult> SyncUsers([FromQuery] bool only_active = false)
     {
@@ -77,6 +79,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/sync-users
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("sync-users")]
     public async Task<IActionResult> GetUsers([FromQuery] bool only_active = false)
     {
@@ -92,6 +95,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-time-entries
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpPost("sync-time-entries")]
     public async Task<IActionResult> SyncTimeEntries([FromQuery] string? from, [FromQuery] string? to)
     {
@@ -115,6 +119,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-time-entries-all
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpPost("sync-time-entries-all")]
     public async Task<IActionResult> SyncTimeEntriesAll([FromQuery] string? from, [FromQuery] string? to)
     {
@@ -134,6 +139,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-time-entries-by-project
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpPost("sync-time-entries-by-project")]
     public async Task<IActionResult> SyncTimeEntriesByProject([FromQuery] string project_id, [FromQuery] string? from, [FromQuery] string? to)
     {
@@ -156,6 +162,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/sync-projects
+    [RequirePermission("PROJECTS_ACCESS", "SETTINGS_ACCESS")]
     [HttpPost("sync-projects")]
     public async Task<IActionResult> SyncProjects()
     {
@@ -172,6 +179,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/sync-time-entries
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("sync-time-entries")]
     public async Task<IActionResult> GetTimeEntries(
         [FromQuery] string? from,
@@ -198,6 +206,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/sync-time-entries-all
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("sync-time-entries-all")]
     public async Task<IActionResult> GetTimeEntriesAll(
         [FromQuery] string? from,
@@ -246,6 +255,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/sync-time-entries-by-project
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("sync-time-entries-by-project")]
     public async Task<IActionResult> GetTimeEntriesByProject(
         [FromQuery] string project_id,
@@ -280,6 +290,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/estimate-time-entries
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("estimate-time-entries")]
     public async Task<IActionResult> EstimateTimeEntries(
         [FromQuery] string? from,
@@ -313,6 +324,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/projects/{id}/sync-status
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("projects/{id}/sync-status")]
     public async Task<IActionResult> GetSyncStatus(ulong id)
     {
@@ -352,6 +364,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // POST api/timesheet/projects/{id}/sync-time-entries
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpPost("projects/{id}/sync-time-entries")]
     public async Task<IActionResult> SyncProjectTimeEntries(
         ulong id,
@@ -396,6 +409,7 @@ public class TimesheetSyncController : ControllerBase
     }
 
     // GET api/timesheet/projects/{id}/hours-summary
+    [RequirePermission("PROJECTS_ACCESS")]
     [HttpGet("projects/{id}/hours-summary")]
     public async Task<IActionResult> GetProjectHoursSummary(ulong id)
     {

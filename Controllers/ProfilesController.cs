@@ -9,7 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/profiles")]
-[RequirePermission("ADMIN_ACCESS")]
+[RequirePermission("SETTINGS_ACCESS")]
 public class ProfilesController : ControllerBase
 {
     private readonly AppDbContext _db;
