@@ -9,6 +9,7 @@ public class ProjectTrackingSummaryDto
     public DateOnly? PlannedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public DateOnly? ImplementationDate { get; set; }
+    public int UpdatesCount { get; set; }
 }
 
 // ── Historial de desvíos ────────────────────────────────────────────────────

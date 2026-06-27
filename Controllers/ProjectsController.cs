@@ -46,6 +46,7 @@ public class ProjectsController : ControllerBase
                 .Include(p => p.Client)
                 .Include(p => p.Filter)
                 .Include(p => p.ProjectTracking)
+                    .ThenInclude(t => t.Updates)
                 .AsQueryable();
 
             if (onlyVisible)
@@ -250,7 +251,8 @@ public class ProjectsController : ControllerBase
             StartDate          = p.ProjectTracking.StartDate,
             PlannedEndDate     = p.ProjectTracking.PlannedEndDate,
             ActualEndDate      = p.ProjectTracking.ActualEndDate,
-            ImplementationDate = p.ProjectTracking.ImplementationDate
+            ImplementationDate = p.ProjectTracking.ImplementationDate,
+            UpdatesCount       = p.ProjectTracking.Updates.Count
         },
         CreatedAt = p.CreatedAt,
         UpdatedAt = p.UpdatedAt,
