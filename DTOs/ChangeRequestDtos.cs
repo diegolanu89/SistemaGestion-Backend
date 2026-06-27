@@ -24,7 +24,7 @@ public class CreateChangeRequestDto
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? RequestedBy { get; set; }
-    public DateOnly RequestedDate { get; set; }
+    public DateOnly? RequestedDate { get; set; }
     public string Status { get; set; } = "propuesto";
     public decimal? BacHoursIncrement { get; set; }
     public decimal? BacCostIncrement { get; set; }
@@ -34,8 +34,11 @@ public class CreateChangeRequestDto
 
 public class UpdateChangeRequestDto
 {
+    public string? Code { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
+    public string? RequestedBy { get; set; }
+    public DateOnly? RequestedDate { get; set; }
     public string? Status { get; set; }
     public decimal? BacHoursIncrement { get; set; }
     public decimal? BacCostIncrement { get; set; }

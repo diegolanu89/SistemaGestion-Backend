@@ -58,9 +58,9 @@ public class ProjectTrackingsController : ControllerBase
     {
         try
         {
-            if (dto.StartDate == default)
+            if (dto.StartDate is null)
                 return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
-            if (dto.PlannedEndDate == default)
+            if (dto.PlannedEndDate is null)
                 return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
 
             var projectExists = await _db.TimesheetProjects.AnyAsync(p => p.Id == projectId);
@@ -109,9 +109,9 @@ public class ProjectTrackingsController : ControllerBase
             if (tracking == null)
                 return NotFound(new { success = false, message = "El proyecto no tiene seguimiento registrado. Usá POST para crear." });
 
-            if (dto.StartDate == default)
+            if (dto.StartDate is null)
                 return UnprocessableEntity(new { success = false, message = "start_date es obligatorio" });
-            if (dto.PlannedEndDate == default)
+            if (dto.PlannedEndDate is null)
                 return UnprocessableEntity(new { success = false, message = "planned_end_date es obligatorio" });
 
             tracking.StartDate = dto.StartDate;
@@ -139,7 +139,7 @@ public class ProjectTrackingsController : ControllerBase
     {
         try
         {
-            if (dto.ChangeEndDate == default)
+            if (dto.ChangeEndDate is null)
                 return UnprocessableEntity(new { success = false, message = "change_end_date es obligatorio" });
             if (string.IsNullOrWhiteSpace(dto.Observations))
                 return UnprocessableEntity(new { success = false, message = "Las observaciones son obligatorias" });

@@ -1,3 +1,4 @@
+using bdt_evm_app.Converters;
 using bdt_evm_app.Data;
 using bdt_evm_app.Middleware;
 using bdt_evm_app.Services;
@@ -20,7 +21,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        // "" / espacios => null para fechas opcionales (ver NullableDateOnlyJsonConverter).
+        options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuditSaveChangesInterceptor>();
 builder.Services.AddEndpointsApiExplorer();
