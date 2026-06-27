@@ -8,7 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/permissions")]
-[RequirePermission("ADMIN_ACCESS")]
+[RequirePermission("SETTINGS_ACCESS")]
 public class PermissionsController : ControllerBase
 {
     private readonly AppDbContext _db;

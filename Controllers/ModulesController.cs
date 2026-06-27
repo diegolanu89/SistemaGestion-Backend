@@ -8,7 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/app/modules")]
-[RequirePermission("ADMIN_ACCESS")]
+[RequirePermission("SETTINGS_ACCESS")]
 public class ModulesController : ControllerBase
 {
     private readonly AppDbContext _db;

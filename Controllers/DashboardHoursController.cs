@@ -8,7 +8,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/dashboard-hours")]
-[RequirePermission("DASHBOARD_HOURS_ACCESS")]
+[RequirePermission("DASHBOARD_HOURS_ACCESS", "REPORTS_ACCESS")]
 public class DashboardHoursController : ControllerBase
 {
     private readonly AppDbContext _db;

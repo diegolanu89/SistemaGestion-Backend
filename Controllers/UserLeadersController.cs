@@ -9,7 +9,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/user-leaders")]
-[RequirePermission("ADMIN_ACCESS")]
+[RequirePermission("SETTINGS_ACCESS")]
 public class UserLeadersController : ControllerBase
 {
     private readonly AppDbContext _db;

@@ -10,7 +10,7 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/timesheet-users/{userId}/capacities")]
-[RequirePermission("SETTINGS_ACCESS")]
+[RequirePermission("SETTINGS_ACCESS", "DASHBOARD_HOURS_ACCESS", "REPORTS_ACCESS")]
 public class UserMonthlyCapacityController : ControllerBase
 {
     private readonly AppDbContext _db;

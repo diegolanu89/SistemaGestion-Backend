@@ -8,11 +8,11 @@ namespace bdt_evm_app.Attributes;
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 public class RequirePermissionAttribute : Attribute, IAsyncAuthorizationFilter
 {
-    private readonly string _permissionCode;
+    private readonly string[] _permissionCodes;
 
-    public RequirePermissionAttribute(string permissionCode)
+    public RequirePermissionAttribute(params string[] permissionCodes)
     {
-        _permissionCode = permissionCode;
+        _permissionCodes = permissionCodes;
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -44,11 +44,12 @@ public class RequirePermissionAttribute : Attribute, IAsyncAuthorizationFilter
         var allowed = await db.ProfilePermissions
             .AnyAsync(pp =>
                 pp.ProfileId == profileId.Value &&
-                pp.Permission!.Code == _permissionCode);
+                _permissionCodes.Contains(pp.Permission!.Code));
 
         if (!allowed)
         {
-            context.Result = new ObjectResult(new { message = $"Permiso requerido: {_permissionCode}" })
+            var required = string.Join(" | ", _permissionCodes);
+            context.Result = new ObjectResult(new { message = $"Permiso requerido: {required}" })
             {
                 StatusCode = 403
             };

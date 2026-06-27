@@ -10,7 +10,6 @@ namespace bdt_evm_app.Controllers;
 
 [ApiController]
 [Route("api/potencial-projects")]
-[RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
 public class PotencialProjectsController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -23,6 +22,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // GET api/potencial-projects
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -35,6 +35,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // GET api/potencial-projects/{id}
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(ulong id)
     {
@@ -49,6 +50,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // POST api/potencial-projects
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PotencialProjectRequestDto dto)
     {
@@ -76,6 +78,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // PUT api/potencial-projects/{id}
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(ulong id, [FromBody] PotencialProjectRequestDto dto)
     {
@@ -102,6 +105,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // DELETE api/potencial-projects/{id}
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(ulong id)
     {
@@ -116,6 +120,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // GET api/potencial-projects/{id}/allocations
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpGet("{id}/allocations")]
     public async Task<IActionResult> GetAllocations(ulong id)
     {
@@ -134,6 +139,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // POST api/potencial-projects/{id}/allocations
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpPost("{id}/allocations")]
     public async Task<IActionResult> StoreAllocations(ulong id, [FromBody] StoreAllocationsDto dto)
     {
@@ -187,6 +193,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // POST api/potencial-projects/capacity-limits
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS", "REPORTS_ACCESS")]
     [HttpPost("capacity-limits")]
     public async Task<IActionResult> GetCapacityLimits([FromBody] CapacityLimitsRequestDto dto)
     {
@@ -225,6 +232,7 @@ public class PotencialProjectsController : ControllerBase
     }
 
     // POST api/potencial-projects/validate-capacity
+    [RequirePermission("ESTIMATED_PROJECTS_ACCESS")]
     [HttpPost("validate-capacity")]
     public async Task<IActionResult> ValidateCapacity([FromBody] ValidateCapacityRequestDto dto)
     {
