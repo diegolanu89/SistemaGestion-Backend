@@ -59,6 +59,9 @@ public class ChangeRequestsController : ControllerBase
         if (string.IsNullOrWhiteSpace(dto.Title))
             return UnprocessableEntity(new { message = "El título es requerido" });
 
+        if (dto.RequestedDate is null)
+            return UnprocessableEntity(new { message = "La fecha de solicitud es requerida" });
+
         var validStatuses = new[] { "propuesto", "aprobado", "rechazado", "implementado" };
         if (!validStatuses.Contains(dto.Status))
             return UnprocessableEntity(new { message = "Estado inválido" });
@@ -68,19 +71,24 @@ public class ChangeRequestsController : ControllerBase
         if (codeExists)
             return UnprocessableEntity(new { message = $"Ya existe un control de cambio con el código '{dto.Code}' en este proyecto" });
 
+        // Solicitante y aprobador se estampan desde el usuario. aprobación es un 2do paso, así
+        // que solo se persiste en aprobado/implementado
+        var currentUserName = await ResolveCurrentUserNameAsync();
+        var isApproved = IsApprovedStatus(dto.Status);
+
         var cr = new ChangeRequest
         {
             ProjectId = projectId,
             Code = dto.Code,
             Title = dto.Title,
             Description = dto.Description,
-            RequestedBy = dto.RequestedBy,
-            RequestedDate = dto.RequestedDate,
+            RequestedBy = currentUserName,
+            RequestedDate = dto.RequestedDate.Value,
             Status = dto.Status,
             BacHoursIncrement = dto.BacHoursIncrement ?? 0,
             BacCostIncrement = dto.BacCostIncrement ?? 0,
-            ApprovedBy = dto.ApprovedBy,
-            ApprovedDate = dto.ApprovedDate,
+            ApprovedBy = isApproved ? currentUserName : null,
+            ApprovedDate = isApproved ? (dto.ApprovedDate ?? DateOnly.FromDateTime(DateTime.UtcNow.Date)) : null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -121,13 +129,46 @@ public class ChangeRequestsController : ControllerBase
 
         var previousHours = cr.BacHoursIncrement;
 
+        // Código editable: si cambia, validar que no quede vacío ni duplicado en el proyecto.
+        if (dto.Code != null && dto.Code != cr.Code)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Code))
+                return UnprocessableEntity(new { message = "El código es requerido" });
+
+            var codeExists = await _db.ChangeRequests
+                .AnyAsync(c => c.ProjectId == cr.ProjectId && c.Code == dto.Code && c.Id != cr.Id);
+            if (codeExists)
+                return UnprocessableEntity(new { message = $"Ya existe un control de cambio con el código '{dto.Code}' en este proyecto" });
+
+            cr.Code = dto.Code;
+        }
+
         if (dto.Title != null) cr.Title = dto.Title;
         if (dto.Description != null) cr.Description = dto.Description;
+        // El solicitante queda fijo desde el alta: no se reasigna al editar.
+        if (dto.RequestedDate.HasValue) cr.RequestedDate = dto.RequestedDate.Value;
         if (dto.Status != null) cr.Status = dto.Status;
         if (dto.BacHoursIncrement.HasValue) cr.BacHoursIncrement = dto.BacHoursIncrement.Value;
         if (dto.BacCostIncrement.HasValue) cr.BacCostIncrement = dto.BacCostIncrement.Value;
-        if (dto.ApprovedBy != null) cr.ApprovedBy = dto.ApprovedBy;
         if (dto.ApprovedDate.HasValue) cr.ApprovedDate = dto.ApprovedDate;
+
+        // Aprobación: fuera de aprobado/implementado no hay datos de aprobación.
+        // Al entrar en esos estados se estampa el aprobador y
+        // la fecha (hoy si no se cargó) la PRIMERA vez; no se sobreescriben después.
+        if (!IsApprovedStatus(cr.Status))
+        {
+            cr.ApprovedBy = null;
+            cr.ApprovedDate = null;
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(cr.ApprovedBy))
+                cr.ApprovedBy = await ResolveCurrentUserNameAsync();
+
+            if (cr.ApprovedDate is null)
+                cr.ApprovedDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+        }
+
         cr.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -252,6 +293,24 @@ public class ChangeRequestsController : ControllerBase
         ulong? userId = HttpContext.Items.TryGetValue("UserId", out var raw) && raw is ulong u ? u : null;
         var email = HttpContext.Items.TryGetValue("UserEmail", out var er) ? er as string : null;
         return (userId, email);
+    }
+
+    // La aprobación solo aplica en estos estados.
+    private static bool IsApprovedStatus(string status) => status is "aprobado" or "implementado";
+
+    // Nombre para mostrar del usuario autenticado (lo setea SanctumAuthMiddleware
+    // en HttpContext.Items). Se usa para estampar solicitante/aprobador en vez de
+    // aceptar texto libre. Fallback al email si no se puede resolver el nombre.
+    private async Task<string?> ResolveCurrentUserNameAsync()
+    {
+        if (HttpContext.Items.TryGetValue("UserId", out var raw) && raw is ulong uid)
+        {
+            var user = await _db.Users.FindAsync(uid);
+            if (user != null && !string.IsNullOrWhiteSpace(user.Name))
+                return user.Name;
+        }
+
+        return HttpContext.Items.TryGetValue("UserEmail", out var er) ? er as string : null;
     }
 
     private static ChangeRequestDto MapToDto(ChangeRequest cr) => new()

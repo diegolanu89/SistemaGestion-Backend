@@ -14,7 +14,7 @@ public class ProjectTrackingUpdateDto
 
 public class CreateTrackingUpdateDto
 {
-    public DateOnly ChangeEndDate { get; set; }
+    public DateOnly? ChangeEndDate { get; set; }
     public string Observations { get; set; } = string.Empty;
 }
 
@@ -41,8 +41,8 @@ public class ProjectTrackingDto
 
 public class UpsertProjectTrackingDto
 {
-    public DateOnly StartDate { get; set; }
-    public DateOnly PlannedEndDate { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? PlannedEndDate { get; set; }
     public DateOnly? ActualEndDate { get; set; }
     public DateOnly? ImplementationDate { get; set; }
 }
