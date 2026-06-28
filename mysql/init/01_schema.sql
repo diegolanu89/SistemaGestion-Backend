@@ -488,6 +488,7 @@ CREATE TABLE `user_dashboard_filters` (
   `leader_id`  VARCHAR(50)     DEFAULT NULL,
   `month_keys` JSON            DEFAULT NULL,
   `project_id` VARCHAR(50)     DEFAULT NULL,
+  `source_type` VARCHAR(20)     DEFAULT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
