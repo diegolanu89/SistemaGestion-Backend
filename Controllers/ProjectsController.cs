@@ -45,6 +45,8 @@ public class ProjectsController : ControllerBase
             var query = _db.TimesheetProjects
                 .Include(p => p.Client)
                 .Include(p => p.Filter)
+                .Include(p => p.ProjectTracking)
+                    .ThenInclude(t => t.Updates)
                 .AsQueryable();
 
             if (onlyVisible)
@@ -138,6 +140,7 @@ public class ProjectsController : ControllerBase
         var project = await _db.TimesheetProjects
             .Include(p => p.Client)
             .Include(p => p.Filter)
+            .Include(p => p.ProjectTracking)
             .Include(p => p.ChangeRequests)
             .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -234,9 +237,6 @@ public class ProjectsController : ControllerBase
         ClientId = p.ClientId,
         ClientName = p.Client?.Name,
         Status = p.Status,
-        StartDate = p.StartDate,
-        EndDatePlanned = p.EndDatePlanned,
-        EndDateActual = p.EndDateActual,
         BacBaseHours = p.BacBaseHours,
         BacBaseCost = p.BacBaseCost,
         BacTotalHours = p.BacTotalHours,
@@ -244,6 +244,16 @@ public class ProjectsController : ControllerBase
         HourlyRate = p.HourlyRate,
         EtcCalculationMode = p.EtcCalculationMode,
         EtcTotalHours = etcTotalHours,
+        ProjectTrackingId = p.ProjectTrackingId,
+        Tracking = p.ProjectTracking == null ? null : new ProjectTrackingSummaryDto
+        {
+            Id                 = p.ProjectTracking.Id,
+            StartDate          = p.ProjectTracking.StartDate,
+            PlannedEndDate     = p.ProjectTracking.PlannedEndDate,
+            ActualEndDate      = p.ProjectTracking.ActualEndDate,
+            ImplementationDate = p.ProjectTracking.ImplementationDate,
+            UpdatesCount       = p.ProjectTracking.Updates.Count
+        },
         CreatedAt = p.CreatedAt,
         UpdatedAt = p.UpdatedAt,
         Filter = p.Filter != null ? new { p.Filter.Id, p.Filter.ProjectId } : null

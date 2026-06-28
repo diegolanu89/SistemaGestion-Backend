@@ -155,6 +155,19 @@ CREATE TABLE `timesheet_clients` (
   UNIQUE KEY `uq_clients_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- project_trackings va antes de timesheet_projects porque ambos referencian su FK
+
+CREATE TABLE `project_trackings` (
+  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `start_date`          DATE            DEFAULT NULL,
+  `planned_end_date`    DATE            DEFAULT NULL,
+  `actual_end_date`     DATE            DEFAULT NULL,
+  `implementation_date` DATE            DEFAULT NULL,
+  `created_at`          TIMESTAMP       NULL DEFAULT NULL,
+  `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `timesheet_users` (
   `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `timesheet_user_id`   VARCHAR(64)     DEFAULT NULL,
@@ -177,24 +190,26 @@ CREATE TABLE `timesheet_projects` (
   `code`                 VARCHAR(100)    DEFAULT NULL,
   `client_id`            BIGINT UNSIGNED DEFAULT NULL,
   `status`               ENUM('activo','pausado','cerrado') NOT NULL DEFAULT 'activo',
-  `start_date`           DATE            DEFAULT NULL,
-  `end_date_planned`     DATE            DEFAULT NULL,
-  `end_date_actual`      DATE            DEFAULT NULL,
   `bac_base_hours`       DECIMAL(10,2)   NOT NULL DEFAULT '0.00',
   `bac_base_cost`        DECIMAL(12,2)   NOT NULL DEFAULT '0.00',
   `bac_total_hours`      DECIMAL(10,2)   NOT NULL DEFAULT '0.00',
   `bac_total_cost`       DECIMAL(12,2)   NOT NULL DEFAULT '0.00',
   `hourly_rate`          DECIMAL(10,2)   NOT NULL DEFAULT '0.00',
   `etc_calculation_mode` ENUM('manual','automatic') NOT NULL DEFAULT 'manual',
+  `project_tracking_id`  BIGINT UNSIGNED DEFAULT NULL,
   `created_at`           TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`           TIMESTAMP       NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_projects_clockify` (`timesheet_project_id`),
   KEY `idx_projects_client` (`client_id`),
   KEY `idx_projects_status` (`status`),
+  KEY `idx_projects_tracking` (`project_tracking_id`),
   CONSTRAINT `clockify_projects_client_id_foreign`
     FOREIGN KEY (`client_id`) REFERENCES `timesheet_clients` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `timesheet_projects_project_tracking_id_foreign`
+    FOREIGN KEY (`project_tracking_id`) REFERENCES `project_trackings` (`id`)
+    ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `timesheet_project_filters` (
@@ -311,26 +326,10 @@ CREATE TABLE `etc_records` (
 
 -- ── Control de cambios ────────────────────────────────────────
 
-CREATE TABLE `project_trackings` (
-  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `project_id`          BIGINT UNSIGNED NOT NULL,
-  `start_date`          DATE            DEFAULT NULL,
-  `planned_end_date`    DATE            DEFAULT NULL,
-  `actual_end_date`     DATE            DEFAULT NULL,
-  `implementation_date` DATE            DEFAULT NULL,
-  `created_at`          TIMESTAMP       NULL DEFAULT NULL,
-  `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `project_trackings_project_id_unique` (`project_id`),
-  CONSTRAINT `project_trackings_project_id_foreign`
-    FOREIGN KEY (`project_id`) REFERENCES `timesheet_projects` (`id`)
-    ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `project_tracking_updates` (
   `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `project_tracking_id` BIGINT UNSIGNED NOT NULL,
-  `change_end_date`     DATE            DEFAULT NULL,
+  `milestone_date`      DATE            DEFAULT NULL,
   `observations`        TEXT            DEFAULT NULL,
   `created_at`          TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
@@ -599,14 +598,12 @@ CREATE TABLE `project_intake_records` (
   `project_name`                VARCHAR(255)    DEFAULT NULL,
   `category_code`               VARCHAR(20)     DEFAULT NULL,
   `project_status_code`         VARCHAR(30)     DEFAULT NULL,
-  `business_status_date`        DATE            DEFAULT NULL,
-  `estimated_end_date`          DATE            DEFAULT NULL,
-  `actual_end_date`             DATE            DEFAULT NULL,
   `commercial_status`           VARCHAR(120)    DEFAULT NULL,
   `leader_timesheet_user_id`    BIGINT UNSIGNED DEFAULT NULL,
   `observations`                TEXT            DEFAULT NULL,
   `requires_timesheet_creation` TINYINT(1)      NOT NULL DEFAULT 0,
   `timesheet_record_id`         BIGINT UNSIGNED DEFAULT NULL,
+  `project_tracking_id`         BIGINT UNSIGNED DEFAULT NULL,
   `created_by`                  BIGINT UNSIGNED DEFAULT NULL,
   `updated_by`                  BIGINT UNSIGNED DEFAULT NULL,
   `is_active`                   TINYINT(1)      NOT NULL DEFAULT 1,
@@ -621,6 +618,7 @@ CREATE TABLE `project_intake_records` (
   KEY `idx_intake_timesheet_record`       (`timesheet_record_id`),
   KEY `idx_intake_client_id`              (`client_id`),
   KEY `idx_intake_leader`                 (`leader_timesheet_user_id`),
+  KEY `idx_intake_tracking`               (`project_tracking_id`),
   CONSTRAINT `fk_intake_category_code`
     FOREIGN KEY (`category_code`) REFERENCES `project_intake_category_refs` (`code`)
     ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -638,7 +636,10 @@ CREATE TABLE `project_intake_records` (
     ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_intake_status_code`
     FOREIGN KEY (`project_status_code`) REFERENCES `project_intake_status_refs` (`code`)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_intake_tracking`
+    FOREIGN KEY (`project_tracking_id`) REFERENCES `project_trackings` (`id`)
+    ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Auditoría ─────────────────────────────────────────────────

@@ -144,7 +144,7 @@ public class TimesheetSyncService
             }
             else
             {
-                _db.TimesheetProjects.Add(new TimesheetProject
+                var project = new TimesheetProject
                 {
                     TimesheetProjectId = p.ExternalId,
                     Name = p.Name,
@@ -153,7 +153,19 @@ public class TimesheetSyncService
                     ClientId = clientId,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
-                });
+                };
+                _db.TimesheetProjects.Add(project);
+                await _db.SaveChangesAsync();
+
+                var tracking = new ProjectTracking
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _db.ProjectTrackings.Add(tracking);
+                await _db.SaveChangesAsync();
+                project.ProjectTrackingId = tracking.Id;
+                await _db.SaveChangesAsync();
             }
         }
         await _db.SaveChangesAsync();

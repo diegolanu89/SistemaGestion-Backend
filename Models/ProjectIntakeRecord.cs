@@ -23,12 +23,6 @@ public class ProjectIntakeRecord
     public string? CategoryCode { get; set; }
     [Column("project_status_code")]
     public string? ProjectStatusCode { get; set; }
-    [Column("business_status_date")]
-    public DateOnly? BusinessStatusDate { get; set; }
-    [Column("estimated_end_date")]
-    public DateOnly? EstimatedEndDate { get; set; }
-    [Column("actual_end_date")]
-    public DateOnly? ActualEndDate { get; set; }
     [Column("commercial_status")]
     public string? CommercialStatus { get; set; }
     [Column("client_id")]
@@ -41,6 +35,8 @@ public class ProjectIntakeRecord
     public bool RequiresTimesheetCreation { get; set; } = false;
     [Column("timesheet_record_id")]
     public ulong? TimesheetRecordId { get; set; }
+    [Column("project_tracking_id")]
+    public ulong? ProjectTrackingId { get; set; }
     [Column("is_active")]
     public bool IsActive { get; set; } = true;
     [Column("created_by")]
@@ -58,4 +54,5 @@ public class ProjectIntakeRecord
     public TimesheetProject? TimesheetProject { get; set; }
     public TimesheetClient? Client { get; set; }
     public TimesheetUser? LeaderTimesheetUser { get; set; }
+    public ProjectTracking? ProjectTracking { get; set; }
 }

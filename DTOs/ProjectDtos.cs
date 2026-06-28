@@ -9,9 +9,6 @@ public class ProjectDto
     public ulong? ClientId { get; set; }
     public string? ClientName { get; set; }
     public string Status { get; set; } = string.Empty;
-    public DateOnly? StartDate { get; set; }
-    public DateOnly? EndDatePlanned { get; set; }
-    public DateOnly? EndDateActual { get; set; }
     public decimal BacBaseHours { get; set; }
     public decimal BacBaseCost { get; set; }
     public decimal BacTotalHours { get; set; }
@@ -19,6 +16,8 @@ public class ProjectDto
     public decimal HourlyRate { get; set; }
     public string EtcCalculationMode { get; set; } = string.Empty;
     public decimal EtcTotalHours { get; set; }
+    public ulong? ProjectTrackingId { get; set; }
+    public ProjectTrackingSummaryDto? Tracking { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public object? Filter { get; set; }

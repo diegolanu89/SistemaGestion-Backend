@@ -35,6 +35,8 @@ public static class AuditModuleMap
         ["ProjectIntakeTypeRef"]         = "operations",
         ["ProjectIntakeCategoryRef"]     = "operations",
         ["ProjectIntakeStatusRef"]       = "operations",
+        ["ProjectTracking"]              = "operations",
+        ["ProjectTrackingUpdate"]        = "operations",
         ["PotencialClient"]              = "operations",
         ["PotencialProject"]             = "operations",
         ["PotencialProjectAllocation"]   = "operations",

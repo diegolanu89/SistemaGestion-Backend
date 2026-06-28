@@ -7,8 +7,6 @@ public class ProjectTracking
 {
     [Column("id")]
     public ulong Id { get; set; }
-    [Column("project_id")]
-    public ulong ProjectId { get; set; }
     [Column("start_date")]
     public DateOnly? StartDate { get; set; }
     [Column("planned_end_date")]
@@ -22,6 +20,5 @@ public class ProjectTracking
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
 
-    public TimesheetProject? Project { get; set; }
     public List<ProjectTrackingUpdate> Updates { get; set; } = new();
 }

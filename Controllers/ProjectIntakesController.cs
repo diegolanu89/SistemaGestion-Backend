@@ -144,6 +144,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
                 .Include(r => r.LeaderTimesheetUser)
+                .Include(r => r.ProjectTracking)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(project_type))
@@ -208,6 +209,7 @@ public class ProjectIntakesController : ControllerBase
                 .Include(r => r.TimesheetProject)
                 .Include(r => r.Client)
                 .Include(r => r.LeaderTimesheetUser)
+                .Include(r => r.ProjectTracking)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (record == null)
@@ -244,6 +246,15 @@ public class ProjectIntakesController : ControllerBase
             if (validationErrors.Any())
                 return UnprocessableEntity(new { success = false, message = "Errores de validación", errors = validationErrors });
 
+            // VALIDACIÓN NEGOCIO: si RequiresTimesheetCreation, StartDate y PlannedEndDate son obligatorios
+            if (dto.RequiresTimesheetCreation &&
+                (!dto.StartDate.HasValue || !dto.PlannedEndDate.HasValue))
+                return UnprocessableEntity(new
+                {
+                    success = false,
+                    message = "start_date y planned_end_date son obligatorios cuando requires_timesheet_creation es true"
+                });
+
             var userId = HttpContext.Items["UserId"] as ulong?;
             var internalNumber = await _intakeService.GenerateInternalProjectNumberAsync(dto.ProjectType);
 
@@ -274,9 +285,6 @@ public class ProjectIntakesController : ControllerBase
                 ProjectName = dto.ProjectName,
                 CategoryCode = dto.CategoryCode,
                 ProjectStatusCode = dto.ProjectStatusCode,
-                BusinessStatusDate = dto.BusinessStatusDate,
-                EstimatedEndDate = dto.EstimatedEndDate,
-                ActualEndDate = dto.ActualEndDate,
                 CommercialStatus = dto.CommercialStatus,
                 LeaderTimesheetUserId = dto.LeaderTimesheetUserId,
                 Observations = dto.Observations,
@@ -288,6 +296,27 @@ public class ProjectIntakesController : ControllerBase
                 UpdatedAt = DateTime.UtcNow
             };
 
+            // D2: crear tracking si vienen fechas
+            bool hasTrackingData = dto.StartDate.HasValue
+                                || dto.PlannedEndDate.HasValue
+                                || dto.ActualEndDate.HasValue
+                                || dto.ImplementationDate.HasValue;
+            if (hasTrackingData)
+            {
+                var tracking = new ProjectTracking
+                {
+                    StartDate          = dto.StartDate,
+                    PlannedEndDate     = dto.PlannedEndDate,
+                    ActualEndDate      = dto.ActualEndDate,
+                    ImplementationDate = dto.ImplementationDate,
+                    CreatedAt          = DateTime.UtcNow,
+                    UpdatedAt          = DateTime.UtcNow
+                };
+                _db.ProjectTrackings.Add(tracking);
+                await _db.SaveChangesAsync();
+                record.ProjectTrackingId = tracking.Id;
+            }
+
             string? clockifyMessage = null;
 
             if (dto.RequiresTimesheetCreation)
@@ -295,9 +324,17 @@ public class ProjectIntakesController : ControllerBase
                 try
                 {
                     var clockifyName = $"{internalNumber} - {dto.ProjectName}";
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, dto.ClientId);
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(
+                        clockifyName, dto.ClientId, record.ProjectTrackingId);
                     record.TimesheetRecordId = clockifyRecordId;
                     clockifyMessage = message;
+
+                    // D3: si el proyecto ya existía en Clockify (existing), asignar tracking al timesheet_project
+                    if (record.ProjectTrackingId.HasValue)
+                    {
+                        var tp = await _db.TimesheetProjects.FindAsync(clockifyRecordId);
+                        if (tp != null) tp.ProjectTrackingId = record.ProjectTrackingId;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -323,6 +360,8 @@ public class ProjectIntakesController : ControllerBase
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
             if (record.LeaderTimesheetUserId.HasValue)
                 await _db.Entry(record).Reference(r => r.LeaderTimesheetUser).LoadAsync();
+            if (record.ProjectTrackingId.HasValue)
+                await _db.Entry(record).Reference(r => r.ProjectTracking).LoadAsync();
 
             return StatusCode(201, new
             {
@@ -354,6 +393,15 @@ public class ProjectIntakesController : ControllerBase
             if (!record.IsActive)
                 return UnprocessableEntity(new { success = false, message = "No se puede modificar un proyecto dado de baja" });
 
+            // VALIDACIÓN NEGOCIO: si RequiresTimesheetCreation pasa a true, fechas son obligatorias
+            if (dto.RequiresTimesheetCreation == true &&
+                (!dto.StartDate.HasValue || !dto.PlannedEndDate.HasValue))
+                return UnprocessableEntity(new
+                {
+                    success = false,
+                    message = "start_date y planned_end_date son obligatorios cuando requires_timesheet_creation es true"
+                });
+
             var userId = HttpContext.Items["UserId"] as ulong?;
 
             if (dto.SecondaryProjectNumber != null) record.SecondaryProjectNumber = dto.SecondaryProjectNumber;
@@ -369,9 +417,6 @@ public class ProjectIntakesController : ControllerBase
             if (dto.ProjectName != null) record.ProjectName = dto.ProjectName;
             if (dto.CategoryCode != null) record.CategoryCode = dto.CategoryCode;
             if (dto.ProjectStatusCode != null) record.ProjectStatusCode = dto.ProjectStatusCode;
-            if (dto.BusinessStatusDate.HasValue) record.BusinessStatusDate = dto.BusinessStatusDate;
-            if (dto.EstimatedEndDate.HasValue) record.EstimatedEndDate = dto.EstimatedEndDate;
-            if (dto.ActualEndDate.HasValue) record.ActualEndDate = dto.ActualEndDate;
             if (dto.CommercialStatus != null) record.CommercialStatus = dto.CommercialStatus;
             if (dto.LeaderTimesheetUserId.HasValue)
             {
@@ -383,6 +428,43 @@ public class ProjectIntakesController : ControllerBase
             if (dto.Observations != null) record.Observations = dto.Observations;
             if (dto.RequiresTimesheetCreation.HasValue) record.RequiresTimesheetCreation = dto.RequiresTimesheetCreation.Value;
 
+            // D2: actualizar o crear tracking según vengan fechas
+            bool hasTrackingData = dto.StartDate.HasValue
+                                || dto.PlannedEndDate.HasValue
+                                || dto.ActualEndDate.HasValue
+                                || dto.ImplementationDate.HasValue;
+            if (hasTrackingData)
+            {
+                if (record.ProjectTrackingId.HasValue)
+                {
+                    var existingTracking = await _db.ProjectTrackings.FindAsync(record.ProjectTrackingId.Value);
+                    if (existingTracking != null)
+                    {
+                        if (dto.StartDate.HasValue)          existingTracking.StartDate          = dto.StartDate;
+                        if (dto.PlannedEndDate.HasValue)     existingTracking.PlannedEndDate     = dto.PlannedEndDate;
+                        if (dto.ActualEndDate.HasValue)      existingTracking.ActualEndDate      = dto.ActualEndDate;
+                        if (dto.ImplementationDate.HasValue) existingTracking.ImplementationDate = dto.ImplementationDate;
+                        existingTracking.UpdatedAt = DateTime.UtcNow;
+                        await _db.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    var newTracking = new ProjectTracking
+                    {
+                        StartDate          = dto.StartDate,
+                        PlannedEndDate     = dto.PlannedEndDate,
+                        ActualEndDate      = dto.ActualEndDate,
+                        ImplementationDate = dto.ImplementationDate,
+                        CreatedAt          = DateTime.UtcNow,
+                        UpdatedAt          = DateTime.UtcNow
+                    };
+                    _db.ProjectTrackings.Add(newTracking);
+                    await _db.SaveChangesAsync();
+                    record.ProjectTrackingId = newTracking.Id;
+                }
+            }
+
             string? clockifyMessage = null;
 
             if (dto.RequiresTimesheetCreation == true && record.TimesheetRecordId == null)
@@ -390,9 +472,17 @@ public class ProjectIntakesController : ControllerBase
                 try
                 {
                     var clockifyName = $"{record.InternalProjectNumber} - {record.ProjectName ?? string.Empty}";
-                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(clockifyName, record.ClientId);
+                    var (clockifyRecordId, _, message) = await _intakeService.CreateInClockifyAsync(
+                        clockifyName, record.ClientId, record.ProjectTrackingId);
                     record.TimesheetRecordId = clockifyRecordId;
                     clockifyMessage = message;
+
+                    // D3: asignar tracking al timesheet_project si ya existía en Clockify
+                    if (record.ProjectTrackingId.HasValue)
+                    {
+                        var tp = await _db.TimesheetProjects.FindAsync(clockifyRecordId);
+                        if (tp != null) tp.ProjectTrackingId = record.ProjectTrackingId;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -404,6 +494,14 @@ public class ProjectIntakesController : ControllerBase
                         error = ex.Message
                     });
                 }
+            }
+
+            // D3: si RequiresTimesheetCreation pasa a true y ya tiene TimesheetRecordId, sincronizar tracking
+            if (dto.RequiresTimesheetCreation == true && record.TimesheetRecordId.HasValue && record.ProjectTrackingId.HasValue)
+            {
+                var tp = await _db.TimesheetProjects.FindAsync(record.TimesheetRecordId.Value);
+                if (tp != null && tp.ProjectTrackingId != record.ProjectTrackingId)
+                    tp.ProjectTrackingId = record.ProjectTrackingId;
             }
 
             record.UpdatedBy = userId;
@@ -420,6 +518,8 @@ public class ProjectIntakesController : ControllerBase
                 await _db.Entry(record).Reference(r => r.Client).LoadAsync();
             if (record.LeaderTimesheetUserId.HasValue)
                 await _db.Entry(record).Reference(r => r.LeaderTimesheetUser).LoadAsync();
+            if (record.ProjectTrackingId.HasValue)
+                await _db.Entry(record).Reference(r => r.ProjectTracking).LoadAsync();
 
             return Ok(new
             {
@@ -479,15 +579,21 @@ public class ProjectIntakesController : ControllerBase
         ProjectName = r.ProjectName,
         CategoryCode = r.CategoryCode,
         ProjectStatusCode = r.ProjectStatusCode,
-        BusinessStatusDate = r.BusinessStatusDate,
-        EstimatedEndDate = r.EstimatedEndDate,
-        ActualEndDate = r.ActualEndDate,
         CommercialStatus = r.CommercialStatus,
         LeaderTimesheetUserId = r.LeaderTimesheetUserId,
         LeaderName = r.LeaderTimesheetUser?.Name,
         Observations = r.Observations,
         RequiresTimesheetCreation = r.RequiresTimesheetCreation,
         TimesheetRecordId = r.TimesheetRecordId,
+        ProjectTrackingId = r.ProjectTrackingId,
+        Tracking = r.ProjectTracking == null ? null : new ProjectTrackingSummaryDto
+        {
+            Id                 = r.ProjectTracking.Id,
+            StartDate          = r.ProjectTracking.StartDate,
+            PlannedEndDate     = r.ProjectTracking.PlannedEndDate,
+            ActualEndDate      = r.ProjectTracking.ActualEndDate,
+            ImplementationDate = r.ProjectTracking.ImplementationDate
+        },
         IsActive = r.IsActive,
         CreatedBy = r.CreatedBy,
         UpdatedBy = r.UpdatedBy,

@@ -49,15 +49,14 @@ public class ProjectIntakeRecordDto
     public string? ProjectName { get; set; }
     public string? CategoryCode { get; set; }
     public string? ProjectStatusCode { get; set; }
-    public DateOnly? BusinessStatusDate { get; set; }
-    public DateOnly? EstimatedEndDate { get; set; }
-    public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
     public ulong? LeaderTimesheetUserId { get; set; }
     public string? LeaderName { get; set; }
     public string? Observations { get; set; }
     public bool RequiresTimesheetCreation { get; set; }
     public ulong? TimesheetRecordId { get; set; }
+    public ulong? ProjectTrackingId { get; set; }
+    public ProjectTrackingSummaryDto? Tracking { get; set; }
     public bool IsActive { get; set; }
     public ulong? CreatedBy { get; set; }
     public ulong? UpdatedBy { get; set; }
@@ -82,13 +81,14 @@ public class CreateProjectIntakeDto
     public string ProjectName { get; set; } = string.Empty;
     public string? CategoryCode { get; set; }
     public string? ProjectStatusCode { get; set; }
-    public DateOnly? BusinessStatusDate { get; set; }
-    public DateOnly? EstimatedEndDate { get; set; }
-    public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
     public ulong? LeaderTimesheetUserId { get; set; }
     public string? Observations { get; set; }
     public bool RequiresTimesheetCreation { get; set; } = false;
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? PlannedEndDate { get; set; }
+    public DateOnly? ActualEndDate { get; set; }
+    public DateOnly? ImplementationDate { get; set; }
 }
 
 public class UpdateProjectIntakeDto
@@ -99,11 +99,12 @@ public class UpdateProjectIntakeDto
     public string? ProjectName { get; set; }
     public string? CategoryCode { get; set; }
     public string? ProjectStatusCode { get; set; }
-    public DateOnly? BusinessStatusDate { get; set; }
-    public DateOnly? EstimatedEndDate { get; set; }
-    public DateOnly? ActualEndDate { get; set; }
     public string? CommercialStatus { get; set; }
     public ulong? LeaderTimesheetUserId { get; set; }
     public string? Observations { get; set; }
     public bool? RequiresTimesheetCreation { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? PlannedEndDate { get; set; }
+    public DateOnly? ActualEndDate { get; set; }
+    public DateOnly? ImplementationDate { get; set; }
 }
